@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="1276px" preserveAspectRatio="none" style="width:1312px;height:1276px;background:#777777;" version="1.1" viewBox="0 0 1312 1276" width="1312px" zoomAndPan="magnify"><defs><filter height="300%" id="f1vbzw44gi1wlr" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[bc0be90c79562cd000425a056c1f4bdf]
+cluster FlowChart--><polygon fill="#778899" filter="url(#f1vbzw44gi1wlr)" points="422.5,102,432.5,92,681.5,92,681.5,1184,671.5,1194,422.5,1194,422.5,102" style="stroke: #1B1B1B; stroke-width: 1.5;"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="671.5" x2="680.5" y1="102" y2="93"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="422.5" x2="671.5" y1="102" y2="102"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="671.5" x2="671.5" y1="102" y2="1194"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="65" x="515.5" y="116.0591">FlowChart</text><!--MD5=[cf23bcdb1cdd7b700fd476ef473d16ce]
+cluster Receiver--><polygon fill="#20B2AA" filter="url(#f1vbzw44gi1wlr)" points="461.5,651,471.5,641,657.5,641,657.5,1160,647.5,1170,461.5,1170,461.5,651" style="stroke: #1B1B1B; stroke-width: 1.5;"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="647.5" x2="656.5" y1="651" y2="642"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="461.5" x2="647.5" y1="651" y2="651"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="647.5" x2="647.5" y1="651" y2="1170"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="57" x="527" y="665.0591">Receiver</text><!--MD5=[0658c60ca41c53ba59af01c00c52dac1]
+cluster ChannelEnvironment--><polygon fill="#87CEFA" filter="url(#f1vbzw44gi1wlr)" points="446.5,413,456.5,403,657.5,403,657.5,571,647.5,581,446.5,581,446.5,413" style="stroke: #1B1B1B; stroke-width: 1.5;"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="647.5" x2="656.5" y1="413" y2="404"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="446.5" x2="647.5" y1="413" y2="413"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="647.5" x2="647.5" y1="413" y2="581"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="135" x="480.5" y="427.0591">ChannelEnvironment</text><!--MD5=[4e68481e22c4f085fcb923d3279ae1b0]
+cluster Transmitter--><polygon fill="#20B2AA" filter="url(#f1vbzw44gi1wlr)" points="450.5,147,460.5,137,622.5,137,622.5,333,612.5,343,450.5,343,450.5,147" style="stroke: #1B1B1B; stroke-width: 1.5;"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="612.5" x2="621.5" y1="147" y2="138"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="450.5" x2="612.5" y1="147" y2="147"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="612.5" x2="612.5" y1="147" y2="343"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="77" x="494" y="161.0591">Transmitter</text><!--MD5=[f413a687f22f8124d5a097105821c9ef]
+cluster Global--><polygon fill="#483D8B" filter="url(#f1vbzw44gi1wlr)" points="81.5,685.5,91.5,675.5,355.5,675.5,355.5,857.5,345.5,867.5,81.5,867.5,81.5,685.5" style="stroke: #1B1B1B; stroke-width: 1.5;"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="345.5" x2="354.5" y1="685.5" y2="676.5"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="81.5" x2="345.5" y1="685.5" y2="685.5"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="345.5" x2="345.5" y1="685.5" y2="867.5"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="41" x="194" y="699.5591">Global</text><!--MD5=[259cbd550d2a85f30cb3b74eea0c00ec]
+cluster Simulators--><polygon fill="#FFA07A" filter="url(#f1vbzw44gi1wlr)" points="864.5,670.5,874.5,660.5,1241.5,660.5,1241.5,872.5,1231.5,882.5,864.5,882.5,864.5,670.5" style="stroke: #1B1B1B; stroke-width: 1.5;"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="1231.5" x2="1240.5" y1="670.5" y2="661.5"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="864.5" x2="1231.5" y1="670.5" y2="670.5"/><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="1231.5" x2="1231.5" y1="670.5" y2="882.5"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="70" x="1014" y="684.5591">Simulators</text><!--MD5=[08278ffe0d19eded36b1ad8609ead0c1]
+class Detector--><rect fill="#2E2E2E" filter="url(#f1vbzw44gi1wlr)" height="208.0313" id="Detector" style="stroke: #1B1B1B; stroke-width: 1.5;" width="124" x="477.5" y="678"/><ellipse cx="511.55" cy="691" fill="#1A66C2" rx="8" ry="8" style="stroke: #1B1B1B; stroke-width: 1.0;"/><path d="M512.1906,695.1563 Q511.3,695.1563 510.5422,694.8906 Q509.7844,694.625 509.2375,694.1094 Q508.7063,693.5938 508.4016,692.8125 Q508.0969,692.0313 508.0969,691.0156 Q508.0969,690.0625 508.3859,689.2891 Q508.675,688.5156 509.2219,687.9531 Q509.7375,687.4219 510.5109,687.1328 Q511.2844,686.8438 512.1906,686.8438 Q512.6906,686.8438 513.0969,686.8984 Q513.5031,686.9531 513.8469,687.0469 Q514.2063,687.1563 514.5031,687.2813 Q514.8,687.4063 515.0188,687.5156 L515.0188,689.4531 L514.7844,689.4531 Q514.6281,689.3281 514.4016,689.1484 Q514.175,688.9688 513.8781,688.7969 Q513.5813,688.625 513.2375,688.5078 Q512.8938,688.3906 512.5031,688.3906 Q512.0656,688.3906 511.675,688.5234 Q511.2844,688.6563 510.9563,688.9844 Q510.6438,689.2813 510.4484,689.7891 Q510.2531,690.2969 510.2531,691.0156 Q510.2531,691.7656 510.4641,692.2734 Q510.675,692.7813 510.9875,693.0625 Q511.3156,693.3594 511.7219,693.4844 Q512.1281,693.6094 512.5188,693.6094 Q512.8938,693.6094 513.2609,693.5 Q513.6281,693.3906 513.9406,693.1875 Q514.2063,693.0469 514.4328,692.8672 Q514.6594,692.6875 514.8,692.5625 L515.0188,692.5625 L515.0188,694.4688 Q514.7219,694.6094 514.4484,694.7266 Q514.175,694.8438 513.8625,694.9219 Q513.4719,695.0313 513.1281,695.0938 Q512.7844,695.1563 512.1906,695.1563 Z "/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="49" x="527.45" y="695.3748">Detector</text><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="478.5" x2="600.5" y1="704" y2="704"/><polygon fill="none" points="488.5,727.8359,492.5,731.8359,488.5,735.8359,484.5,731.8359" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="55" x="494.5" y="737.2549">InputPower</text><polygon fill="none" points="488.5,741.6719,492.5,745.6719,488.5,749.6719,484.5,745.6719" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="58" x="494.5" y="751.0908">Reflectance</text><polygon fill="none" points="488.5,755.5078,492.5,759.5078,488.5,763.5078,484.5,759.5078" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="48" x="494.5" y="764.9268">Efficiency</text><polygon fill="none" points="488.5,769.3438,492.5,773.3438,488.5,777.3438,484.5,773.3438" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="24" x="494.5" y="778.7627">Area</text><polygon fill="none" points="488.5,783.1797,492.5,787.1797,488.5,791.1797,484.5,787.1797" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="62" x="494.5" y="792.5986">Responsivity</text><polygon fill="none" points="488.5,797.0156,492.5,801.0156,488.5,805.0156,484.5,801.0156" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="14" x="494.5" y="806.4346">DR</text><polygon fill="none" points="488.5,810.8516,492.5,814.8516,488.5,818.8516,484.5,814.8516" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="101" x="494.5" y="820.2705">FrequencyResponse</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="478.5" x2="513.5" y1="718.918" y2="718.918"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="513.5" y="722.9189">[Variables]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="565.5" x2="600.5" y1="718.918" y2="718.918"/><ellipse cx="488.5" cy="847.5234" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="37" x="494.5" y="851.9424">getDR()</text><ellipse cx="488.5" cy="861.3594" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="63" x="494.5" y="865.7783">isSaturated()</text><ellipse cx="488.5" cy="875.1953" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="86" x="494.5" y="879.6143">getPhotoCurrent()</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="478.5" x2="516" y1="833.6055" y2="833.6055"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="516" y="837.6064">[Methods]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="563" x2="600.5" y1="833.6055" y2="833.6055"/><!--MD5=[ec764fd255517cf4e1e73b5288bf6dc7]
+class Circuit--><rect fill="#2E2E2E" filter="url(#f1vbzw44gi1wlr)" height="180.3594" id="Circuit" style="stroke: #1B1B1B; stroke-width: 1.5;" width="124" x="477.5" y="974"/><ellipse cx="517.5" cy="987" fill="#1A66C2" rx="8" ry="8" style="stroke: #1B1B1B; stroke-width: 1.0;"/><path d="M518.1406,991.1563 Q517.25,991.1563 516.4922,990.8906 Q515.7344,990.625 515.1875,990.1094 Q514.6563,989.5938 514.3516,988.8125 Q514.0469,988.0313 514.0469,987.0156 Q514.0469,986.0625 514.3359,985.2891 Q514.625,984.5156 515.1719,983.9531 Q515.6875,983.4219 516.4609,983.1328 Q517.2344,982.8438 518.1406,982.8438 Q518.6406,982.8438 519.0469,982.8984 Q519.4531,982.9531 519.7969,983.0469 Q520.1563,983.1563 520.4531,983.2813 Q520.75,983.4063 520.9688,983.5156 L520.9688,985.4531 L520.7344,985.4531 Q520.5781,985.3281 520.3516,985.1484 Q520.125,984.9688 519.8281,984.7969 Q519.5313,984.625 519.1875,984.5078 Q518.8438,984.3906 518.4531,984.3906 Q518.0156,984.3906 517.625,984.5234 Q517.2344,984.6563 516.9063,984.9844 Q516.5938,985.2813 516.3984,985.7891 Q516.2031,986.2969 516.2031,987.0156 Q516.2031,987.7656 516.4141,988.2734 Q516.625,988.7813 516.9375,989.0625 Q517.2656,989.3594 517.6719,989.4844 Q518.0781,989.6094 518.4688,989.6094 Q518.8438,989.6094 519.2109,989.5 Q519.5781,989.3906 519.8906,989.1875 Q520.1563,989.0469 520.3828,988.8672 Q520.6094,988.6875 520.75,988.5625 L520.9688,988.5625 L520.9688,990.4688 Q520.6719,990.6094 520.3984,990.7266 Q520.125,990.8438 519.8125,990.9219 Q519.4219,991.0313 519.0781,991.0938 Q518.7344,991.1563 518.1406,991.1563 Z "/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="37" x="533.5" y="991.3748">Circuit</text><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="478.5" x2="600.5" y1="1000" y2="1000"/><polygon fill="none" points="488.5,1023.8359,492.5,1027.8359,488.5,1031.8359,484.5,1027.8359" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="14" x="494.5" y="1033.2549">DR</text><polygon fill="none" points="488.5,1037.6719,492.5,1041.6719,488.5,1045.6719,484.5,1041.6719" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="49" x="494.5" y="1047.0908">Sensitivity</text><polygon fill="none" points="488.5,1051.5078,492.5,1055.5078,488.5,1059.5078,484.5,1055.5078" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="101" x="494.5" y="1060.9268">FrequencyResponse</text><polygon fill="none" points="488.5,1065.3438,492.5,1069.3438,488.5,1073.3438,484.5,1069.3438" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="44" x="494.5" y="1074.7627">Simulator</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="478.5" x2="513.5" y1="1014.918" y2="1014.918"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="513.5" y="1018.9189">[Variables]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="565.5" x2="600.5" y1="1014.918" y2="1014.918"/><ellipse cx="488.5" cy="1102.0156" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="37" x="494.5" y="1106.4346">getDR()</text><ellipse cx="488.5" cy="1115.8516" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="63" x="494.5" y="1120.2705">isSaturated()</text><ellipse cx="488.5" cy="1129.6875" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="86" x="494.5" y="1134.1064">getPhotoCurrent()</text><ellipse cx="488.5" cy="1143.5234" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="72" x="494.5" y="1147.9424">runSimulation()</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="478.5" x2="516" y1="1088.0977" y2="1088.0977"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="516" y="1092.0986">[Methods]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="563" x2="600.5" y1="1088.0977" y2="1088.0977"/><!--MD5=[1e4e6ac1845d89d680410515caa0c0ac]
+class Channel--><rect fill="#2E2E2E" filter="url(#f1vbzw44gi1wlr)" height="125.0156" id="Channel" style="stroke: #1B1B1B; stroke-width: 1.5;" width="78" x="497.5" y="440"/><ellipse cx="511.75" cy="453" fill="#1A66C2" rx="8" ry="8" style="stroke: #1B1B1B; stroke-width: 1.0;"/><path d="M512.3906,457.1563 Q511.5,457.1563 510.7422,456.8906 Q509.9844,456.625 509.4375,456.1094 Q508.9063,455.5938 508.6016,454.8125 Q508.2969,454.0313 508.2969,453.0156 Q508.2969,452.0625 508.5859,451.2891 Q508.875,450.5156 509.4219,449.9531 Q509.9375,449.4219 510.7109,449.1328 Q511.4844,448.8438 512.3906,448.8438 Q512.8906,448.8438 513.2969,448.8984 Q513.7031,448.9531 514.0469,449.0469 Q514.4063,449.1563 514.7031,449.2813 Q515,449.4063 515.2188,449.5156 L515.2188,451.4531 L514.9844,451.4531 Q514.8281,451.3281 514.6016,451.1484 Q514.375,450.9688 514.0781,450.7969 Q513.7813,450.625 513.4375,450.5078 Q513.0938,450.3906 512.7031,450.3906 Q512.2656,450.3906 511.875,450.5234 Q511.4844,450.6563 511.1563,450.9844 Q510.8438,451.2813 510.6484,451.7891 Q510.4531,452.2969 510.4531,453.0156 Q510.4531,453.7656 510.6641,454.2734 Q510.875,454.7813 511.1875,455.0625 Q511.5156,455.3594 511.9219,455.4844 Q512.3281,455.6094 512.7188,455.6094 Q513.0938,455.6094 513.4609,455.5 Q513.8281,455.3906 514.1406,455.1875 Q514.4063,455.0469 514.6328,454.8672 Q514.8594,454.6875 515,454.5625 L515.2188,454.5625 L515.2188,456.4688 Q514.9219,456.6094 514.6484,456.7266 Q514.375,456.8438 514.0625,456.9219 Q513.6719,457.0313 513.3281,457.0938 Q512.9844,457.1563 512.3906,457.1563 Z "/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="523.25" y="457.3748">Channel</text><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="498.5" x2="574.5" y1="466" y2="466"/><polygon fill="none" points="508.5,489.8359,512.5,493.8359,508.5,497.8359,504.5,493.8359" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="46" x="514.5" y="499.2549">RayPaths</text><polygon fill="none" points="508.5,503.6719,512.5,507.6719,508.5,511.6719,504.5,507.6719" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="514.5" y="513.0908">RayDelays</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="498.5" x2="510.5" y1="480.918" y2="480.918"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="510.5" y="484.9189">[Variables]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="562.5" x2="574.5" y1="480.918" y2="480.918"/><ellipse cx="508.5" cy="540.3438" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="55" x="514.5" y="544.7627">RayTrace()</text><ellipse cx="508.5" cy="554.1797" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="41" x="514.5" y="558.5986">GetCIR()</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="498.5" x2="513" y1="526.4258" y2="526.4258"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="513" y="530.4268">[Methods]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="560" x2="574.5" y1="526.4258" y2="526.4258"/><!--MD5=[ff9531700701b9f79f5bebb05f0385de]
+class LightSource--><rect fill="#2E2E2E" filter="url(#f1vbzw44gi1wlr)" height="152.6875" id="LightSource" style="stroke: #1B1B1B; stroke-width: 1.5;" width="139" x="467" y="174"/><ellipse cx="499.7" cy="187" fill="#1A66C2" rx="8" ry="8" style="stroke: #1B1B1B; stroke-width: 1.0;"/><path d="M500.3406,191.1563 Q499.45,191.1563 498.6922,190.8906 Q497.9344,190.625 497.3875,190.1094 Q496.8563,189.5938 496.5516,188.8125 Q496.2469,188.0313 496.2469,187.0156 Q496.2469,186.0625 496.5359,185.2891 Q496.825,184.5156 497.3719,183.9531 Q497.8875,183.4219 498.6609,183.1328 Q499.4344,182.8438 500.3406,182.8438 Q500.8406,182.8438 501.2469,182.8984 Q501.6531,182.9531 501.9969,183.0469 Q502.3563,183.1563 502.6531,183.2813 Q502.95,183.4063 503.1688,183.5156 L503.1688,185.4531 L502.9344,185.4531 Q502.7781,185.3281 502.5516,185.1484 Q502.325,184.9688 502.0281,184.7969 Q501.7313,184.625 501.3875,184.5078 Q501.0438,184.3906 500.6531,184.3906 Q500.2156,184.3906 499.825,184.5234 Q499.4344,184.6563 499.1063,184.9844 Q498.7938,185.2813 498.5984,185.7891 Q498.4031,186.2969 498.4031,187.0156 Q498.4031,187.7656 498.6141,188.2734 Q498.825,188.7813 499.1375,189.0625 Q499.4656,189.3594 499.8719,189.4844 Q500.2781,189.6094 500.6688,189.6094 Q501.0438,189.6094 501.4109,189.5 Q501.7781,189.3906 502.0906,189.1875 Q502.3563,189.0469 502.5828,188.8672 Q502.8094,188.6875 502.95,188.5625 L503.1688,188.5625 L503.1688,190.4688 Q502.8719,190.6094 502.5984,190.7266 Q502.325,190.8438 502.0125,190.9219 Q501.6219,191.0313 501.2781,191.0938 Q500.9344,191.1563 500.3406,191.1563 Z "/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="67" x="515.3" y="191.3748">LightSource</text><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="468" x2="605" y1="200" y2="200"/><polygon fill="none" points="478,223.8359,482,227.8359,478,231.8359,474,227.8359" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="484" y="233.2549">LightType</text><polygon fill="none" points="478,237.6719,482,241.6719,478,245.6719,474,241.6719" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="20" x="484" y="247.0908">PSD</text><polygon fill="none" points="478,251.5078,482,255.5078,478,259.5078,474,255.5078" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="40" x="484" y="260.9268">Intensity</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="468" x2="510.5" y1="214.918" y2="214.918"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="510.5" y="218.9189">[Variables]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="562.5" x2="605" y1="214.918" y2="214.918"/><ellipse cx="478" cy="288.1797" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="44" x="484" y="292.5986">getSNR()</text><ellipse cx="478" cy="302.0156" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="116" x="484" y="306.4346">getIntensityAtDistance()</text><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="0" x="487" y="320.2705"/><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="468" x2="513" y1="274.2617" y2="274.2617"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="513" y="278.2627">[Methods]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="560" x2="605" y1="274.2617" y2="274.2617"/><!--MD5=[cbb0ce9529e06fe09b0a35713533207b]
+class Ambient--><rect fill="#2E2E2E" filter="url(#f1vbzw44gi1wlr)" height="111.1797" id="Ambient" style="stroke: #1B1B1B; stroke-width: 1.5;" width="99" x="98" y="726.5"/><ellipse cx="121.7" cy="739.5" fill="#1A66C2" rx="8" ry="8" style="stroke: #1B1B1B; stroke-width: 1.0;"/><path d="M122.3406,743.6563 Q121.45,743.6563 120.6922,743.3906 Q119.9344,743.125 119.3875,742.6094 Q118.8563,742.0938 118.5516,741.3125 Q118.2469,740.5313 118.2469,739.5156 Q118.2469,738.5625 118.5359,737.7891 Q118.825,737.0156 119.3719,736.4531 Q119.8875,735.9219 120.6609,735.6328 Q121.4344,735.3438 122.3406,735.3438 Q122.8406,735.3438 123.2469,735.3984 Q123.6531,735.4531 123.9969,735.5469 Q124.3563,735.6563 124.6531,735.7813 Q124.95,735.9063 125.1688,736.0156 L125.1688,737.9531 L124.9344,737.9531 Q124.7781,737.8281 124.5516,737.6484 Q124.325,737.4688 124.0281,737.2969 Q123.7313,737.125 123.3875,737.0078 Q123.0438,736.8906 122.6531,736.8906 Q122.2156,736.8906 121.825,737.0234 Q121.4344,737.1563 121.1063,737.4844 Q120.7938,737.7813 120.5984,738.2891 Q120.4031,738.7969 120.4031,739.5156 Q120.4031,740.2656 120.6141,740.7734 Q120.825,741.2813 121.1375,741.5625 Q121.4656,741.8594 121.8719,741.9844 Q122.2781,742.1094 122.6688,742.1094 Q123.0438,742.1094 123.4109,742 Q123.7781,741.8906 124.0906,741.6875 Q124.3563,741.5469 124.5828,741.3672 Q124.8094,741.1875 124.95,741.0625 L125.1688,741.0625 L125.1688,742.9688 Q124.8719,743.1094 124.5984,743.2266 Q124.325,743.3438 124.0125,743.4219 Q123.6219,743.5313 123.2781,743.5938 Q122.9344,743.6563 122.3406,743.6563 Z "/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="135.3" y="743.8748">Ambient</text><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="99" x2="196" y1="752.5" y2="752.5"/><polygon fill="none" points="109,776.3359,113,780.3359,109,784.3359,105,780.3359" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="74" x="115" y="785.7549">ObjectPositions</text><polygon fill="none" points="109,790.1719,113,794.1719,109,798.1719,105,794.1719" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="22" x="115" y="799.5908">FOV</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="99" x2="121.5" y1="767.418" y2="767.418"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="121.5" y="771.4189">[Variables]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="173.5" x2="196" y1="767.418" y2="767.418"/><ellipse cx="109" cy="826.8438" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="76" x="115" y="831.2627">InitializeObject()</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="99" x2="124" y1="812.9258" y2="812.9258"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="124" y="816.9268">[Methods]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="171" x2="196" y1="812.9258" y2="812.9258"/><!--MD5=[bbaa1efa6746a45e47ef8db404a46944]
+class MeritFunctions--><rect fill="#2E2E2E" filter="url(#f1vbzw44gi1wlr)" height="138.8516" id="MeritFunctions" style="stroke: #1B1B1B; stroke-width: 1.5;" width="107" x="232" y="712.5"/><ellipse cx="244" cy="725.5" fill="#1A66C2" rx="8" ry="8" style="stroke: #1B1B1B; stroke-width: 1.0;"/><path d="M244.6406,729.6563 Q243.75,729.6563 242.9922,729.3906 Q242.2344,729.125 241.6875,728.6094 Q241.1563,728.0938 240.8516,727.3125 Q240.5469,726.5313 240.5469,725.5156 Q240.5469,724.5625 240.8359,723.7891 Q241.125,723.0156 241.6719,722.4531 Q242.1875,721.9219 242.9609,721.6328 Q243.7344,721.3438 244.6406,721.3438 Q245.1406,721.3438 245.5469,721.3984 Q245.9531,721.4531 246.2969,721.5469 Q246.6563,721.6563 246.9531,721.7813 Q247.25,721.9063 247.4688,722.0156 L247.4688,723.9531 L247.2344,723.9531 Q247.0781,723.8281 246.8516,723.6484 Q246.625,723.4688 246.3281,723.2969 Q246.0313,723.125 245.6875,723.0078 Q245.3438,722.8906 244.9531,722.8906 Q244.5156,722.8906 244.125,723.0234 Q243.7344,723.1563 243.4063,723.4844 Q243.0938,723.7813 242.8984,724.2891 Q242.7031,724.7969 242.7031,725.5156 Q242.7031,726.2656 242.9141,726.7734 Q243.125,727.2813 243.4375,727.5625 Q243.7656,727.8594 244.1719,727.9844 Q244.5781,728.1094 244.9688,728.1094 Q245.3438,728.1094 245.7109,728 Q246.0781,727.8906 246.3906,727.6875 Q246.6563,727.5469 246.8828,727.3672 Q247.1094,727.1875 247.25,727.0625 L247.4688,727.0625 L247.4688,728.9688 Q247.1719,729.1094 246.8984,729.2266 Q246.625,729.3438 246.3125,729.4219 Q245.9219,729.5313 245.5781,729.5938 Q245.2344,729.6563 244.6406,729.6563 Z "/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="81" x="255" y="729.8748">MeritFunctions</text><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="233" x2="338" y1="738.5" y2="738.5"/><polygon fill="none" points="243,762.3359,247,766.3359,243,770.3359,239,766.3359" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="20" x="249" y="771.7549">BER</text><polygon fill="none" points="243,776.1719,247,780.1719,243,784.1719,239,780.1719" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="21" x="249" y="785.5908">SNR</text><polygon fill="none" points="243,790.0078,247,794.0078,243,798.0078,239,794.0078" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="44" x="249" y="799.4268">DataRate</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="233" x2="259.5" y1="753.418" y2="753.418"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="259.5" y="757.4189">[Variables]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="311.5" x2="338" y1="753.418" y2="753.418"/><ellipse cx="243" cy="826.6797" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="84" x="249" y="831.0986">getConstellation()</text><ellipse cx="243" cy="840.5156" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="59" x="249" y="844.9346">getFigures()</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="233" x2="262" y1="812.7617" y2="812.7617"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="262" y="816.7627">[Methods]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="309" x2="338" y1="812.7617" y2="812.7617"/><!--MD5=[4548ce45d8f091489046923959998f17]
+class Virtuoso--><rect fill="#2E2E2E" filter="url(#f1vbzw44gi1wlr)" height="152.6875" id="Virtuoso" style="stroke: #1B1B1B; stroke-width: 1.5;" width="137" x="908" y="705.5"/><ellipse cx="949.5" cy="718.5" fill="#1A66C2" rx="8" ry="8" style="stroke: #1B1B1B; stroke-width: 1.0;"/><path d="M950.1406,722.6563 Q949.25,722.6563 948.4922,722.3906 Q947.7344,722.125 947.1875,721.6094 Q946.6563,721.0938 946.3516,720.3125 Q946.0469,719.5313 946.0469,718.5156 Q946.0469,717.5625 946.3359,716.7891 Q946.625,716.0156 947.1719,715.4531 Q947.6875,714.9219 948.4609,714.6328 Q949.2344,714.3438 950.1406,714.3438 Q950.6406,714.3438 951.0469,714.3984 Q951.4531,714.4531 951.7969,714.5469 Q952.1563,714.6563 952.4531,714.7813 Q952.75,714.9063 952.9688,715.0156 L952.9688,716.9531 L952.7344,716.9531 Q952.5781,716.8281 952.3516,716.6484 Q952.125,716.4688 951.8281,716.2969 Q951.5313,716.125 951.1875,716.0078 Q950.8438,715.8906 950.4531,715.8906 Q950.0156,715.8906 949.625,716.0234 Q949.2344,716.1563 948.9063,716.4844 Q948.5938,716.7813 948.3984,717.2891 Q948.2031,717.7969 948.2031,718.5156 Q948.2031,719.2656 948.4141,719.7734 Q948.625,720.2813 948.9375,720.5625 Q949.2656,720.8594 949.6719,720.9844 Q950.0781,721.1094 950.4688,721.1094 Q950.8438,721.1094 951.2109,721 Q951.5781,720.8906 951.8906,720.6875 Q952.1563,720.5469 952.3828,720.3672 Q952.6094,720.1875 952.75,720.0625 L952.9688,720.0625 L952.9688,721.9688 Q952.6719,722.1094 952.3984,722.2266 Q952.125,722.3438 951.8125,722.4219 Q951.4219,722.5313 951.0781,722.5938 Q950.7344,722.6563 950.1406,722.6563 Z "/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="965.5" y="722.8748">Virtuoso</text><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="909" x2="1044" y1="731.5" y2="731.5"/><polygon fill="none" points="919,755.3359,923,759.3359,919,763.3359,915,759.3359" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="59" x="925" y="764.7549">inputCurrent</text><polygon fill="none" points="919,769.1719,923,773.1719,919,777.1719,915,773.1719" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="58" x="925" y="778.5908">circuitNetlist</text><polygon fill="none" points="919,783.0078,923,787.0078,919,791.0078,915,787.0078" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="114" x="925" y="792.4268">environmentParameters</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="909" x2="950.5" y1="746.418" y2="746.418"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="950.5" y="750.4189">[Variables]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="1002.5" x2="1044" y1="746.418" y2="746.418"/><ellipse cx="919" cy="819.6797" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="59" x="925" y="824.0986">getCurrent()</text><ellipse cx="919" cy="833.5156" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="75" x="925" y="837.9346">outputVoltage()</text><ellipse cx="919" cy="847.3516" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="72" x="925" y="851.7705">runSimulation()</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="909" x2="953" y1="805.7617" y2="805.7617"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="953" y="809.7627">[Methods]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="1000" x2="1044" y1="805.7617" y2="805.7617"/><!--MD5=[dcdc9dd10deffb968bb85fb49465f866]
+class Tanner--><rect fill="#2E2E2E" filter="url(#f1vbzw44gi1wlr)" height="152.6875" id="Tanner" style="stroke: #1B1B1B; stroke-width: 1.5;" width="137" x="1080" y="705.5"/><ellipse cx="1125" cy="718.5" fill="#1A66C2" rx="8" ry="8" style="stroke: #1B1B1B; stroke-width: 1.0;"/><path d="M1125.6406,722.6563 Q1124.75,722.6563 1123.9922,722.3906 Q1123.2344,722.125 1122.6875,721.6094 Q1122.1563,721.0938 1121.8516,720.3125 Q1121.5469,719.5313 1121.5469,718.5156 Q1121.5469,717.5625 1121.8359,716.7891 Q1122.125,716.0156 1122.6719,715.4531 Q1123.1875,714.9219 1123.9609,714.6328 Q1124.7344,714.3438 1125.6406,714.3438 Q1126.1406,714.3438 1126.5469,714.3984 Q1126.9531,714.4531 1127.2969,714.5469 Q1127.6563,714.6563 1127.9531,714.7813 Q1128.25,714.9063 1128.4688,715.0156 L1128.4688,716.9531 L1128.2344,716.9531 Q1128.0781,716.8281 1127.8516,716.6484 Q1127.625,716.4688 1127.3281,716.2969 Q1127.0313,716.125 1126.6875,716.0078 Q1126.3438,715.8906 1125.9531,715.8906 Q1125.5156,715.8906 1125.125,716.0234 Q1124.7344,716.1563 1124.4063,716.4844 Q1124.0938,716.7813 1123.8984,717.2891 Q1123.7031,717.7969 1123.7031,718.5156 Q1123.7031,719.2656 1123.9141,719.7734 Q1124.125,720.2813 1124.4375,720.5625 Q1124.7656,720.8594 1125.1719,720.9844 Q1125.5781,721.1094 1125.9688,721.1094 Q1126.3438,721.1094 1126.7109,721 Q1127.0781,720.8906 1127.3906,720.6875 Q1127.6563,720.5469 1127.8828,720.3672 Q1128.1094,720.1875 1128.25,720.0625 L1128.4688,720.0625 L1128.4688,721.9688 Q1128.1719,722.1094 1127.8984,722.2266 Q1127.625,722.3438 1127.3125,722.4219 Q1126.9219,722.5313 1126.5781,722.5938 Q1126.2344,722.6563 1125.6406,722.6563 Z "/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="40" x="1141" y="722.8748">Tanner</text><line style="stroke: #1B1B1B; stroke-width: 1.5;" x1="1081" x2="1216" y1="731.5" y2="731.5"/><polygon fill="none" points="1091,755.3359,1095,759.3359,1091,763.3359,1087,759.3359" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="59" x="1097" y="764.7549">inputCurrent</text><polygon fill="none" points="1091,769.1719,1095,773.1719,1091,777.1719,1087,773.1719" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="58" x="1097" y="778.5908">circuitNetlist</text><polygon fill="none" points="1091,783.0078,1095,787.0078,1091,791.0078,1087,787.0078" style="stroke: #B38D22; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="114" x="1097" y="792.4268">environmentParameters</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="1081" x2="1122.5" y1="746.418" y2="746.418"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="52" x="1122.5" y="750.4189">[Variables]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="1174.5" x2="1216" y1="746.418" y2="746.418"/><ellipse cx="1091" cy="819.6797" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="59" x="1097" y="824.0986">getCurrent()</text><ellipse cx="1091" cy="833.5156" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="75" x="1097" y="837.9346">outputVoltage()</text><ellipse cx="1091" cy="847.3516" fill="#84BE84" rx="3" ry="3" style="stroke: #038048; stroke-width: 1.0;"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="72" x="1097" y="851.7705">runSimulation()</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="1081" x2="1125" y1="805.7617" y2="805.7617"/><text fill="#AAAAAA" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="47" x="1125" y="809.7627">[Methods]</text><line style="stroke: #1B1B1B; stroke-width: 1.0;" x1="1172" x2="1216" y1="805.7617" y2="805.7617"/><path d="M6,1045.5 L6,1082.2373 A0,0 0 0 0 6,1082.2373 L181,1082.2373 A0,0 0 0 0 181,1082.2373 L181,1055.5 L171,1045.5 L100.8886,1045.5 L136.96,837.652 L92.8886,1045.5 L6,1045.5 A0,0 0 0 0 6,1045.5 " fill="#1A66C2" filter="url(#f1vbzw44gi1wlr)" style="stroke: #002642; stroke-width: 1.0;"/><path d="M171,1045.5 L171,1055.5 L181,1055.5 L171,1045.5 " fill="#1A66C2" style="stroke: #002642; stroke-width: 1.0;"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="154" x="12" y="1061.5591">Describes the environment</text><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="112" x="12" y="1074.9277">and all objects on it</text><path d="M697.5,232 L697.5,268.7373 L835.5,268.7373 L835.5,242 L825.5,232 L697.5,232 " fill="#1A66C2" filter="url(#f1vbzw44gi1wlr)" style="stroke: #002642; stroke-width: 1.0;"/><path d="M825.5,232 L825.5,242 L835.5,242 L825.5,232 " fill="#1A66C2" style="stroke: #002642; stroke-width: 1.0;"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="117" x="703.5" y="248.0591">Describes Ray paths</text><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="59" x="703.5" y="261.4277">to get CIR</text><path d="M452,8 L452,44.7373 A0,0 0 0 0 452,44.7373 L532.5,44.7373 L536.5,173.87 L540.5,44.7373 L621,44.7373 A0,0 0 0 0 621,44.7373 L621,18 L611,8 L452,8 A0,0 0 0 0 452,8 " fill="#1A66C2" filter="url(#f1vbzw44gi1wlr)" style="stroke: #002642; stroke-width: 1.0;"/><path d="M611,8 L611,18 L621,18 L611,8 " fill="#1A66C2" style="stroke: #002642; stroke-width: 1.0;"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="148" x="458" y="24.0591">Describes the light source</text><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="118" x="458" y="37.4277">its PSD and intensity</text><path d="M697.5,484 L697.5,520.7373 L841.5,520.7373 L841.5,494 L831.5,484 L697.5,484 " fill="#1A66C2" filter="url(#f1vbzw44gi1wlr)" style="stroke: #002642; stroke-width: 1.0;"/><path d="M831.5,484 L831.5,494 L841.5,494 L831.5,484 " fill="#1A66C2" style="stroke: #002642; stroke-width: 1.0;"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="703.5" y="500.0591">Converts input power</text><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="88" x="703.5" y="513.4277">to photocurrent</text><path d="M464.5,1241 L464.5,1264.3687 A0,0 0 0 0 464.5,1264.3687 L614.5,1264.3687 A0,0 0 0 0 614.5,1264.3687 L614.5,1251 L604.5,1241 L543.5,1241 L539.5,1154.153 L535.5,1241 L464.5,1241 A0,0 0 0 0 464.5,1241 " fill="#1A66C2" filter="url(#f1vbzw44gi1wlr)" style="stroke: #002642; stroke-width: 1.0;"/><path d="M604.5,1241 L604.5,1251 L614.5,1251 L604.5,1241 " fill="#1A66C2" style="stroke: #002642; stroke-width: 1.0;"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="129" x="470.5" y="1257.0591">Circuit to be simulated</text><path d="M877,491 L877,514.3687 A0,0 0 0 0 877,514.3687 L972.5,514.3687 L976.5,705.407 L980.5,514.3687 L1076,514.3687 A0,0 0 0 0 1076,514.3687 L1076,501 L1066,491 L877,491 A0,0 0 0 0 877,491 " fill="#1A66C2" filter="url(#f1vbzw44gi1wlr)" style="stroke: #002642; stroke-width: 1.0;"/><path d="M1066,491 L1066,501 L1076,501 L1066,491 " fill="#1A66C2" style="stroke: #002642; stroke-width: 1.0;"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="178" x="883" y="507.0591">Interface to Cadence simulator</text><path d="M1111,491 L1111,514.3687 A0,0 0 0 0 1111,514.3687 L1199.34,514.3687 L1164.03,705.407 L1207.34,514.3687 L1300,514.3687 A0,0 0 0 0 1300,514.3687 L1300,501 L1290,491 L1111,491 A0,0 0 0 0 1111,491 " fill="#1A66C2" filter="url(#f1vbzw44gi1wlr)" style="stroke: #002642; stroke-width: 1.0;"/><path d="M1290,491 L1290,501 L1300,501 L1290,491 " fill="#1A66C2" style="stroke: #002642; stroke-width: 1.0;"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="168" x="1117" y="507.0591">Interface to Tanner simulator</text><path d="M216,1045.5 L216,1082.2373 A0,0 0 0 0 216,1082.2373 L355,1082.2373 A0,0 0 0 0 355,1082.2373 L355,1055.5 L345,1045.5 L289.5,1045.5 L285.5,851.854 L281.5,1045.5 L216,1045.5 A0,0 0 0 0 216,1045.5 " fill="#1A66C2" filter="url(#f1vbzw44gi1wlr)" style="stroke: #002642; stroke-width: 1.0;"/><path d="M345,1045.5 L345,1055.5 L355,1055.5 L345,1045.5 " fill="#1A66C2" style="stroke: #002642; stroke-width: 1.0;"/><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="118" x="222" y="1061.5591">All merit functions of</text><text fill="#FFFFFF" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="115" x="222" y="1074.9277">of the whole system</text><!--MD5=[406464a89ef15e49b45d40c75123199a]
+link GMN19 to Channel--><path d="M756.439,269.291 C740.705,296.305 708.44,348.585 673.5,387 C643.674,419.792 604.422,451.676 575.58,473.435 " fill="none" id="GMN19-Channel" style="stroke: #FFFFFF; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><!--MD5=[32da6c4adf96036a6a2f3d787c9f603f]
+link GMN25 to Detector--><path d="M756.428,521.054 C738.552,544.904 705.296,588.731 675.5,625 C651.893,653.734 625.145,684.733 601.654,711.469 " fill="none" id="GMN25-Detector" style="stroke: #FFFFFF; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><!--MD5=[a81b53f1cca95f85a41eafb1d08e5535]
+link Simulators to Circuit--><path d="M864.137,790.0317 C863.9776,790.1658 863.8161,790.3016 863.6524,790.4392 C858.4159,794.8424 851.0308,801.0521 841.9748,808.6668 C823.8629,823.8961 799.0671,844.7455 771.408,868.0025 C716.0898,914.5165 649.318,970.661 601.656,1010.737 " fill="none" id="Simulators-Circuit" style="stroke: #FFFFFF; stroke-width: 1.0;"/><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="127" x="707.5" y="928.0591">All possible simulators</text><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="76" x="733" y="941.4277">for the circuit</text><!--MD5=[76cb9404ac3f9766d230ea753074d385]
+link LightSource to Channel--><path d="M536.5,327.187 C536.5,361.427 536.5,401.547 536.5,434.659 " fill="none" id="LightSource-&gt;Channel" style="stroke: #FFFFFF; stroke-width: 1.0;"/><polygon fill="#FFFFFF" points="536.5,439.911,540.5,430.911,536.5,434.911,532.5,430.911,536.5,439.911" style="stroke: #FFFFFF; stroke-width: 1.0;"/><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="127" x="537.5" y="371.0591">All possible simulators</text><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="76" x="563" y="384.4277">for the circuit</text><!--MD5=[dac268797b7e7d50209bd89f43b4b22c]
+link Channel to Detector--><path d="M537.166,565.086 C537.507,596.666 537.933,636.065 538.327,672.53 " fill="none" id="Channel-&gt;Detector" style="stroke: #FFFFFF; stroke-width: 1.0;"/><polygon fill="#FFFFFF" points="538.385,677.888,542.2871,668.8451,538.3307,672.8883,534.2875,668.932,538.385,677.888" style="stroke: #FFFFFF; stroke-width: 1.0;"/><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="127" x="539.5" y="609.0591">All possible simulators</text><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="76" x="565" y="622.4277">for the circuit</text><!--MD5=[ae20139454848e2a7235322837c86e0c]
+link Detector to Circuit--><path d="M539.5,886.069 C539.5,913.113 539.5,942.138 539.5,968.698 " fill="none" id="Detector-&gt;Circuit" style="stroke: #FFFFFF; stroke-width: 1.0;"/><polygon fill="#FFFFFF" points="539.5,973.976,543.5,964.976,539.5,968.976,535.5,964.976,539.5,973.976" style="stroke: #FFFFFF; stroke-width: 1.0;"/><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="127" x="540.5" y="928.0591">All possible simulators</text><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="76" x="566" y="941.4277">for the circuit</text><!--MD5=[2aa4de71d844bada13265e781c35a72b]
+link MeritFunctions to Circuit--><path d="M330.364,851.836 C350.914,881.399 376.465,915.602 402.5,944 C424.034,967.489 449.939,990.994 473.399,1010.835 " fill="none" id="MeritFunctions-&gt;Circuit" style="stroke: #FFFFFF; stroke-width: 1.0;"/><polygon fill="#FFFFFF" points="477.445,1014.241,473.1351,1005.3852,473.6196,1011.0213,467.9836,1011.5058,477.445,1014.241" style="stroke: #FFFFFF; stroke-width: 1.0;"/><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="127" x="403.5" y="928.0591">All possible simulators</text><text fill="#BBBBBB" font-family="Verdana" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="76" x="429" y="941.4277">for the circuit</text><!--MD5=[9223c1e6377a39e947edf159c72772b7]
+@startuml SimulArch
+!define DARKBLUE
+' !define DARKRED
+' !define DARKGREEN
+!include my_styles.puml
+allowmixing
+
+
+
+package FlowChart <<Node>> #LightSlateGrey { 
+  
+  package Receiver <<Node>> #LightSeaGreen {
+    class Detector
+    class Circuit
+  }
+  
+  package ChannelEnvironment <<Node>> #LightSkyBlue { 
+    class Channel
+  }
+
+  package Transmitter <<Node>> #LightSeaGreen  {
+    class LightSource
+  }
+  
+}
+
+package Global <<Node>> #DarkSlateBlue  {
+  class Ambient
+  class MeritFunctions
+}  
+
+package Simulators <<Node>> #LightSalmon { 
+  class Virtuoso
+  class Tanner
+}
+
+class Ambient {
+    - - [Variables] - -
+    # ObjectPositions
+    # FOV    
+    - - [Methods] - -
+    +InitializeObject()
+}
+note bottom: Describes the environment\nand all objects on it
+
+class Channel {
+    - - [Variables] - -
+    # RayPaths
+    # RayDelays
+    - - [Methods] - -
+    +RayTrace()
+    +GetCIR()
+}
+note top: Describes Ray paths\nto get CIR
+
+class LightSource {
+    - - [Variables] - -
+    # LightType
+    # PSD
+    # Intensity
+    - - [Methods] - -
+    +getSNR()
+    +getIntensityAtDistance()
+
+}
+note top: Describes the light source\nits PSD and intensity
+
+class Detector {
+    - - [Variables] - -
+    # InputPower
+    # Reflectance
+    # Efficiency
+    # Area
+    # Responsivity
+    # DR
+    # FrequencyResponse
+    - - [Methods] - -
+    +getDR()
+    +isSaturated()
+    +getPhotoCurrent()
+}
+note top: Converts input power\nto photocurrent
+
+class Circuit {
+    - - [Variables] - -
+    # DR
+    # Sensitivity
+    # FrequencyResponse
+    # Simulator
+    - - [Methods] - -
+    +getDR()
+    +isSaturated()
+    +getPhotoCurrent()
+    +runSimulation()
+}
+note bottom: Circuit to be simulated
+
+class Virtuoso {
+    - - [Variables] - -
+    # inputCurrent
+    # circuitNetlist
+    # environmentParameters
+    - - [Methods] - -
+    +getCurrent()
+    +outputVoltage()
+    +runSimulation()
+}
+note top: Interface to Cadence simulator
+
+class Tanner {
+    - - [Variables] - -
+    # inputCurrent
+    # circuitNetlist
+    # environmentParameters
+    - - [Methods] - -
+    +getCurrent()
+    +outputVoltage()
+    +runSimulation()
+}
+note top: Interface to Tanner simulator
+
+class MeritFunctions {
+    - - [Variables] - -
+    # BER
+    # SNR
+    # DataRate
+    - - [Methods] - -
+    +getConstellation()
+    +getFigures()
+}
+note bottom: All merit functions of\nof the whole system
+
+Simulators - - Circuit : All possible simulators\nfor the circuit
+
+' FlowChart - - Ambient : All possible simulators\nfor the circuit
+
+' Transmitter -right-> Channel : All possible simulators\nfor the circuit
+LightSource - -> Channel : All possible simulators\nfor the circuit
+
+' Channel -right-> Receiver : All possible simulators\nfor the circuit
+Channel - -> Detector : All possible simulators\nfor the circuit
+
+Detector - -> Circuit : All possible simulators\nfor the circuit
+
+MeritFunctions - -> Circuit  : All possible simulators\nfor the circuit
+' Receiver - -> MeritFunctions : All possible simulators\nfor the circuit
+
+
+@enduml
+
+@startuml SimulArch
+
+
+
+skinparam backgroundColor 777
+skinparam stereotypeCBackgroundColor 1a66c2
+
+
+
+
+
+skinparam backgroundColor 777
+
+
+
+
+
+
+
+skinparam circledCharacter {
+  radius 8
+  fontSize 11
+  fontName "Verdana"
+}
+
+skinparam class {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+    arrowColor fff
+  arrowFontName "Verdana"
+  arrowFontColor bbb
+  arrowFontSize 11
+
+  attributeFontColor aaa
+  attributeFontSize 11
+  attributeIconSize 11
+}
+
+
+skinparam actor {
+    backgroundColor 1a66c2
+  borderColor 002642
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam participant {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam collections {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam SequenceBox{
+    backgroundColor 575757
+  borderColor 767676
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+
+skinparam interface {
+    backgroundColor 1a66c2
+  borderColor 002642
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam component {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam node {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam database {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam queue {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+
+skinparam usecase {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+    arrowColor fff
+  arrowFontName "Verdana"
+  arrowFontColor bbb
+  arrowFontSize 11
+}
+
+skinparam activity {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+    arrowColor fff
+  arrowFontName "Verdana"
+  arrowFontColor bbb
+  arrowFontSize 11
+}
+
+skinparam sequence {
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+    arrowColor fff
+  arrowFontName "Verdana"
+  arrowFontColor bbb
+  arrowFontSize 11
+
+  lifeLineBorderColor fff
+  lifeLineBackgroundColor bbb
+}
+
+skinparam boundary {
+    backgroundColor 1a66c2
+  borderColor 002642
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam control {
+    backgroundColor 1a66c2
+  borderColor 002642
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam entity {
+    backgroundColor 1a66c2
+  borderColor 002642
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+
+skinparam state {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+    arrowColor fff
+  arrowFontName "Verdana"
+  arrowFontColor bbb
+  arrowFontSize 11
+  startColor 1a66c2
+  endColor 002642
+}
+
+
+skinparam object {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+    arrowColor fff
+  arrowFontName "Verdana"
+  arrowFontColor bbb
+  arrowFontSize 11
+}
+
+
+skinparam note {
+    backgroundColor 1a66c2
+  borderColor 002642
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam cloud {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+    arrowColor fff
+  arrowFontName "Verdana"
+  arrowFontColor bbb
+  arrowFontSize 11
+}
+
+skinparam rectangle {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+skinparam storage {
+    backgroundColor 2e2e2e
+  borderColor 1b1b1b
+    fontColor fff
+  fontName "Verdana"
+  fontSize 11
+  stereotypeFontColor aaa
+  stereotypeFontSize 11
+}
+
+allowmixing
+
+
+
+package FlowChart <<Node>> #LightSlateGrey { 
+  
+  package Receiver <<Node>> #LightSeaGreen {
+    class Detector
+    class Circuit
+  }
+  
+  package ChannelEnvironment <<Node>> #LightSkyBlue { 
+    class Channel
+  }
+
+  package Transmitter <<Node>> #LightSeaGreen  {
+    class LightSource
+  }
+  
+}
+
+package Global <<Node>> #DarkSlateBlue  {
+  class Ambient
+  class MeritFunctions
+}  
+
+package Simulators <<Node>> #LightSalmon { 
+  class Virtuoso
+  class Tanner
+}
+
+class Ambient {
+    - - [Variables] - -
+    # ObjectPositions
+    # FOV    
+    - - [Methods] - -
+    +InitializeObject()
+}
+note bottom: Describes the environment\nand all objects on it
+
+class Channel {
+    - - [Variables] - -
+    # RayPaths
+    # RayDelays
+    - - [Methods] - -
+    +RayTrace()
+    +GetCIR()
+}
+note top: Describes Ray paths\nto get CIR
+
+class LightSource {
+    - - [Variables] - -
+    # LightType
+    # PSD
+    # Intensity
+    - - [Methods] - -
+    +getSNR()
+    +getIntensityAtDistance()
+
+}
+note top: Describes the light source\nits PSD and intensity
+
+class Detector {
+    - - [Variables] - -
+    # InputPower
+    # Reflectance
+    # Efficiency
+    # Area
+    # Responsivity
+    # DR
+    # FrequencyResponse
+    - - [Methods] - -
+    +getDR()
+    +isSaturated()
+    +getPhotoCurrent()
+}
+note top: Converts input power\nto photocurrent
+
+class Circuit {
+    - - [Variables] - -
+    # DR
+    # Sensitivity
+    # FrequencyResponse
+    # Simulator
+    - - [Methods] - -
+    +getDR()
+    +isSaturated()
+    +getPhotoCurrent()
+    +runSimulation()
+}
+note bottom: Circuit to be simulated
+
+class Virtuoso {
+    - - [Variables] - -
+    # inputCurrent
+    # circuitNetlist
+    # environmentParameters
+    - - [Methods] - -
+    +getCurrent()
+    +outputVoltage()
+    +runSimulation()
+}
+note top: Interface to Cadence simulator
+
+class Tanner {
+    - - [Variables] - -
+    # inputCurrent
+    # circuitNetlist
+    # environmentParameters
+    - - [Methods] - -
+    +getCurrent()
+    +outputVoltage()
+    +runSimulation()
+}
+note top: Interface to Tanner simulator
+
+class MeritFunctions {
+    - - [Variables] - -
+    # BER
+    # SNR
+    # DataRate
+    - - [Methods] - -
+    +getConstellation()
+    +getFigures()
+}
+note bottom: All merit functions of\nof the whole system
+
+Simulators - - Circuit : All possible simulators\nfor the circuit
+
+
+LightSource - -> Channel : All possible simulators\nfor the circuit
+
+Channel - -> Detector : All possible simulators\nfor the circuit
+
+Detector - -> Circuit : All possible simulators\nfor the circuit
+
+MeritFunctions - -> Circuit  : All possible simulators\nfor the circuit
+
+
+@enduml
+
+PlantUML version 1.2020.10(Sun May 17 06:35:57 BRT 2020)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Java Version: 1.8.0_241-b07
+Operating System: Windows 10
+Default Encoding: Cp1252
+Language: pt
+Country: BR
+--></g></svg>
