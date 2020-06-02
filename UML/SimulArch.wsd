@@ -1,0 +1,104 @@
+@startuml SimulArch
+!define DARKBLUE
+' !define DARKRED
+' !define DARKGREEN
+!include my_styles.puml
+allowmixing
+
+package DevMachine <<Node>> {
+  class Workspace
+}
+
+package RaspbHW <<Node>> {
+  class JenkinsServer
+  class RaspbSW
+}
+
+package uControlHW <<Node>> {
+  class uControlSW
+}
+
+
+package DeviceHW <<Node>> {
+  class ScreenViewer
+}
+class Workspace {
+    -- [RaspCode] --
+    # code
+    +checkin()
+    +checkout()
+    -- [JenkinsCode] --
+    # code
+    +checkin()
+    +checkout()
+}
+note bottom: Machine for code development
+
+class ScreenViewer {
+    -- [View] --
+    + show_jenkins()
+    -- [Control] --
+    + cmd_jenkins()
+}
+note top: Brownser
+
+class JenkinsServer {
+    -- [Variables] --
+    # temperature
+    # ph
+    # humidity
+    -- [Pipeline Stages] --
+    + git_checkout()
+    + run_pump()
+    + get_sensor_data()
+    + show_sensor_data()
+}
+note top: Contains all the\npipeline automation
+
+class RaspbSW {
+    -- [Variables] --
+    # all_controller_vars
+    -- [Stages] --
+    + run_jenkins_server()
+    + access_uControlSW()
+}
+
+note top: Runs the JenkinsServer server\nand access the uControlSW
+
+
+
+class uControlSW {
+    -- [Variables] --
+    # all_controller_vars
+    -- [Methods] --
+    + run_pump()
+    + access_sensors()
+}
+note bottom: Microcontroller
+
+database gitHub
+
+JenkinsServer -down-> ScreenViewer : [Brownser] --> User sees and\ncontrol the Jenkins server
+JenkinsServer -left> RaspbSW : Jenkins server executes RaspSW scripts
+RaspbSW -right> uControlSW : Rasp controls uControl
+
+Workspace -[hidden]up-> uControlSW
+
+gitHub <--> JenkinsServer  : Gets all codes from git,\nincluding the pipeline
+RaspbSW <--> gitHub : Gets updated code from git\nand saves data there.
+
+Workspace <--> gitHub : Develop code to Git
+
+actor dev
+note right : Develops and is an user
+actor user
+note right : Enjoys
+dev <-up-> Workspace: Devs through the\nWorkspace on DevMachine
+dev <-up-> ScreenViewer: User interacts\nwith Borwnser to access Jenkins
+user <-up-> ScreenViewer: User interacts\nwith Borwnser to access Jenkins
+dev <-[hidden]up-> gitHub: User 
+' user <-[hidden]up-> ScreenViewer: User 
+
+
+
+@enduml
