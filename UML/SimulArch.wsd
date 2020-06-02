@@ -5,100 +5,145 @@
 !include my_styles.puml
 allowmixing
 
-package DevMachine <<Node>> {
-  class Workspace
-}
-
-package RaspbHW <<Node>> {
-  class JenkinsServer
-  class RaspbSW
-}
-
-package uControlHW <<Node>> {
-  class uControlSW
-}
 
 
-package DeviceHW <<Node>> {
-  class ScreenViewer
-}
-class Workspace {
-    -- [RaspCode] --
-    # code
-    +checkin()
-    +checkout()
-    -- [JenkinsCode] --
-    # code
-    +checkin()
-    +checkout()
-}
-note bottom: Machine for code development
+package FlowChart <<Node>> #LightSlateGrey { 
+  
+  package Receiver <<Node>> #LightSeaGreen {
+    class Detector
+    class Circuit
+  }
+  
+  package ChannelEnvironment <<Node>> #LightSkyBlue { 
+    class Channel
+  }
 
-class ScreenViewer {
-    -- [View] --
-    + show_jenkins()
-    -- [Control] --
-    + cmd_jenkins()
+  package Transmitter <<Node>> #LightSeaGreen  {
+    class LightSource
+  }
+  
 }
-note top: Brownser
 
-class JenkinsServer {
+package Global <<Node>> #DarkSlateBlue  {
+  class Ambient
+  class MeritFunctions
+}  
+
+package Simulators <<Node>> #LightSalmon { 
+  class Virtuoso
+  class Tanner
+}
+
+class Ambient {
     -- [Variables] --
-    # temperature
-    # ph
-    # humidity
-    -- [Pipeline Stages] --
-    + git_checkout()
-    + run_pump()
-    + get_sensor_data()
-    + show_sensor_data()
-}
-note top: Contains all the\npipeline automation
-
-class RaspbSW {
-    -- [Variables] --
-    # all_controller_vars
-    -- [Stages] --
-    + run_jenkins_server()
-    + access_uControlSW()
-}
-
-note top: Runs the JenkinsServer server\nand access the uControlSW
-
-
-
-class uControlSW {
-    -- [Variables] --
-    # all_controller_vars
+    # ObjectPositions
+    # FOV    
     -- [Methods] --
-    + run_pump()
-    + access_sensors()
+    +InitializeObject()
 }
-note bottom: Microcontroller
+note bottom: Describes the environment\nand all objects on it
 
-database gitHub
+class Channel {
+    -- [Variables] --
+    # RayPaths
+    # RayDelays
+    -- [Methods] --
+    +RayTrace()
+    +GetCIR()
+}
+note top: Describes Ray paths\nto get CIR
 
-JenkinsServer -down-> ScreenViewer : [Brownser] --> User sees and\ncontrol the Jenkins server
-JenkinsServer -left> RaspbSW : Jenkins server executes RaspSW scripts
-RaspbSW -right> uControlSW : Rasp controls uControl
+class LightSource {
+    -- [Variables] --
+    # LightType
+    # PSD
+    # Intensity
+    -- [Methods] --
+    +getSNR()
+    +getIntensityAtDistance()
 
-Workspace -[hidden]up-> uControlSW
+}
+note top: Describes the light source\nits PSD and intensity
 
-gitHub <--> JenkinsServer  : Gets all codes from git,\nincluding the pipeline
-RaspbSW <--> gitHub : Gets updated code from git\nand saves data there.
+class Detector {
+    -- [Variables] --
+    # InputPower
+    # Reflectance
+    # Efficiency
+    # Area
+    # Responsivity
+    # DR
+    # FrequencyResponse
+    -- [Methods] --
+    +getDR()
+    +isSaturated()
+    +getPhotoCurrent()
+}
+note top: Converts input power\nto photocurrent
 
-Workspace <--> gitHub : Develop code to Git
+class Circuit {
+    -- [Variables] --
+    # DR
+    # Sensitivity
+    # FrequencyResponse
+    # Simulator
+    -- [Methods] --
+    +getDR()
+    +isSaturated()
+    +getPhotoCurrent()
+    +runSimulation()
+}
+note bottom: Circuit to be simulated
 
-actor dev
-note right : Develops and is an user
-actor user
-note right : Enjoys
-dev <-up-> Workspace: Devs through the\nWorkspace on DevMachine
-dev <-up-> ScreenViewer: User interacts\nwith Borwnser to access Jenkins
-user <-up-> ScreenViewer: User interacts\nwith Borwnser to access Jenkins
-dev <-[hidden]up-> gitHub: User 
-' user <-[hidden]up-> ScreenViewer: User 
+class Virtuoso {
+    -- [Variables] --
+    # inputCurrent
+    # circuitNetlist
+    # environmentParameters
+    -- [Methods] --
+    +getCurrent()
+    +outputVoltage()
+    +runSimulation()
+}
+note top: Interface to Cadence simulator
 
+class Tanner {
+    -- [Variables] --
+    # inputCurrent
+    # circuitNetlist
+    # environmentParameters
+    -- [Methods] --
+    +getCurrent()
+    +outputVoltage()
+    +runSimulation()
+}
+note top: Interface to Tanner simulator
+
+class MeritFunctions {
+    -- [Variables] --
+    # BER
+    # SNR
+    # DataRate
+    -- [Methods] --
+    +getConstellation()
+    +getFigures()
+}
+note bottom: All merit functions of\nof the whole system
+
+Simulators -- Circuit : All possible simulators\nfor the circuit
+
+' FlowChart -- Ambient : All possible simulators\nfor the circuit
+
+' Transmitter -right-> Channel : All possible simulators\nfor the circuit
+LightSource --> Channel : All possible simulators\nfor the circuit
+
+' Channel -right-> Receiver : All possible simulators\nfor the circuit
+Channel --> Detector : All possible simulators\nfor the circuit
+
+Detector --> Circuit : All possible simulators\nfor the circuit
+
+MeritFunctions --> Circuit  : All possible simulators\nfor the circuit
+' Receiver --> MeritFunctions : All possible simulators\nfor the circuit
 
 
 @enduml
