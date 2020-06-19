@@ -1,3 +1,5 @@
+echo "Git sync before commit"
+git pull
 echo "Git added all files"
 git add *
 echo "Git commit"
