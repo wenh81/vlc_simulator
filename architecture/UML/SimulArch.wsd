@@ -1,0 +1,149 @@
+@startuml SimulArch
+!define DARKBLUE
+' !define DARKRED
+' !define DARKGREEN
+!include my_styles.puml
+allowmixing
+
+
+
+package FlowChart <<Node>> #LightSlateGrey { 
+  
+  package Receiver <<Node>> #LightSeaGreen {
+    class Detector
+    class Circuit
+  }
+  
+  package ChannelEnvironment <<Node>> #LightSkyBlue { 
+    class Channel
+  }
+
+  package Transmitter <<Node>> #LightSeaGreen  {
+    class LightSource
+  }
+  
+}
+
+package Global <<Node>> #DarkSlateBlue  {
+  class Ambient
+  class MeritFunctions
+}  
+
+package Simulators <<Node>> #LightSalmon { 
+  class Virtuoso
+  class Tanner
+}
+
+class Ambient {
+    -- [Variables] --
+    # ObjectPositions
+    # FOV    
+    -- [Methods] --
+    +InitializeObject()
+}
+note bottom: Describes the environment\nand all objects on it
+
+class Channel {
+    -- [Variables] --
+    # RayPaths
+    # RayDelays
+    -- [Methods] --
+    +RayTrace()
+    +GetCIR()
+}
+note top: Describes Ray paths\nto get CIR
+
+class LightSource {
+    -- [Variables] --
+    # LightType
+    # PSD
+    # Intensity
+    -- [Methods] --
+    +getSNR()
+    +getIntensityAtDistance()
+
+}
+note top: Describes the light source\nits PSD and intensity
+
+class Detector {
+    -- [Variables] --
+    # InputPower
+    # Reflectance
+    # Efficiency
+    # Area
+    # Responsivity
+    # DR
+    # FrequencyResponse
+    -- [Methods] --
+    +getDR()
+    +isSaturated()
+    +getPhotoCurrent()
+}
+note top: Converts input power\nto photocurrent
+
+class Circuit {
+    -- [Variables] --
+    # DR
+    # Sensitivity
+    # FrequencyResponse
+    # Simulator
+    -- [Methods] --
+    +getDR()
+    +isSaturated()
+    +getPhotoCurrent()
+    +runSimulation()
+}
+note bottom: Circuit to be simulated
+
+class Virtuoso {
+    -- [Variables] --
+    # inputCurrent
+    # circuitNetlist
+    # environmentParameters
+    -- [Methods] --
+    +getCurrent()
+    +outputVoltage()
+    +runSimulation()
+}
+note top: Interface to Cadence simulator
+
+class Tanner {
+    -- [Variables] --
+    # inputCurrent
+    # circuitNetlist
+    # environmentParameters
+    -- [Methods] --
+    +getCurrent()
+    +outputVoltage()
+    +runSimulation()
+}
+note top: Interface to Tanner simulator
+
+class MeritFunctions {
+    -- [Variables] --
+    # BER
+    # SNR
+    # DataRate
+    -- [Methods] --
+    +getConstellation()
+    +getFigures()
+}
+note bottom: All merit functions of\nof the whole system
+
+Simulators -- Circuit : All possible simulators\nfor the circuit
+
+' FlowChart -- Ambient : All possible simulators\nfor the circuit
+
+' Transmitter -right-> Channel : All possible simulators\nfor the circuit
+LightSource --> Channel : All possible simulators\nfor the circuit
+
+' Channel -right-> Receiver : All possible simulators\nfor the circuit
+Channel --> Detector : All possible simulators\nfor the circuit
+
+Detector --> Circuit : All possible simulators\nfor the circuit
+
+MeritFunctions --> Circuit  : All possible simulators\nfor the circuit
+' Receiver --> MeritFunctions : All possible simulators\nfor the circuit
+
+
+@enduml
