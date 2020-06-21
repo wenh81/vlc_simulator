@@ -15,13 +15,3 @@ class Dog(Animal):
         """func1 doc"""
         pass
     
-
-    def func2(self, t):
-        """doc2"""
-        pass
-    
-
-    def func3(self):
-        """1"""
-        pass
-    

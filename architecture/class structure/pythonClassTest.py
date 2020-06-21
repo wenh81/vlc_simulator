@@ -42,19 +42,22 @@ class and parent class names."""
         self.listOfTabs = []
 
         for className in xl.sheet_names:
+            
+            # Ignore tab if name is all_config
+            if className != 'all_config':
 
-            # get the actual tab name
-            self.listOfTabs.append(className)
+                # get the actual tab name
+                self.listOfTabs.append(className)
 
-            # Check if there is a parent class
-            # if '<' in className and '>' in className:
-            if '#' in className:
-                className = className.split('#')
-                self.listOfClasses.append(className[0])
-                self.listOfParentClasses.append(className[1])
-            else:
-                self.listOfClasses.append(className)
-                self.listOfParentClasses.append("None")
+                # Check if there is a parent class
+                # if '<' in className and '>' in className:
+                if '#' in className:
+                    className = className.split('#')
+                    self.listOfClasses.append(className[0])
+                    self.listOfParentClasses.append(className[1])
+                else:
+                    self.listOfClasses.append(className)
+                    self.listOfParentClasses.append("None")
 
 
     def write_class(self, df, className, parentClass):
@@ -189,7 +192,7 @@ become the final python unit test script."""
         pass\n"""
 
         classUnitStr += f"""\n
-    def testTypes(self):
+    def test_types(self):
         \"\"\" Function to test data types for class {className} \"\"\"
         """
 
@@ -229,45 +232,44 @@ at line '{idxV+2}' does not have a datatype!\n")
         
         """
 
-                classUnitStr += f"""self.{className}Obj = {className}()\n"""
+        #         classUnitStr += f"""self.{className}Obj = {className}()\n"""
 
-                # Init each var, with its default values
-                for idxV,var in enumerate(listOfVars):
-                    # init define for the variables
-                    if str(var) != 'nan':
-                        classUnitStr += f"""
-        self.{var} = self.{className}Obj.{var}"""
+        #         # Init each var, with its default values
+        #         for idxV,var in enumerate(listOfVars):
+        #             # init define for the variables
+        #             if str(var) != 'nan':
+        #                 classUnitStr += f"""
+        # self.{var} = self.{className}Obj.{var}"""
                 
                 # Add a pass for the case there are no vars, for some reason
                 classUnitStr += f"""
-        
         pass\n"""
                 
 
-                classUnitStr += f"""\n
-    def testTypes(self):
-        \"\"\" Function to test data types for method {className}.{funcname}() \"\"\"
-        """
+#                 classUnitStr += f"""\n
+#     def testTypes(self):
+#         \"\"\" Function to test data types for method {className}.{funcname}() \"\"\"
+#         """
 
-                # For each var, test it's data type
-                for idxV,var in enumerate(listOfVars):
-                    default = listOfDefaultVars[idxV]
-                    datatype = listOfDataTypeList[idxV]
+#                 # For each var, test it's data type
+#                 for idxV,var in enumerate(listOfVars):
+#                     default = listOfDefaultVars[idxV]
+#                     datatype = listOfDataTypeList[idxV]
 
-                    # init define for the variables
-                    if str(var) != 'nan':
-                        if str(datatype) != 'nan':
-                            classUnitStr += f"""
-        self.assertIsInstance(self.{var}, {datatype})"""
-                        else:
-                            raise ValueError(f"\n\n*Error --> Method <<{funcname}>> \
-at line <{idxV+2}> does not have a datatype!\n")
+#                     # init define for the variables
+#                     if str(var) != 'nan':
+#                         if str(datatype) != 'nan':
+#                             classUnitStr += f"""
+#         self.assertIsInstance(self.{var}, {datatype})"""
+#                         else:
+#                             raise ValueError(f"\n\n*Error --> Method <<{funcname}>> \
+# at line <{idxV+2}> does not have a datatype!\n")
 
 
-                # Add a pass for the case there are no vars, for some reason
-                classUnitStr += f"""
+#                 # Add a pass for the case there are no vars, for some reason
+#                 classUnitStr += f"""
         
-        pass\n"""
+#         pass\n"""
 
         classUnitStr += f"""
 
