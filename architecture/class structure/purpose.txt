@@ -1,0 +1,5 @@
+Use the pythonClassHierarchy to:
+	get all info from a spreadsheet and create template classes
+		or
+	dump all classes (already written) to a spreadsheet
+		
