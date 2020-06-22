@@ -426,3 +426,9 @@ if __name__ == '__main__':
     
     # Create auto_gen unittests
     classy.create_unittests()
+
+    # Create auto_gen sphinx/pydoc
+    # # classy.create_auto_doc()
+    
+    # Create auto_gen plant uml
+    # # classy.create_plant_uml()
