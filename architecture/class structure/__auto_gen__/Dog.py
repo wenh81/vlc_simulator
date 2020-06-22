@@ -1,17 +1,20 @@
 from Animal import Animal
 
 class Dog(Animal):
-    def __init__(self):
+    def __init__(self, barkSound, dogAge, dogName):
+        """Constructor"""
 
-            self.var1 = 0.3
-            
-            # var222
-            self.var2 = "1"
-            
-            # var222
-            self.var3 = -2
+        Animal.__init__(self, age = dogAge, name = dogName)
+        
 
-    def func1(self, a, n):
-        """func1 doc"""
-        pass
+        # Stores name
+        self.name = dogName
+        self.age = dogAge
+
+        # Type for that class.
+        self.type = "dog"
+
+        # Bark sound.
+        self.barkSound = barkSound
     
+        pass

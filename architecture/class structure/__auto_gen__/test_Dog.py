@@ -8,11 +8,12 @@ class TestDogTypes(unittest.TestCase):
     def setUp(self):
         """ Setup function TestTypes for class Dog """
         
-        self.DogObj = Dog()
+        self.DogObj = Dog(barkSound, dogAge, dogName)
 
-        self.var1 = self.DogObj.var1
-        self.var2 = self.DogObj.var2
-        self.var3 = self.DogObj.var3
+        self.name = self.DogObj.name
+        self.age = self.DogObj.age
+        self.type = self.DogObj.type
+        self.barkSound = self.DogObj.barkSound
         
         pass
 
@@ -20,17 +21,10 @@ class TestDogTypes(unittest.TestCase):
     def test_types(self):
         """ Function to test data types for class Dog """
         
-        self.assertIsInstance(self.var1, float)
-        self.assertIsInstance(self.var2, str)
-        self.assertIsInstance(self.var3, int)
-        
-        pass
-
-class TestFunc1(unittest.TestCase):
-    
-    def setUp(self):
-        """ Setup function to test method Dog.func1() """
-        
+        self.assertIsInstance(self.name, str)
+        self.assertIsInstance(self.age, int)
+        self.assertIsInstance(self.type, str)
+        self.assertIsInstance(self.barkSound, str)
         
         pass
 

@@ -8,7 +8,7 @@ class TestLightSourceTypes(unittest.TestCase):
     def setUp(self):
         """ Setup function TestTypes for class LightSource """
         
-        self.LightSourceObj = LightSource()
+        self.LightSourceObj = LightSource(light_type, var1, var2)
 
         self.light_type = self.LightSourceObj.light_type
         self.psd = self.LightSourceObj.psd

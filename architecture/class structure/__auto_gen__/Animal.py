@@ -1,20 +1,14 @@
 class Animal(object):
-    def __init__(self):
+    def __init__(self, age, name):
+        """Constructor"""
 
-            self.var1 = 0.2
-            
-            # var222
-            self.var2 = "1"
-            
-            # var222
-            self.var3 = -2
-
-    def func1(self, a, n):
-        """func1 doc"""
-        pass
+        # Stores name
+        self.name = "name"
+        self.age = age
     
+        pass
 
-    def func2(self, t):
-        """docstring"""
+    def speak(self):
+        """The animal speaks. Has no arguments."""
         pass
     

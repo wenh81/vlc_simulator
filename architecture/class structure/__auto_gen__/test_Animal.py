@@ -8,11 +8,10 @@ class TestAnimalTypes(unittest.TestCase):
     def setUp(self):
         """ Setup function TestTypes for class Animal """
         
-        self.AnimalObj = Animal()
+        self.AnimalObj = Animal(age, name)
 
-        self.var1 = self.AnimalObj.var1
-        self.var2 = self.AnimalObj.var2
-        self.var3 = self.AnimalObj.var3
+        self.name = self.AnimalObj.name
+        self.age = self.AnimalObj.age
         
         pass
 
@@ -20,24 +19,15 @@ class TestAnimalTypes(unittest.TestCase):
     def test_types(self):
         """ Function to test data types for class Animal """
         
-        self.assertIsInstance(self.var1, float)
-        self.assertIsInstance(self.var2, str)
-        self.assertIsInstance(self.var3, int)
+        self.assertIsInstance(self.name, str)
+        self.assertIsInstance(self.age, int)
         
         pass
 
-class TestFunc1(unittest.TestCase):
+class TestSpeak(unittest.TestCase):
     
     def setUp(self):
-        """ Setup function to test method Animal.func1() """
-        
-        
-        pass
-
-class TestFunc2(unittest.TestCase):
-    
-    def setUp(self):
-        """ Setup function to test method Animal.func2() """
+        """ Setup function to test method Animal.speak() """
         
         
         pass
