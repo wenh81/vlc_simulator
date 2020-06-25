@@ -140,7 +140,11 @@ found at Class '{className}'.\n")
                         dict_parent_map[temp[1]] = temp[0]
                         tempArgs.append(temp[0])
                     else:
-                        tempArgs.append(item.strip())
+                        if item.strip() == "#all_variables":
+                            for var in listOfVars:
+                                tempArgs.append(var)
+                        else:
+                            tempArgs.append(item.strip())
                 argslist = ', '.join(tempArgs)
                 # argslist = ', '.join(argslist)
                 argslist = f"{argslist}"
@@ -284,7 +288,11 @@ become the final python unit test script."""
                     temp = item.strip().replace(']', '').split('[')
                     tempArgs.append(temp[0])
                 else:
-                    tempArgs.append(item.strip())
+                    if item.strip() == "#all_variables":
+                        for var in listOfVars:
+                            tempArgs.append(var)
+                    else:
+                        tempArgs.append(item.strip())
             argslist = ', '.join(tempArgs)
             argslist = [item.strip() for item in argslist.split(',')]
             argslist = ', '.join(argslist)
@@ -419,7 +427,8 @@ if __name__ == '__main__':
 
 if __name__ == '__main__':
     # classy = ClassWriter('class_structure.xlsx')
-    classy = ClassWriter('class_structure_example.xlsx')
+    # classy = ClassWriter('class_structure_example.xlsx')
+    classy = ClassWriter('class_structure_WFS.xlsx')
 
     # Create auto_gen classes
     classy.create_classes()

@@ -11,10 +11,4 @@ class Animal(object):
     def speak(self):
         """The animal speaks. Has no arguments."""
         pass
-
-
-    def anotherMethod(self):
-        """The animal speaks. Has no arguments."""
-        
-        self.speak()
     
