@@ -418,8 +418,8 @@ if __name__ == '__main__':
 
 
 if __name__ == '__main__':
-    classy = ClassWriter('class_structure.xlsx')
-    # classy = ClassWriter('class_structure_example.xlsx')
+    # classy = ClassWriter('class_structure.xlsx')
+    classy = ClassWriter('class_structure_example.xlsx')
 
     # Create auto_gen classes
     classy.create_classes()
