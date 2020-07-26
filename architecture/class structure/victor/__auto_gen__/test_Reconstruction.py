@@ -8,7 +8,7 @@ class TestReconstructionTypes(unittest.TestCase):
     def setUp(self):
         """ Setup function TestTypes for class Reconstruction """
         
-        self.ReconstructionObj = Reconstruction(c, dX, dY, dXg, dYg, dXqg, dYqg, Xr, Yr, dXq, dYq, outx_cal, outy_cal, dXql, dYql, dWx, dWy, Wf1, W, Wrms, delta, yb, x_edge, z_basis, coeff, nz, mz, nn, a, b, a1, b1, theta, jx, jy, ma, xx, outx_l)
+        self.ReconstructionObj = Reconstruction(c, dX, dY, dXg, dYg, dXqg, dYqg, Xr, Yr, dXq, dYq, outx_cal, outy_cal, dXql, dYql, dWx, dWy, Wf1, W, Wrms, delta, yb, x_edge, z_basis, coeff, nz, mz, nn, a, b, a1, b1, theta, jx, jy, na, ma, xx, outx_l)
 
         self.c = self.ReconstructionObj.c
         self.dX = self.ReconstructionObj.dX
@@ -45,6 +45,7 @@ class TestReconstructionTypes(unittest.TestCase):
         self.theta = self.ReconstructionObj.theta
         self.jx = self.ReconstructionObj.jx
         self.jy = self.ReconstructionObj.jy
+        self.na = self.ReconstructionObj.na
         self.ma = self.ReconstructionObj.ma
         self.xx = self.ReconstructionObj.xx
         self.outx_l = self.ReconstructionObj.outx_l
@@ -55,31 +56,31 @@ class TestReconstructionTypes(unittest.TestCase):
     def test_types(self):
         """ Function to test data types for class Reconstruction """
         
-        self.assertIsInstance(self.c, int)
-        self.assertIsInstance(self.dX, int)
-        self.assertIsInstance(self.dY, int)
-        self.assertIsInstance(self.dXg, int)
-        self.assertIsInstance(self.dYg, int)
-        self.assertIsInstance(self.dXqg, int)
-        self.assertIsInstance(self.dYqg, int)
-        self.assertIsInstance(self.Xr, int)
-        self.assertIsInstance(self.Yr, int)
-        self.assertIsInstance(self.dXq, int)
-        self.assertIsInstance(self.dYq, int)
-        self.assertIsInstance(self.outx_cal, int)
-        self.assertIsInstance(self.outy_cal, int)
-        self.assertIsInstance(self.dXql, int)
-        self.assertIsInstance(self.dYql, int)
-        self.assertIsInstance(self.dWx, int)
-        self.assertIsInstance(self.dWy, int)
-        self.assertIsInstance(self.Wf1, int)
-        self.assertIsInstance(self.W, int)
-        self.assertIsInstance(self.Wrms, int)
-        self.assertIsInstance(self.delta, int)
-        self.assertIsInstance(self.yb, int)
-        self.assertIsInstance(self.x_edge, int)
-        self.assertIsInstance(self.z_basis, int)
-        self.assertIsInstance(self.coeff, int)
+        self.assertIsInstance(self.c, list)
+        self.assertIsInstance(self.dX, list)
+        self.assertIsInstance(self.dY, list)
+        self.assertIsInstance(self.dXg, list)
+        self.assertIsInstance(self.dYg, list)
+        self.assertIsInstance(self.dXqg, list)
+        self.assertIsInstance(self.dYqg, list)
+        self.assertIsInstance(self.Xr, list)
+        self.assertIsInstance(self.Yr, list)
+        self.assertIsInstance(self.dXq, list)
+        self.assertIsInstance(self.dYq, list)
+        self.assertIsInstance(self.outx_cal, list)
+        self.assertIsInstance(self.outy_cal, list)
+        self.assertIsInstance(self.dXql, list)
+        self.assertIsInstance(self.dYql, list)
+        self.assertIsInstance(self.dWx, list)
+        self.assertIsInstance(self.dWy, list)
+        self.assertIsInstance(self.Wf1, list)
+        self.assertIsInstance(self.W, float)
+        self.assertIsInstance(self.Wrms, float)
+        self.assertIsInstance(self.delta, float)
+        self.assertIsInstance(self.yb, float)
+        self.assertIsInstance(self.x_edge, float)
+        self.assertIsInstance(self.z_basis, float)
+        self.assertIsInstance(self.coeff, float)
         self.assertIsInstance(self.nz, int)
         self.assertIsInstance(self.mz, int)
         self.assertIsInstance(self.nn, int)
@@ -87,12 +88,13 @@ class TestReconstructionTypes(unittest.TestCase):
         self.assertIsInstance(self.b, int)
         self.assertIsInstance(self.a1, int)
         self.assertIsInstance(self.b1, int)
-        self.assertIsInstance(self.theta, int)
-        self.assertIsInstance(self.jx, int)
-        self.assertIsInstance(self.jy, int)
+        self.assertIsInstance(self.theta, float)
+        self.assertIsInstance(self.jx, float)
+        self.assertIsInstance(self.jy, float)
+        self.assertIsInstance(self.na, int)
         self.assertIsInstance(self.ma, int)
-        self.assertIsInstance(self.xx, int)
-        self.assertIsInstance(self.outx_l, int)
+        self.assertIsInstance(self.xx, float)
+        self.assertIsInstance(self.outx_l, float)
         
         pass
 

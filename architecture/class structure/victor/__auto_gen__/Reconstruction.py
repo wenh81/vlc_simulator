@@ -1,5 +1,5 @@
 class Reconstruction(object):
-    def __init__(self, c, dX, dY, dXg, dYg, dXqg, dYqg, Xr, Yr, dXq, dYq, outx_cal, outy_cal, dXql, dYql, dWx, dWy, Wf1, W, Wrms, delta, yb, x_edge, z_basis, coeff, nz, mz, nn, a, b, a1, b1, theta, jx, jy, ma, xx, outx_l):
+    def __init__(self, c, dX, dY, dXg, dYg, dXqg, dYqg, Xr, Yr, dXq, dYq, outx_cal, outy_cal, dXql, dYql, dWx, dWy, Wf1, W, Wrms, delta, yb, x_edge, z_basis, coeff, nz, mz, nn, a, b, a1, b1, theta, jx, jy, na, ma, xx, outx_l):
         """Constructor"""
 
         # Zernike coefficient, c[n][m]
@@ -35,20 +35,16 @@ class Reconstruction(object):
         # "measured" y dispalcement at each spot
         self.dYq = dYq
 
-        # Calibrated zero at each QC, for a
-flat input WF (c[n][m]=0, for all n,m)
+        # Calibrated zero at each QC, for a flat input WF (c[n][m]=0, for all n,m)
         self.outx_cal = outx_cal
 
-        # Calibrated zero at each QC, for a
-flat input WF (c[n][m]=0, for all n,m)
+        # Calibrated zero at each QC, for a flat input WF (c[n][m]=0, for all n,m)
         self.outy_cal = outy_cal
 
-        # "real" dX in realtion to each QC
-center in QC coord system
+        # "real" dX in realtion to each QC center in QC coord system
         self.dXql = dXql
 
-        # "real" dY in realtion to each QC
-center in QC coord system
+        # "real" dY in realtion to each QC center in QC coord system
         self.dYql = dYql
 
         # Acumulates Wxmax and Wxmin difference values
@@ -72,7 +68,7 @@ center in QC coord system
         # 0.
         self.yb = yb
 
-        # REPETIDO EM QUADCELL
+        # Can assume values between 0 and 1, 0 means QC-center, 1 means QC edge(ALSO ON QUADCELL)
         self.x_edge = x_edge
 
         # basis formed by zernikes at each spot
@@ -87,7 +83,7 @@ center in QC coord system
         # zernike m indice for each zernike term
         self.mz = mz
 
-        # REPETIDO EM QUADCELL
+        # Number of integrations points inside the QC(ALSO ON QUADCELL)
         self.nn = nn
 
         # vector indice
@@ -102,22 +98,25 @@ center in QC coord system
         # Variable for determinate microlen
         self.b1 = b1
 
-        # REPETIDO EM QUADCELL
+        # Rotation angle of QC system (radian) (ALSO ON QUADCELL)
         self.theta = theta
 
-        # REPETIDO EM QUADCELL
+        # X position of QC in realation to the microlens coord. system(ALSO ON QUADCELL)
         self.jx = jx
 
-        # REPETIDO EM QUADCELL
+        # Y position of QC in realation to the microlens coord. system(ALSO ON QUADCELL)
         self.jy = jy
 
-        # REPETIDO EM QUADCELL
+        # n in realation to the microlens coord. system(ALSO ON QUADCELL)
+        self.na = na
+
+        # m in realation to the microlens coord. system(ALSO ON QUADCELL)
         self.ma = ma
 
-        # REPETIDO EM QUADCELL
+        # 0.(ALSO ON QUADCELL)
         self.xx = xx
 
-        # REPETIDO EM QUADCELL
+        # 0.(ALSO ON QUADCELL)
         self.outx_l = outx_l
     
         pass

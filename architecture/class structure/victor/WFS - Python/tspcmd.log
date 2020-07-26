@@ -1,0 +1,16 @@
+T-Spice - Tanner SPICE
+Version 15.00
+Network license
+Product Release ID: T-Spice Win32 15.00.20100420.01:51:18
+Copyright © 1988-2010 Tanner EDA
+
+	Parsing "C:\Users\victo\OneDrive\Área de Trabalho\WFS_2013_simulator\tspcmd.exe"
+Fatal Error : "tspcmd.exe" line 1 Input file contains NULL characters
+
+
+Parsing                      0.02 seconds
+Overhead                     0.28 seconds
+-----------------------------------------
+Total                        0.30 seconds
+
+Simulation failed	with  1 Fatal Error

@@ -14,4 +14,3 @@ class Circuit(object):
         """Calculates the output reconstructed voltage."""
         pass
     
-

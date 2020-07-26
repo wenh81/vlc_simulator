@@ -111,6 +111,7 @@ The string 'classStr' stores the text to become the final python script."""
         
         # store in lists each entry from the dictionary
         listOfVars = df['variables']
+        listOfVars = [item for item in listOfVars if str(item) != 'nan']
         listOfDefaultVars = df['default']
         listOfVarComments = df['comment']
         listOfMethods = df['methods']
@@ -267,6 +268,7 @@ become the final python unit test script."""
 
         # store in lists each entry from the dictionary
         listOfVars = df['variables']
+        listOfVars = [item for item in listOfVars if str(item) != 'nan']
         listOfDefaultVars = df['default']
         # listOfVarComments = df['comment']
         listOfMethods = df['methods']
@@ -428,7 +430,8 @@ if __name__ == '__main__':
 if __name__ == '__main__':
     # classy = ClassWriter('class_structure.xlsx')
     # classy = ClassWriter('class_structure_example.xlsx')
-    classy = ClassWriter('class_structure_WFS.xlsx')
+    # classy = ClassWriter('class_structure_WFS.xlsx')
+    classy = ClassWriter('class_structure_WFS_teste.xlsx')
 
     # Create auto_gen classes
     classy.create_classes()

@@ -1,5 +1,4 @@
 
-
 # Determinate if ML system needs rotation
 rot_flag = 0
 
@@ -52,7 +51,7 @@ flag_spice = 0
 flag_XQC_YQC = 0
 
 # Sinalizes for use of extern file containing voltages values
-# flag_Vout_QC = 0
+#flag_Vout_QC = 0
 
 # Sinalizes for file record of calculated displacements for Spice
 flag_grava_outx_spice = 0
@@ -63,8 +62,14 @@ flag_defocus = 0
 # ???optical crosstalk flag; if = 0, adds FPN, else doesn't
 oxtl_flag = 0
 
+#QC's format. 1 for square, 0 for circular
+qc_format = 0
+
+#QC's type of approximation. 1 for linear, 0 for sigmoidal
+flag_approx_type = 0
+
 # Pi value
-PI = 314159265358979006464
+PI = 314159265358979
 
 # Boltzman constant (J/K)
 Kb = 1.38066e-18
@@ -84,7 +89,11 @@ hplk_c0_e = 12398.435442
 # electron charge  (Coulomb)
 ele = 1.602177e-13
 
-# 10
-N = 0
+# standard (max) size of the matrix for the wavefronts (check if right!)
+N = 10
 
-pass
+# Rotation angle of QC system (degree)
+theta = 0
+
+# Scan-position step
+stepp = 20.0

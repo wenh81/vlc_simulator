@@ -1,0 +1,15 @@
+varA = 0.0
+varB = 0.0
+
+def func_alterar_var()
+	varA = 1.0
+
+def main()
+	print("Hello World")
+	print(varA)
+	varA = 1.0
+	print(varA)
+	func_alterar_var()
+	print(varA)
+
+main()
