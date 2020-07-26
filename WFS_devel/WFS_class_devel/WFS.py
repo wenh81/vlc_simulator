@@ -236,6 +236,21 @@ class WFS(object):
     def calibration(self, coeff_file):
         """Calculates the spot position for each microlens given an imput WF coefficient vector"""
         pass
+
+    def calculate_outx(self, xx):
+        """Calculates X position coorditate for slope_QC, given the dummy_qc and xx value"""
+        
+        # calc all intensities
+        self.dummy_qc.calcAllIntensities(xx, 0)
+        intensity_A = self.dummy_qc.getIntensitiy("A")
+        intensity_B = self.dummy_qc.getIntensitiy("B")
+        intensity_C = self.dummy_qc.getIntensitiy("C")
+        intensity_D = self.dummy_qc.getIntensitiy("D")
+
+        if (intensity_A + intensity_B + intensity_C + intensity_D) == 0 :
+            self.outx += 0
+        else :
+            self.outx += ((intensity_B + intensity_C) - (intensity_A + intensity_D)) / (intensity_A + intensity_B + intensity_C + intensity_D)
     
 
     def slope_QC(self):
@@ -253,7 +268,7 @@ class WFS(object):
         sd1 = 0
 
         # Creates dummy QC, only to use the getIntensitiy method
-        dummy_qc = Quadcell(self.smooth, self.TP, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        self.dummy_qc = Quadcell(self.smooth, self.TP, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
         ##Cálculo da média
         for xx in np.arange(-x_edge, x_edge + (x_edge / NN), x_edge / NN):
@@ -264,16 +279,7 @@ class WFS(object):
                 # print("Calc media", round((xx) / (x_edge / NN)))
                 pass
             
-            dummy_qc.calcAllIntensities(xx, 0)
-            intensity_A = dummy_qc.getIntensitiy("A")
-            intensity_B = dummy_qc.getIntensitiy("B")
-            intensity_C = dummy_qc.getIntensitiy("C")
-            intensity_D = dummy_qc.getIntensitiy("D")
-
-            if (intensity_A + intensity_B + intensity_C + intensity_D) == 0 :
-                self.outx += 0
-            else :
-                self.outx += ((intensity_B + intensity_C) - (intensity_A + intensity_D)) / (intensity_A + intensity_B + intensity_C + intensity_D)
+            self.calculate_outx(xx)
 
             xs += xx
             ccc += 1.0
@@ -295,19 +301,8 @@ class WFS(object):
             else :
                 # print("Calc slope",round((xx) / (x_edge / NN)))
                 pass
-            # Creates dummy QC, only to use the getIntensitiy method
-            dummy_qc.calcAllIntensities(xx, 0)
-            intensity_A = dummy_qc.getIntensitiy("A")
-            intensity_B = dummy_qc.getIntensitiy("B")
-            intensity_C = dummy_qc.getIntensitiy("C")
-            intensity_D = dummy_qc.getIntensitiy("D")
-
-            if (intensity_A + intensity_B + intensity_C + intensity_D) == 0 :
-                self.outx = 0
-            else :
-                self.outx = ((intensity_B + intensity_C) - (intensity_A + intensity_D)) / (intensity_A + intensity_B + intensity_C + intensity_D)
-            intens = self.outx
-
+            
+            self.calculate_outx(xx)
 
             soma1 += ((xx - xs) * (intens - media))
             soma2 += math.pow((xx - xs),2)
@@ -326,17 +321,8 @@ class WFS(object):
             else :
                 # print("Calc desvio padrão",round((xx) / (x_edge / NN)))
                 pass
-
-            dummy_qc.calcAllIntensities(xx, 0)
-            intensity_A = dummy_qc.getIntensitiy("A")
-            intensity_B = dummy_qc.getIntensitiy("B")
-            intensity_C = dummy_qc.getIntensitiy("C")
-            intensity_D = dummy_qc.getIntensitiy("D")
-
-            if (intensity_A + intensity_B + intensity_C + intensity_D) == 0 :
-                self.outx = 0
-            else :
-                self.outx = ((intensity_B + intensity_C) - (intensity_A + intensity_D)) / (intensity_A + intensity_B + intensity_C + intensity_D)
+            
+            self.calculate_outx(xx)
 
             sd1 += math.pow((self.outx - (b0 + b1 * xx)),2)
         sd1 /= (ccc - 2)
@@ -352,7 +338,7 @@ class WFS(object):
             self.yb = b0
         print(R)
         #Fim while
-        del dummy_qc
+        del self.dummy_qc
         
         # return ?
     
