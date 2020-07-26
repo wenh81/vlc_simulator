@@ -797,11 +797,6 @@ def main():
 				Xr[int(a)][int(b)] = (-dimens + (mlq_dimen / 2)) + a * mlq_dimen
 				Yr[int(a)][int(b)] = (-dimens + (mlq_dimen / 2)) + b * mlq_dimen
 
-	print(Xr)
-	print(Yr)
-
-	STOP_HERE
-	
 	#Conjunto de rotinas para distribuição aleatória de microlentes
 	if matriz_ortogonal == 0 :
 		inFile = open("Otimizacao\\Graficos\\posicoes.txt", "r")
@@ -846,12 +841,14 @@ def main():
 
 	if flag_experimental == 0 :
 		#Cálculo do fator de ponderação da potência de luz para cada microlente.
+		##ADICIONAR SINC QUADRADA
 		theta *= PI / 180
 		for xpp in numpy.arange(-2,2 + 1.0 / stepp,1.0 / stepp):
 			for ypp in numpy.arange(-2,2 + 1.0 / stepp,1.0 / stepp):
 				sto = (math.sin((1 / radius) * math.sqrt(math.pow(xpp, 2) + math.pow(ypp, 2)))) / ((1 / radius) * math.sqrt(math.pow(xpp, 2) + math.pow(ypp, 2)))
 				sto = math.pow(sto, 2)
 				TP += sto
+	print("TP =", TP)
 
 	#Cálculo do slope da aproximação linear da resposta da QC.
 	smooth = 1
@@ -879,7 +876,7 @@ def main():
 				else :
 					Wf1[int(a)][int(b)] /= nn
 					dWx[int(a)][int(b)] /= nn
-					dWy[int(a)][int(b)] /= nn
+					dWy[int(a)][int(b)] /= nn###PARAMOS AQUI
 				dX[int(a)][int(b)] = (f * dWx[int(a)][int(b)])
 				dY[int(a)][int(b)] = (f * dWy[int(a)][int(b)])
 				dXg[int(a)][int(b)] = dX[int(a)][int(b)] + Xr[int(a)][int(b)]
@@ -919,22 +916,22 @@ def main():
 										oxtl_flag = 1
 									q.qcell((dXql[int(aa)][int(bb)] + (aa - a) * ml_dimen) / (cell_qc), (dYql[int(aa)][int(bb)] + (bb - b) * ml_dimen) / (cell_qc))
 
-									if flag_XQC_YQC == 1 :
-										q.saida_XQC_YQC()
-									else :
-										As += Aq
-										Bs += Bq
-										Cs += Cq
-										Ds += Dq
+					if flag_XQC_YQC == 1 :
+						q.saida_XQC_YQC()
+					else :
+						As += Aq
+						Bs += Bq
+						Cs += Cq
+						Ds += Dq	
 
-										if (As + Bs + Cs + Ds) == 0 :
-											outx = 0
-											outy = 0
-										else :
-											outx = ((Bs + Cs) - (As + Ds)) / (As + Bs + Cs + Ds)
-											outy = ((As + Bs) - (Cs + Ds)) / (As + Bs + Cs + Ds)
-										outx -= outx_cal[int(a)][int(b)]
-										outy -= outy_cal[int(a)][int(b)]
+						if (As + Bs + Cs + Ds) == 0 :
+							outx = 0
+							outy = 0
+						else :
+							outx = ((Bs + Cs) - (As + Ds)) / (As + Bs + Cs + Ds)
+							outy = ((As + Bs) - (Cs + Ds)) / (As + Bs + Cs + Ds)
+						outx -= outx_cal[int(a)][int(b)]
+						outy -= outy_cal[int(a)][int(b)]
 
 			if flag_experimental == 1 :
 				Asref = Bsref = Csref = Dsref = 0.0
@@ -954,6 +951,7 @@ def main():
 					outy -= ((Asref + Bsref) - (Csref + Dsref)) / (Asref + Bsref + Csref + Dsref)
 
 			Aq = Bq = Cq = Dq = 0.0
+			#Calcula o spot "real"
 			if flag_linear_resp_QC == 1 :
 				if slope == 0 :
 					dXq[int(a)][int(b)] = 0
