@@ -204,11 +204,6 @@ class Quadcell(object):
         Cq = Cc
         Dq = Dc
 
-        # self.A_intensity = Ac
-        # self.B_intensity = Bc
-        # self.C_intensity = Cc
-        # self.D_intensity = Dc
-
         #tp/TP = cotribution percentage of the spot with respect to max (spot center)
         if self.smooth == 0 :
             if (Config.hplk_c0_e * self.TP) == 0 :

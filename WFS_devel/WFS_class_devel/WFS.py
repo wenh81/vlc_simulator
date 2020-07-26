@@ -123,9 +123,6 @@ class WFS(object):
 
         self.smooth = 0
 
-
-
-
         #Inicializa variáveis que serão usadas na amostragem e reconstrução da frente de onda.
 
         
@@ -183,7 +180,7 @@ class WFS(object):
                     b += 1
  
 
-    def use_defocus(self, input_file):
+    def use_defocus___(self, input_file):
         """Get all cartesian coordinates for each QC from an input file. Stores the return in Xr and Yr (in um)."""
         pass
     
