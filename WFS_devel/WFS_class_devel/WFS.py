@@ -256,7 +256,7 @@ class WFS(object):
         sd1 = 0
 
         # Creates dummy QC, only to use the getIntensitiy method
-        dummy_qc = Quadcell(self.smooth, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        dummy_qc = Quadcell(self.smooth, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
         ##Cálculo da média
         for xx in np.arange(-x_edge, x_edge + (x_edge / NN), x_edge / NN):
@@ -276,10 +276,6 @@ class WFS(object):
             else :
                 self.outx += ((intensity_B + intensity_C) - (intensity_A + intensity_D)) / (intensity_A + intensity_B + intensity_C + intensity_D)
 
-            intensity_A = 0.0
-            intensity_B = 0.0
-            intensity_C = 0.0
-            intensity_D = 0.0
             xs += xx
             ccc += 1.0
         if ccc == 0 :
@@ -290,14 +286,16 @@ class WFS(object):
             xs = 0
         else :
             xs /= ccc
-        print(ccc, media, xs)
+        # print(ccc, media, xs)
         self.outx = 0.0
         ##Cálculo do slope
         for xx in np.arange(-x_edge,x_edge + x_edge / NN,x_edge / NN):
             if x_edge == 0 or NN == 0:
-                print("Calc slope", 0.0)
+                # print("Calc slope", 0.0)
+                pass
             else :
-                print("Calc slope",round((xx) / (x_edge / NN)))
+                # print("Calc slope",round((xx) / (x_edge / NN)))
+                pass
             # Creates dummy QC, only to use the getIntensitiy method
             dummy_qc.calcAllIntensities(xx, 0)
             intensity_A = dummy_qc.getIntensitiy("A")
@@ -310,10 +308,7 @@ class WFS(object):
             else :
                 self.outx = ((intensity_B + intensity_C) - (intensity_A + intensity_D)) / (intensity_A + intensity_B + intensity_C + intensity_D)
             intens = self.outx
-            intensity_A = 0.0
-            intensity_B = 0.0
-            intensity_C = 0.0
-            intensity_D = 0.0
+
 
             soma1 += ((xx - xs) * (intens - media))
             soma2 += math.pow((xx - xs),2)
@@ -322,7 +317,7 @@ class WFS(object):
             else :
                 b1 = soma1 / soma2
             b0 = media - b1 * xs
-        print(b0)
+        # print(b0)
         ##Cálculo do desvio padrão
         for xx in np.arange(-x_edge,x_edge + x_edge / NN,x_edge / NN):
             if x_edge == 0 or NN == 0:
@@ -341,11 +336,6 @@ class WFS(object):
             else :
                 self.outx = ((intensity_B + intensity_C) - (intensity_A + intensity_D)) / (intensity_A + intensity_B + intensity_C + intensity_D)
 
-            intensity_A = 0.0
-            intensity_B = 0.0
-            intensity_C = 0.0
-            intensity_D = 0.0
-
             sd1 += math.pow((self.outx - (b0 + b1 * xx)),2)
         sd1 /= (ccc - 2)
         sd = math.sqrt(sd1)
@@ -360,8 +350,9 @@ class WFS(object):
             self.yb = b0
         print(R)
         #Fim while
-
         del dummy_qc
+        
+        # return ?
     
 
     def calc_qc_output_approximation(self, approx_type):

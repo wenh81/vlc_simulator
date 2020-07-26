@@ -1,9 +1,12 @@
 import Config
 import Parameters
 
+import numpy as np
+import math
+
 
 class Quadcell(object):
-    def __init__(self, jx, jy, smooth, nn, theta, na, ma, xx, outx_l, outx, outy, cell_qc, slope, slope_exp, x_edge, qc_type, has_microlens, A_intensity, B_intensity, C_intensity, D_intensity):
+    def __init__(self, jx, jy, smooth, nn, theta, na, ma, xx, outx_l, outx, outy, slope, slope_exp, x_edge, qc_type, has_microlens, A_intensity, B_intensity, C_intensity, D_intensity):
         """Constructor"""
 
         # Number of integrations points inside the QC
@@ -36,9 +39,6 @@ class Quadcell(object):
         # The calculated Y spot coordinate.
         self.outy = outy
 
-        # QC's dimension (edge for square-QC and diameter for circular QC) (um)
-        self.cell_qc = cell_qc
-
         # Scan-position step
         self.stepp = Config.stepp
         
@@ -51,7 +51,7 @@ class Quadcell(object):
         # QC's inner radius [um]
         self.radius_inner = Parameters.cent
 
-        # Radius or edge of QC [um]
+        # QC's dimension (edge for square-QC and diameter for circular QC) [um]
         self.cell_qc = Parameters.cell
         
         # QC's material quantum efficience
@@ -59,6 +59,9 @@ class Quadcell(object):
         
         # QC's material quantum efficience of inner radius
         self.QE_inner = Parameters.quant_inner
+        
+        # G ??...
+        self.G = Config.G
 
         # QC anwser linear aproximation's slope
         self.slope = 0
@@ -94,8 +97,114 @@ class Quadcell(object):
 
     def calcAllIntensities(self, xc, yc):
         """Calculates the intensity for each photocell over a given qc spot coordinate (jx, jy)"""
-        pass
-    
+
+        tp = 0.0
+        ix = 0
+        iy = 0
+        h = 0
+        ints = np.zeros([5, 5])
+        ints_inner = np.zeros([5, 5])
+        # ints = [[0.0] * 5] * 5
+        # ints_inner = [[0.0] * 5] * 5
+        x = 0.0
+        y = 0.0
+        xc1 = 0.0
+        yc1 = 0.0
+        xc1 = xc
+        yc1 = yc
+        
+        for h in np.arange(1,5,1):
+            for k in np.arange(1,5,1):
+                ints[h][k] = 0.0
+                ints_inner[h][k] = 0.0
+
+        for k in np.arange(0, 2, 1):
+            for h in np.arange(0, 2, 1):
+                for ix in np.arange(0, self.stepp + 1, 1):
+                    for iy in np.arange(0, self.stepp + 1, 1):
+                        #print(k, h, ix, iy)
+                        if self.qc_format == 0 :
+                            x = -(1 + self.G) + h * (1 + 2 * self.G) + (ix * (1.0 / self.stepp))
+                            y = -(1 + self.G) + k * (1 + 2 * self.G) + (iy * (1.0 / self.stepp))
+                            if self.spot_radius == 0 or math.sqrt(math.pow((x - xc1),2) + math.pow((y - yc1),2)) == 0 :
+                                tp = 0.0
+                            else :
+                                tp = (math.sin((1 / self.spot_radius) * math.sqrt(math.pow((x - xc1),2) + math.pow((y - yc1),2)))) / ((1 / self.spot_radius) * math.sqrt(math.pow((x - xc1),2) + math.pow((y - yc1),2)))
+                            tp = math.pow(tp,2)
+                            #print(tp)
+                        elif self.qc_format == 1 :
+                            x = -1 + h + (ix * (1 / self.stepp))
+                            y = -1 + k + (iy * (1 / self.stepp))
+                            ints[h + 1][k + 1] +=  math.pow(math.exp((math.pow((x - xc1),2) + math.pow((y - yc1),2) ) / math.pow(self.spot_radius,2)), -1)
+                            if (self.spot_radius * self.spot_radius) == 0 or ((x - xc1) * (y - yc1) * np.pi * np.pi) == 0 :
+                                tp = 0.0
+                            else :
+                                tp = (math.sin((x - xc1) * np.pi / self.spot_radius) * math.sin((y - yc1) * np.pi / self.spot_radius)) / (((x - xc1) * (y - yc1) * np.pi * np.pi) / (self.spot_radius * self.spot_radius))
+
+                        if (math.pow(x,2) + math.pow(y,2)) <= math.pow(self.radius_inner,2):
+                            ints_inner[h + 1][k + 1] += tp
+                        else :
+                            if self.qc_format == 1 :
+                                if (math.pow(x,2) + math.pow(y,2)) <= math.pow(self.cell_qc, 2):
+                                    ints[h + 1][k + 1] += tp
+                            if (math.pow(x,2) + math.pow(y,2)) <= 1 :
+                                #print(math.pow(x,2) + math.pow(y,2))
+                                ints[h + 1][k + 1] += tp
+                                # print(ints[h + 1][k + 1])						
+                        tp = 0.0
+
+        # print(ints)
+
+        Aq = 0.0
+        Bq = 0.0
+        Cq = 0.0
+        Dq = 0.0
+        Ac_inner = 0.0
+        Bc_inner = 0.0
+        Cc_inner = 0.0
+        Dc_inner = 0.0
+        Ac = 0.0
+        Bc = 0.0
+        Cc = 0.0
+        Dc = 0.0
+        Ac = ints[1][2]
+        Bc = ints[2][2]
+        Cc = ints[2][1]
+        Dc = ints[1][1]
+
+        Ac_inner = ints_inner[1][2]
+        Bc_inner = ints_inner[2][2]
+        Cc_inner = ints_inner[2][1]
+        Dc_inner = ints_inner[1][1]
+        Ac *= self.QE
+        Bc *= self.QE
+        Cc *= self.QE
+        Dc *= self.QE
+
+        Ac_inner *= self.QE_inner
+        Bc_inner *= self.QE_inner
+        Cc_inner *= self.QE_inner
+        Dc_inner *= self.QE_inner
+        Ac += Ac_inner
+        Bc += Bc_inner
+        Cc += Cc_inner
+        Dc += Dc_inner
+
+        Aq = Ac
+        Bq = Bc
+        Cq = Cc
+        Dq = Dc
+
+        self.A_intensity = Ac
+        self.B_intensity = Bc
+        self.C_intensity = Cc
+        self.D_intensity = Dc
+
+        if self.smooth == 0 :
+            # keep copying....
+            pass
+
+
 
     def getIntensitiy(self, which_photocell):
         """Return the intensity values for a given photocell (A, B, C or D)"""

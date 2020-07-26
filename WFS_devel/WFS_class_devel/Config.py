@@ -97,3 +97,6 @@ theta = 0
 
 # Scan-position step
 stepp = 20.0
+
+# ....?
+G = 0.025

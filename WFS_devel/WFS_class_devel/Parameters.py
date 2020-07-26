@@ -28,7 +28,7 @@ cell = 200
 # Space between QCs [um]
 space = 10
 
-# Effective spot radium [um]
+# Effective spot radius [um]
 eff = 0.3
 
 # Linearization interval [um]
