@@ -117,3 +117,6 @@ tran_time_step = 1000
 
 # Sinalizes for the inclusion of interference between QCs
 noise_noiseless = "noiseless"
+
+# input optical power (W) for whole WFS matrix
+TPS = 1e-4

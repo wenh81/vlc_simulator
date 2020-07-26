@@ -69,25 +69,25 @@ qc_format = 0
 flag_approx_type = 0
 
 # Pi value
-PI = 314159265358979
+PI = 3.14159265358979323844
 
 # Boltzman constant (J/K)
-Kb = 1.38066e-18
+Kb = 1.38066e-23
 
 # Plancks constant (J.s)
-hplk = 6.62608e-29
+hplk = 6.62608e-34
 
 # Speed of light in vacuum (m/s)
-c0 = 29979245800000000
+c0 = 2.99792458e8
 
 # hplk*c0
-hplk_c0 = 1.9864488101e-15
+hplk_c0 = 1.9864488101e-25
 
 # hplk*c0/ele
-hplk_c0_e = 12398.435442
+hplk_c0_e = 1.2398435442e-6
 
 # electron charge  (Coulomb)
-ele = 1.602177e-13
+ele = 1.602177e-19
 
 # standard (max) size of the matrix for the wavefronts (check if right!)
 N = 10

@@ -6,7 +6,7 @@ import math
 
 
 class Quadcell(object):
-    def __init__(self, jx, jy, smooth, nn, theta, na, ma, xx, outx_l, outx, outy, slope, slope_exp, x_edge, qc_type, has_microlens, A_intensity, B_intensity, C_intensity, D_intensity):
+    def __init__(self, smooth, TP, jx, jy, nn, theta, na, ma, xx, outx_l, outx, outy, slope, slope_exp, x_edge, qc_type, has_microlens, A_intensity, B_intensity, C_intensity, D_intensity):
         """Constructor"""
 
         # Number of integrations points inside the QC
@@ -92,6 +92,15 @@ class Quadcell(object):
         
         # If 1, calculates the slope for linear approximation
         self.smooth = smooth
+
+        # Sync weghting factor for each microlens
+        self.TP = TP
+
+        # Square of the number of lenses.
+        self.n_ml = math.sqrt(Parameters.quantity)
+
+        # Wavelenght in [um]
+        self.lamb = Parameters.wave * 1e-6
     
         pass
 
@@ -195,14 +204,53 @@ class Quadcell(object):
         Cq = Cc
         Dq = Dc
 
-        self.A_intensity = Ac
-        self.B_intensity = Bc
-        self.C_intensity = Cc
-        self.D_intensity = Dc
+        # self.A_intensity = Ac
+        # self.B_intensity = Bc
+        # self.C_intensity = Cc
+        # self.D_intensity = Dc
 
+        #tp/TP = cotribution percentage of the spot with respect to max (spot center)
         if self.smooth == 0 :
-            # keep copying....
-            pass
+            if (Config.hplk_c0_e * self.TP) == 0 :
+                cnst = 0
+            else :
+                cnst = ((Parameters.TPS / (self.n_ml * self.n_ml)) * self.lamb) / (Config.hplk_c0_e * self.TP) #Número de fótons efeticos
+            if Config.flag_spice == 1 :
+                Ac *= Parameters.TPS / (self.n_ml * self.n_ml * self.TP) #W
+                Bc *= Parameters.TPS / (self.n_ml * self.n_ml * self.TP)
+                Cc *= Parameters.TPS / (self.n_ml * self.n_ml * self.TP)
+                Dc *= Parameters.TPS / (self.n_ml * self.n_ml * self.TP)
+                Ac *= 1 / (math.pow(self.cell_qc * 1e-6,2)) #W/(m^2)
+                Bc *= 1 / (math.pow(self.cell_qc * 1e-6,2))
+                Cc *= 1 / (math.pow(self.cell_qc * 1e-6,2))
+                Dc *= 1 / (math.pow(self.cell_qc * 1e-6,2))
+                #Ac *= 1 / (self.lamb * 1e6); #Adequação da irradiância para a unidade W/m2micm conforme necessário no SPICE
+                #Bc *= 1 / (self.lamb * 1e6);
+                #Cc *= 1 / (self.lamb * 1e6);
+                #Dc *= 1 / (self.lamb * 1e6);
+                
+                ############################## DOUBLE CHECK ##############################
+                # self.grava_arquivos = 1
+                # self.flag_V_QC = 0
+                # grava_le_arquivos(0) # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                # self.flag_V_QC = 1
+                # self.grava_arquivos = 0
+                ############################## DOUBLE CHECK ##############################
+                Aq *= cnst * 1e9
+                Bq *= cnst * 1e9
+                Cq *= cnst * 1e9
+                Dq *= cnst * 1e9
+            else :
+                Aq *= cnst * 1e9
+                Bq *= cnst * 1e9
+                Cq *= cnst * 1e9
+                Dq *= cnst * 1e9
+
+        # 'returns' all the intensities
+        self.A_intensity = Aq
+        self.B_intensity = Bq
+        self.C_intensity = Cq
+        self.D_intensity = Dq
 
 
 

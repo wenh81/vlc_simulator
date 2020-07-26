@@ -110,7 +110,7 @@ class WFS(object):
 
         self.calculate_sync_weighting_factor()
 
-        print(self.TP)
+        print(f'self.TP = {self.TP}')
 
         #Cálculo do slope da aproximação linear da resposta da QC.
         self.smooth = 1
@@ -256,14 +256,16 @@ class WFS(object):
         sd1 = 0
 
         # Creates dummy QC, only to use the getIntensitiy method
-        dummy_qc = Quadcell(self.smooth, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        dummy_qc = Quadcell(self.smooth, self.TP, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
         ##Cálculo da média
         for xx in np.arange(-x_edge, x_edge + (x_edge / NN), x_edge / NN):
             if x_edge == 0 or NN == 0:
-                print("Calc media", 0.0)
+                # print("Calc media", 0.0)
+                pass
             else :
-                print("Calc media", round((xx) / (x_edge / NN)))
+                # print("Calc media", round((xx) / (x_edge / NN)))
+                pass
             
             dummy_qc.calcAllIntensities(xx, 0)
             intensity_A = dummy_qc.getIntensitiy("A")
@@ -315,15 +317,18 @@ class WFS(object):
             if soma2 == 0 :
                 b1 = 0
             else :
+                
                 b1 = soma1 / soma2
             b0 = media - b1 * xs
         # print(b0)
         ##Cálculo do desvio padrão
         for xx in np.arange(-x_edge,x_edge + x_edge / NN,x_edge / NN):
             if x_edge == 0 or NN == 0:
-                print("Calc desvio padrão", 0.0)
+                # print("Calc desvio padrão", 0.0)
+                pass
             else :
-                print("Calc desvio padrão",round((xx) / (x_edge / NN)))
+                # print("Calc desvio padrão",round((xx) / (x_edge / NN)))
+                pass
 
             dummy_qc.calcAllIntensities(xx, 0)
             intensity_A = dummy_qc.getIntensitiy("A")
