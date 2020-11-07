@@ -338,6 +338,7 @@ class WFS(object):
             self.yb = b0
         print(R)
         #Fim while
+        # delete the temporary "self.dummy_qc"
         del self.dummy_qc
         
         # return ?
