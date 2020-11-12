@@ -1,16 +1,10 @@
-class Circuit(object):
-    def __init__(self, netlist, simulator):
-        """Constructor"""
+from Receiver import Receiver
 
-        # Stores the netlist of the circuit.
-        self.netlist = netlist
+class Circuit(Receiver):
+    def __init__(self):
+        """Constructor."""
 
-        # Defines the simulator for that netlist
-        self.which_simulator = simulator
+        Receiver.__init__(self)
+        
     
         pass
-
-    def calc_out_voltage(self, input_photocurrent_file):
-        """Calculates the output reconstructed voltage."""
-        pass
-    

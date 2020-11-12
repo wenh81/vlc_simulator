@@ -1,0 +1,120 @@
+{
+  "id": "f6fd6e06-b1cf-4177-a3ef-9cae1701693c",
+  "version": "2.0",
+  "name": "test_ligamagic",
+  "url": "https://ligamagic.com",
+  "tests": [{
+    "id": "88f3fd04-5221-4ab2-807e-ab19775a100d",
+    "name": "test",
+    "commands": [{
+      "id": "07668c0d-ca1e-4ae6-9dc2-8f07c0de1e75",
+      "comment": "",
+      "command": "open",
+      "target": "https://ligamagic.com",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "6d969b43-3b10-4831-8498-f3c43297d109",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "xpath=//input[@id='mainsearch']",
+      "targets": [],
+      "value": "10000"
+    }, {
+      "id": "ba6a7209-1ce3-4a7b-945a-7d9e305ecb68",
+      "comment": "",
+      "command": "type",
+      "target": "xpath=//input[@id='mainsearch']",
+      "targets": [],
+      "value": "teferi's protection"
+    }, {
+      "id": "58d7880d-9b1a-4477-8697-aab8e5536f48",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "xpath=//input[@id='mainsearch']",
+      "targets": [],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "d1c7ec0b-ca57-448f-99cd-b2b066423b3f",
+      "comment": "",
+      "command": "waitForElementVisible",
+      "target": "xpath=//div[@id='mobile-precos-menor']",
+      "targets": [],
+      "value": "10000"
+    }, {
+      "id": "142982eb-a857-41c8-a0e7-4cb38f1fd5bf",
+      "comment": "",
+      "command": "select",
+      "target": "xpath=//div[@id='mobile-precos-menor']",
+      "targets": [
+        ["id=precos-menor", "id"],
+        ["css=#precos-menor", "css:finder"],
+        ["xpath=//div[@id='precos-menor']", "xpath:attributes"],
+        ["xpath=//div[@id='card-info']/div[5]/div/div[2]", "xpath:idRelative"],
+        ["xpath=//div[5]/div/div[2]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "fb334071-65a1-4f0c-9b2b-946288ef399a",
+      "comment": "",
+      "command": "",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a5cb9d1c-6981-4f36-bbf6-a22c2f70a6d1",
+      "comment": "",
+      "command": "click",
+      "target": "css=#line_e7798405 > .e-col9-mobile .fFtBb",
+      "targets": [
+        ["css=#line_e7798405 > .e-col9-mobile .fFtBb", "css:finder"],
+        ["xpath=//div[@id='line_e7798405']/div[2]/div[3]/div[3]", "xpath:idRelative"],
+        ["xpath=//div[2]/div[3]/div[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e2adfc9a-c48e-4b49-8d8f-36095092d756",
+      "comment": "",
+      "command": "click",
+      "target": "css=#line_e7798405 .e-mob-preco",
+      "targets": [
+        ["css=#line_e7798405 .e-mob-preco", "css:finder"],
+        ["xpath=//div[@id='line_e7798405']/div[2]/div[3]", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div[4]/div[2]/div[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e8a68237-d476-4579-a1bd-76e1bfa9d90b",
+      "comment": "",
+      "command": "click",
+      "target": "css=#line_e7842819 .e-mob-preco",
+      "targets": [
+        ["css=#line_e7842819 .e-mob-preco", "css:finder"],
+        ["xpath=//div[@id='line_e7842819']/div[2]/div[3]", "xpath:idRelative"],
+        ["xpath=//div[5]/div[2]/div[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "df3adaa2-713e-465a-bf53-02d67c1befc2",
+      "comment": "",
+      "command": "click",
+      "target": "css=#line_e7810756 .e-mob-preco",
+      "targets": [
+        ["css=#line_e7810756 .e-mob-preco", "css:finder"],
+        ["xpath=//div[@id='line_e7810756']/div[2]/div[3]", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div[6]/div[2]/div[3]", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "b0514213-e65f-4087-9574-1751dbab152e",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["88f3fd04-5221-4ab2-807e-ab19775a100d"]
+  }],
+  "urls": ["https://ligamagic.com/"],
+  "plugins": []
+}

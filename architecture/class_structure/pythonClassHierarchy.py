@@ -98,14 +98,19 @@ class and parent class names."""
         """Method to write a class given a dictionary of contents.
 The string 'classStr' stores the text to become the final python script."""
         
-        
+        # Check if any datatype is a class, and import them at begining of file
+        listOfDataTypeList = df['datatype']
+        classStr = ""
+        for data_type in listOfDataTypeList:
+            if str(data_type) not in ["int", "float", "complex", "str", "dict", "list", "nan"]:
+                classStr += f"from {data_type} import {data_type}\n\n"
         
         # write class header, with or without parent hierarchy 
         # and importing its parent
         if parentClass == "None":
-            classStr = f"class {className}(object):"
+            classStr += f"class {className}(object):"
         else:
-            classStr = f"from {parentClass} import {parentClass}\n\n"
+            classStr += f"from {parentClass} import {parentClass}\n\n"
             classStr += f"class {className}({parentClass}):"
         
         
@@ -117,6 +122,7 @@ The string 'classStr' stores the text to become the final python script."""
         listOfMethods = df['methods']
         listOfDocStrings = df['docstring']
         listOfArgsList = df['argslist']
+        
 
         # Check if there is an '__init__' method. If not, raise error.
         if np.sum([1 if method == '__init__' else 0 for method in listOfMethods]) != 1:
@@ -208,6 +214,27 @@ expects mapping to parent variable '{item.strip()}' when calling parent class '{
                 if str(default) == 'nan':
                     raise ValueError(f"\n\n*Error --> No default value passed for \
 variable '{var}' at Class '{className}'.\n")
+                if "#VARIABLES" in str(default):
+                    for tab in self.listOfTabs:
+                        if tab.split("#")[0] in default:
+                            df_temp = pd.read_excel(self.excel_file, sheet_name=tab)
+                            for idx, method in enumerate(df_temp["methods"]):
+                                if method == "__init__":
+                                    arguments = df_temp["argslist"]
+                                    if str(arguments[idx]) == 'nan':
+                                        default = default.replace("#VARIABLES", "")
+                                    else:
+                                        replace_arg = []
+                                        for each_arg in arguments[idx].split(","):
+                                            if each_arg == "#all_variables":
+                                                for each_arg in df_temp["variables"]:
+                                                    replace_arg.append(f"{each_arg}={each_arg}")
+                                            else:
+                                                each_arg = each_arg.strip().split("[")[0]
+                                                replace_arg.append(f"{each_arg}={each_arg}")
+                                        replace_arg = ", ".join(replace_arg)
+                                        default = default.replace("#VARIABLES", str(replace_arg))
+                                    break
                 classStr += f"""{comment}
         self.{var} = {default}"""
             
@@ -216,7 +243,6 @@ variable '{var}' at Class '{className}'.\n")
     
         pass
 """
-
 
         # Given all methods, define them with their default and 
         # a comment (if any) above each line
@@ -431,7 +457,9 @@ if __name__ == '__main__':
 if __name__ == '__main__':
     # classy = ClassWriter('class_structure.xlsx')
     # classy = ClassWriter('class_structure_example.xlsx')
-    classy = ClassWriter('class_structure_WFS.xlsx')
+    # classy = ClassWriter('class_structure_WFS.xlsx')
+    # classy = ClassWriter('class_structure_VLC.xlsx')
+    classy = ClassWriter('class_structure.xlsx')
 
     # Create auto_gen classes
     classy.create_classes()
