@@ -1,0 +1,57 @@
+class Simulator(object):
+    def __init__(self, netlist, sync_obj):
+        """Constructor for the Circuit Simulator."""
+        
+        # Create sync object, and set debug and simulation path
+        self.sync_obj = sync_obj
+        
+        self.DEBUG = self.sync_obj.getDebug()
+        
+        self.sync_obj.appendToSimulationPath("Simulator")
+        
+        if self.DEBUG:
+            print('Running Simulator...')
+        
+        
+        # Timeout to abort simul, after that time is passed.
+        self.simul_timeout = None
+
+        # Netlist of circuit to be simulated.
+        self.netlist = netlist
+    
+        pass
+
+    def stop(self):
+        """Abort simulation, by user command or timeout."""
+        
+        self.sync_obj.appendToSimulationPath("stop @ Simulator")
+        
+        # Set previous for debug
+        self.sync_obj.setPrevious("Simulator")
+        
+        # Get abort from timeout or user command, for example
+        abort = True
+        
+        raise ValueError(f"\n\n***Error --> stop not supported yet!\n")
+        
+        return abort
+    
+    def getSimulTimeout(self):
+        """Returns value of self.simul_timeout"""
+        
+        return self.simul_timeout
+
+    def setSimulTimeout(self, simul_timeout):
+        """Set new value for self.simul_timeout"""
+        
+        self.simul_timeout = simul_timeout
+
+    def getNetlist(self):
+        """Returns value of self.netlist"""
+        
+        return self.netlist
+
+    def setNetlist(self, netlist):
+        """Set new value for self.netlist"""
+        
+        self.netlist = netlist

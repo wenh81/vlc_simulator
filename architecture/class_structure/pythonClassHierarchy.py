@@ -102,7 +102,7 @@ The string 'classStr' stores the text to become the final python script."""
         listOfDataTypeList = df['datatype']
         classStr = ""
         for data_type in listOfDataTypeList:
-            if str(data_type) not in ["int", "float", "complex", "str", "dict", "list", "nan"]:
+            if str(data_type) not in ["int", "float", "complex", "str", "dict", "list", "nan", "tuple", "numpy.ndarray", "bool"]:
                 classStr += f"from {data_type} import {data_type}\n\n"
         
         # write class header, with or without parent hierarchy 
@@ -160,8 +160,23 @@ found at Class '{className}'.\n")
                 argslist = 'self'
             # Write the actual method
             classStr += f"""
-    def __init__({argslist}):
-        \"\"\"{docstring}\"\"\""""
+    def __init__({argslist}, DEBUG=False):
+        \"\"\"{docstring}\"\"\"
+        
+        if DEBUG:
+            print('Running {className}...')
+        
+        """
+        
+        
+        # # print(argslist)
+        # for arg in argslist.split(','):
+        #     arg = arg.strip()
+        #     # match = [print(default) for default in listOfDefaultVars if default == arg]
+        #     match = [default for default in listOfDefaultVars]
+        #     # print(listOfDefaultVars)
+        #     print(match)
+        #     print(arg)
         
         # If there is a parent, get write the inheritance "super" statement
         if parentClass != "None":
@@ -271,8 +286,25 @@ does not have a docstring!\n")
         \"\"\"{docstring}\"\"\"
         pass
     
-"""
+"""     
+        # write get and set functions for each variable
+        for idx,var in enumerate(listOfVars):
+            # Write the actual method
+            varTemp = var.split('_')
+            varTemp = ''.join([(y[0].upper() + y[1:]) for y in varTemp])
+            # print(var)
+            classStr += f"""
+    def get{varTemp}(self):
+        \"\"\"Returns value of self.{var}\"\"\"
         
+        return self.{var}
+
+    def set{varTemp}(self, {var}):
+        \"\"\"Set new value for self.{var}\"\"\"
+        
+        self.{var} = {var}
+"""
+            
         # Open the class file, and dump it
         python_file = os.path.join(self.auto_gen_folder, f'{className}.py')
         with open(python_file, 'w') as f:
