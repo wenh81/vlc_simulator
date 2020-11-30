@@ -7,7 +7,7 @@ class Mapping(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug()
+        self.DEBUG = self.sync_obj.getDebug("Mapping") or self.sync_obj.getDebug("all")
         
         self.sync_obj.appendToSimulationPath("Mapping")
         
@@ -25,19 +25,29 @@ class Mapping(object):
         self.bits_per_symbol = mapping_config[1]
 
         # Size of current frame to be transmitted.
-        self.frame_size = len(bitstream_frame)
+        if self.bitstream_frame is not None:
+            self.frame_size = len(bitstream_frame)
 
+            # Array with all parallelized symbols from the input bitstream.
+            self.parallelized_info = np.zeros([self.frame_size//self.bits_per_symbol, self.bits_per_symbol], dtype=np.uint8)
+            
+        else:
+            
+            self.frame_size = None
+            
+            self.parallelized_info = None
+            
+            
         # Type of mapping to be applied in parallelized data.
         self.mapping_type = mapping_config[0]
 
-        # Array with all parallelized symbols from the input bitstream.
-        self.parallelized_info = np.zeros([self.frame_size//self.bits_per_symbol, self.bits_per_symbol], dtype=np.uint8)
         # self.parallelized_info = np.zeros([self.frame_size//self.bits_per_symbol, self.bits_per_symbol], dtype=np.bool_)
         
         # Bitstream info after receiveing, depending on number of frames.
         self.rx_bitstream_frame = None
         
-        # Array with all symbols converted from the input bitstream.
+        # Array with all symbols converted from the input bitstream, when mapping
+        # Or the output mapped, when demapping
         self.mapped_info = mapped_info
         
         # Has the shape of the input mapped info.
@@ -78,6 +88,10 @@ class Mapping(object):
                 }
             else:
                 raise ValueError(f"\n\n***Error --> {self.bits_per_symbol}-QAM not supported yet.\n")
+            
+        
+        # Also, setup the demapping table
+        self.demapping_table = {v : k for k, v in self.mapping_table.items()}
         
     def serialToParallel(self):
         """Converts each 'bitstream_frame' into 2D numpy array, as [bits_per_symbol, len(bitstream_info)/bits_per_symbol]"""
@@ -120,14 +134,51 @@ class Mapping(object):
 
     def applyDemapping(self):
         """Given 'mapped_output', returns the closest values for the demapping."""
-        pass
-    
+        
+        self.sync_obj.appendToSimulationPath("applyDemapping @ Mapping")
+        
+        self.sync_obj.setPrevious("Mapping")
+        
+        if self.mapping_type == "QAM":
+            
+            self.setupMappingTable()
+            
+            self.sync_obj.setPrevious("Mapping")
+            
+            # Given the demapping table, get all possible constellation points
+            constellation = np.array([x for x in self.demapping_table.keys()])
+            
+            # calculates what is the distance between each received data, and each constellation point
+            euclidean_dist = abs(self.mapped_info.reshape((-1,1)) - constellation.reshape((1,-1)))
+            
+            # Get the minimum distance index
+            min_distance = euclidean_dist.argmin(axis=1)
+            
+            # get back the real constellation point
+            self.found_constellation = constellation[min_distance]
+            
+            # Do the de-mapping transofrmation, back to bit list values
+            self.rx_bitstream_frame = np.vstack([self.demapping_table[C] for C in self.found_constellation])
+            
+            self.sync_obj.setPrevious("Mapping")
+            
+            self.ParallelToserial()
+            
+            self.sync_obj.setPrevious("Mapping")
+            
+        else:
+            raise ValueError(f"\n\n***Error --> Not supported mapping_type: <{self.mapping_type}>!\n")
+        
 
     def ParallelToserial(self):
-        """Converts each 'bitstream_frame' into a serial stream of data 'rx_bitstream_frame'."""
-        pass
-    
-
+        """Converts each parllelized constellation into a serial stream of data 'rx_bitstream_frame'."""
+        
+        self.sync_obj.appendToSimulationPath("ParallelToserial @ Mapping")
+        
+        self.sync_obj.setPrevious("Mapping")
+                
+        self.rx_bitstream_frame = self.rx_bitstream_frame.reshape((-1,))
+        
     def getBitstreamFrame(self):
         """Returns value of self.bitstream_frame"""
         
@@ -191,6 +242,16 @@ class Mapping(object):
         """Set new value for self.rx_bitstream_frame"""
         
         self.rx_bitstream_frame = rx_bitstream_frame
+    
+    def getFoundConstellation(self):
+        """Returns value of self.found_constellation"""
+        
+        return self.found_constellation
+
+    def setFoundConstellation(self, found_constellation):
+        """Set new value for self.found_constellation"""
+        
+        self.found_constellation = found_constellation
     
     def getNumberOfDataCarriers(self):
         """Returns value of self.number_of_data_carriers"""

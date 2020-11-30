@@ -7,7 +7,7 @@ class Virtuoso(Simulator):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug()
+        self.DEBUG = self.sync_obj.getDebug("Virtuoso") or self.sync_obj.getDebug("all")
         
         self.sync_obj.appendToSimulationPath("Virtuoso")
         

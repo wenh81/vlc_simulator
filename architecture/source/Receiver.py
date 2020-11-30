@@ -2,6 +2,8 @@ from Detector import Detector
 
 from ROIC import ROIC
 
+from ADC import ADC
+
 from BouncingPixel import BouncingPixel
 
 # from APS import APS
@@ -15,7 +17,7 @@ class Receiver(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug()
+        self.DEBUG = self.sync_obj.getDebug("Receiver") or self.sync_obj.getDebug("all")
         
         self.sync_obj.appendToSimulationPath("Receiver")
         
@@ -242,8 +244,7 @@ class Receiver(object):
         if not Global.bypass_dict["ADC"]:
             
             # Creates ADC object
-            self.adc_obj = ADC
-            (
+            self.adc_obj = ADC(
                 rx_data = self.rx_voltage_list,
                 sync_obj = self.sync_obj
             )

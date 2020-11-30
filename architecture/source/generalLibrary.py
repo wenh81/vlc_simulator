@@ -6,6 +6,10 @@ from matplotlib import pyplot as plt
 
 import numpy as np
 
+import Global
+
+from timeit import default_timer as timer
+
 def plotTxRxData(data, label, handle, sync_obj, show = False):
     """Plots Tx/Rx data."""
     
@@ -31,7 +35,6 @@ def plotTxRxDataList(data_list, label, handle, sync_obj, show = False):
     
     concatenated_data = []
     for data in data_list:
-        print(type(data))
         concatenated_data += list(data)
     
     concatenated_data = np.array(concatenated_data)
@@ -44,3 +47,14 @@ def plotTxRxDataList(data_list, label, handle, sync_obj, show = False):
         sync_obj = sync_obj,
         show = show
     )
+    
+def timer_dec(function):
+    """Function to be used as decorator, for method timing calculations."""
+    def new_function(*args, **kw):
+        start_time = timer()
+        result = function(*args, **kw)
+        elapsed = timer() - start_time
+        print(f'>>>> Function "{function.__name__}" took {elapsed} seconds to complete.\n')
+        
+        return result
+    return new_function

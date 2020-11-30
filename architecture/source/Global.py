@@ -1,26 +1,89 @@
 import numpy as np
 
+# global debug flag
+DEBUG = {
+    "all": False,
+    "VLC": True,
+    "Message": False,
+    "Transmitter": False,
+    "Mapping": False,
+    "Modulator": False,
+    "OFDM": False,
+    "DAC": False,
+    "Channel": False,
+    "LightSource": False,
+    "Receiver": False,
+    "Detector": False,
+    "ADC": False,
+    "ROIC": False,
+    "BouncingPixel": False,
+    "Simulator": False,
+    "Virtuoso": False,
+    "Tanner": False,
+    "MeritFunctions": True,
+    "SimulationSync": True
+}
+
+# global plot flag
+PLOT = {
+    "all": False,
+    "VLC": True,
+    "Message": False,
+    "Transmitter": False,
+    "Mapping": False,
+    "Modulator": False,
+    "OFDM": False,
+    "DAC": False,
+    "Channel": False,
+    "LightSource": False,
+    "Receiver": False,
+    "Detector": False,
+    "ADC": False,
+    "ROIC": False,
+    "BouncingPixel": False,
+    "Simulator": False,
+    "Virtuoso": False,
+    "Tanner": False,
+    "MeritFunctions": True,
+    "SimulationSync": False
+}
+
+
 # Dict with all bypass flags
 bypass_dict = {
-                "Transmitter": False,
-                "LightSource": True,
-                "DAC": False,
-                "DAC_rounding_or_simul": True,
-                "Channel": True,
-                "Detector": True,
-                "ROIC": False,
-                "ADC": False,
-                "ADC_rounding_or_simul": True
-            }
+    "Modulator": False,
+    "LightSource": True,
+    "DAC": True,
+    "DAC_rounding_or_simul": True,
+    "Channel": True,
+    "Detector": True,
+    "ROIC": True,
+    "ADC": True,
+    "ADC_rounding_or_simul": True
+}
+
+# TODO --- FIX ISSUE WITH << "DAC": False >>, where only
+# abs of signal is passed through. Needs to apply hermitian symetry in this case!
 
 # list of channel responses for each lamp, when bypassig Channel.
-list_of_channel_response = [0.1*np.array([1, 0, 0.3+0.3j])]
+list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
+# list_of_channel_response = [0.1*np.array([1, 0, 0.3+0.3j])]
 
 # rx_SNR (dB) is ued if not set, if not calculated.
-rx_SNR_dB = 25
+rx_SNR_dB = 30
+# rx_SNR_dB = 25
+# rx_SNR_dB = 10
+
+# Flag to remove padded zeros before analysis
+remove_padded_zeros = False
+remove_padded_zeros = True
+# Flag to remove padded zeros at Message(), even if they were not removed before.
+remove_padded_zeros_at_message = False
+remove_padded_zeros_at_message = True
 
 # Flag to indicate use of raytrace, or not, for the CIR estimation
 use_raytrace = False
+# use_raytrace = True
 
 # TODO --- add timeunits to the program
 timeunit = "ns"
@@ -46,12 +109,21 @@ which_simulator = "Virtuoso"
 # Flag to define if using circuit simulation.
 circuit_simulation = False
 
+# Enable multi_theading or not
+multi_theading = True
+# multi_theading = False
+
 # Input info structure
 input_info = {"type": "str", "data": ["Primeiro", "Segundo"]}
+input_info = {"type": "str", "data": ["mini msg!"]}
+input_info = {"type": "str", "data": ["mensagem media...!"]}
 input_info = {"type": "str", "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
-# input_info = {"type": "image", "data": [r"../images/test.png"]}
+input_info = {"type": "str", "data": ["A vida eh curta, por isso viva a vida bem vivida!"]}
+input_info = {"type": "image", "data": [r"../images/zebra.png"], "n_bytes": [3]}
+input_info = {"type": "image", "data": [r"../images/test.png"], "n_bytes": [3]}
+# input_info = {"type": "image", "data": [r"../images/test_larger.png"], "n_bytes": [3]}
+# input_info = {"type": "image", "data": [r"../images/test_large_img.png"], "n_bytes": [3]}
 # input_info = {"type": "image", "data": [r"../images/test.png", r"../images/test_larger.png"]}
-# input_info = {"type": "image", "data": [r"../images/test_large_img.png"]}
 
 # supported input_info types
 supported_input_info = ["str", "image", "audio"]
@@ -65,8 +137,10 @@ modulation_config = {
                     "n_pilots": 8,
                     "n_cp": 32//4
                     },
-                1: {"type": "OOK"}
-                }
+                
+                1: {"type": "OOK"
+                    }
+}
 # Choose modulation type from the above.
 modulation_index = 0
 
@@ -76,6 +150,7 @@ mapping_config = {
                 1: ["QAM", 8],
                 2: ["QAM", 16],
                 3: ["QAM", 64]
-                }
+}
+
 # Choose mapping type from the above.
 mapping_index = 0

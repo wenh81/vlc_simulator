@@ -8,7 +8,7 @@ class Channel(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug()
+        self.DEBUG = self.sync_obj.getDebug("Channel") or self.sync_obj.getDebug("all")
         
         self.sync_obj.appendToSimulationPath("Channel")
         
@@ -159,10 +159,12 @@ class Channel(object):
     def getChannelResponse(self):
         """Returns value of self.channel_response"""
         
+        self.sync_obj.appendToSimulationPath("getChannelResponse @ Channel")
+        
         return self.channel_response
 
     def setChannelResponse(self, channel_response):
-        """Set new value for self.channel_response"""
+        """Set new value for list of self.channel_response"""
         
         self.sync_obj.appendToSimulationPath("setChannelResponse @ Channel")
         
@@ -172,7 +174,7 @@ class Channel(object):
         self.channel_response = channel_response
 
     def getRxConvolved(self):
-        """Returns value of self.rx_convolved"""
+        """Returns value for list of self.rx_convolved"""
         
         return self.rx_convolved
 

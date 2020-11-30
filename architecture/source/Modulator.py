@@ -4,6 +4,8 @@ from OFDM import OFDM
 
 import numpy as np
 
+import Global
+
 class Modulator(object):
     def __init__(self, bitstream_frame, modulation_config, mapping_config, sync_obj):
         """Constructor of Modulator. It's also the demodulator."""
@@ -11,7 +13,7 @@ class Modulator(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug()
+        self.DEBUG = self.sync_obj.getDebug("Modulator") or self.sync_obj.getDebug("all")
         
         self.sync_obj.appendToSimulationPath("Modulator")
         
@@ -88,37 +90,45 @@ class Modulator(object):
         # Set previous for debug
         self.sync_obj.setPrevious("Modulator")
         
-        if self.modulation_type == "OFDM":
+        if not Global.bypass_dict['Modulator']:
+        
+            if self.modulation_type == "OFDM":
+                
+                # Before modulation, we need to setup the carrier inexes.
+                self.ofdm_obj.setupOFDMCarriersIndexes()
+                
+                # Set previous for debug
+                self.sync_obj.setPrevious("Modulator")
+                
+                # Apply OFDM modulation
+                self.ofdm_obj.applyModulation()
+                
+                # Set previous for debug
+                self.sync_obj.setPrevious("Modulator")
+                
+                # Returns a list of OFDM symbols to be transmitted. The input stream data is
+                # splitted into various symbols, depending on the throughput of the modulator.
+                self.tx_data_list = self.ofdm_obj.getOFDMSymbolList()
+                
+            elif self.modulation_type == "OOK":
+                
+                pass
             
-            # Before modulation, we need to setup the carrier inexes.
-            self.ofdm_obj.setupOFDMCarriersIndexes()
-            
-            # Set previous for debug
-            self.sync_obj.setPrevious("Modulator")
-            
-            # Apply OFDM modulation
-            self.ofdm_obj.applyModulation()
-            
-            # Set previous for debug
-            self.sync_obj.setPrevious("Modulator")
-            
-            # Returns a list of OFDM symbols to be transmitted. The input stream data is
-            # splitted into various symbols, depending on the throughput of the modulator.
-            self.tx_data_list = self.ofdm_obj.getOFDMSymbolList()
-            
-        elif self.modulation_type == "OOK":
-            
-            pass
+            else:
+                raise ValueError(f"\n\n***Error --> Not supported modulation_type: <{self.modulation_type}>!\n")
         
         else:
-            raise ValueError(f"\n\n***Error --> Not supported modulation_type: <{self.modulation_type}>!\n")
+            # # Bypass Modulator entirely
+            # self.tx_data_list = list(np.array(self.bitstream_frame))
+            
+            raise ValueError(f"\n\n***Error --> Bypass 'Modulator' not implemented yet!\n")
         
     
 
-    def applyDemodulation(self):
-        """Applies the de-modulation on the received info 'rx_data_list', and returns ??????"""
+    def applyDeModulation(self):
+        """Applies the de-modulation on the received info 'rx_data_list', and returns the symbols"""
         
-        self.sync_obj.appendToSimulationPath("applyDemodulation @ Modulator")
+        self.sync_obj.appendToSimulationPath("applyDeModulation @ Modulator")
         
         # Set previous for debug
         self.sync_obj.setPrevious("Modulator")
@@ -131,15 +141,24 @@ class Modulator(object):
             # Set previous for debug
             self.sync_obj.setPrevious("Modulator")
             
+            # Set the actual channel responses, for further comparissons with estimated ones
+            self.ofdm_obj.setListOfChannelResponses(
+                self.list_of_channel_response
+            )
+            
+            # Set previous for debug
+            self.sync_obj.setPrevious("Modulator")
+            
             # Apply OFDM De-modulation
             self.ofdm_obj.applyDeModulation()
             
             # Set previous for debug
             self.sync_obj.setPrevious("Modulator")
             
-            # # Returns a list of OFDM symbols to be transmitted. The input stream data is
-            # # splitted into various symbols, depending on the throughput of the modulator.
-            # self.tx_data_list = self.ofdm_obj.getOFDMSymbolList()
+            # Get the RX reconstructed frame data
+            self.rx_bitstream_frame = self.ofdm_obj.getBitstreamFrame()
+            
+            self.sync_obj.setPrevious("Modulator")
             
         elif self.modulation_type == "OOK":
             
@@ -149,17 +168,35 @@ class Modulator(object):
             raise ValueError(f"\n\n***Error --> Not supported modulation_type: <{self.modulation_type}>!\n")
         
         
-    
-
+        
+        
     def getBitstreamFrame(self):
         """Returns value of self.bitstream_frame"""
+        
+        self.sync_obj.appendToSimulationPath("getBitstreamFrame @ Modulator")
         
         return self.bitstream_frame
 
     def setBitstreamFrame(self, bitstream_frame):
         """Set new value for self.bitstream_frame"""
         
+        self.sync_obj.appendToSimulationPath("setBitstreamFrame @ Modulator")
+        
         self.bitstream_frame = bitstream_frame
+    
+    def getRxBitstreamFrame(self):
+        """Returns value of self.rx_bitstream_frame"""
+        
+        self.sync_obj.appendToSimulationPath("getRxBitstreamFrame @ Modulator")
+        
+        return self.rx_bitstream_frame
+
+    def setRxBitstreamFrame(self, rx_bitstream_frame):
+        """Set new value for self.rx_bitstream_frame"""
+        
+        self.sync_obj.appendToSimulationPath("setRxBitstreamFrame @ Modulator")
+        
+        self.rx_bitstream_frame = rx_bitstream_frame
 
     def getModulationConfig(self):
         """Returns value of self.modulation_config"""
@@ -258,3 +295,17 @@ class Modulator(object):
         self.sync_obj.appendToSimulationPath("setRxDataList @ Modulator")
         
         self.rx_data_list = rx_data_list
+    
+    def getListOfChannelResponses(self):
+        """Returns value of self.list_of_channel_response"""
+        
+        self.sync_obj.appendToSimulationPath("getListOfChannelResponses @ Modulator")
+        
+        return self.list_of_channel_response
+
+    def setListOfChannelResponses(self, list_of_channel_response):
+        """Set new value for self.list_of_channel_response"""
+        
+        self.sync_obj.appendToSimulationPath("setListOfChannelResponses @ Modulator")
+        
+        self.list_of_channel_response = list_of_channel_response

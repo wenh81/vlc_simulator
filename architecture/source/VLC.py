@@ -23,15 +23,23 @@ from matplotlib import pyplot as plt
 
 import generalLibrary as lib
 
-class Main(object):
-    def __init__(self, DEBUG=False, PLOT=False):
+from generalLibrary import timer_dec
+
+from timeit import default_timer as timer
+
+class VLC(object):
+    
+    def __init__(self):
         """Constructor"""
-        self.DEBUG = DEBUG
         
-        self.PLOT = PLOT
+        self.DEBUG = Global.DEBUG["VLC"]
+        
+        self.PLOT = Global.PLOT["VLC"] or Global.PLOT["all"]
+        
+        self.start_timer = timer()
         
         if self.DEBUG:
-            print('Running Main...')
+            print('Running VLC...')
             pass
         
         ###########################################################################
@@ -39,8 +47,9 @@ class Main(object):
         
         # Create object for SimulationSync, used for overral simulation control and debug.
         self.sync_obj = SimulationSync(
-            DEBUG = self.DEBUG,
-            previous = "Main"
+            DEBUG = Global.DEBUG,
+            PLOT = Global.PLOT,
+            previous = "VLC"
             )
         
         ###########################################################################
@@ -58,7 +67,7 @@ class Main(object):
             pass
         
         # Set previous for debug
-        self.sync_obj.setPrevious("Main")
+        self.sync_obj.setPrevious("VLC")
         
         ###########################################################################
         # >>>>>>>>>> CONVERT MESSAGES TO LIST OF BITSTREAMS
@@ -69,14 +78,18 @@ class Main(object):
         ###########################################################################
         # >>>>>>>>>> FOR EACH MESSAGE, ITERATE THROUGH ITS BITSTREAM FROM TRANSMITTER UP TO RECEIVER
         
+        # starts empty list with all received frames
+        rx_frames = []
+        
         # For loop for each frame bitstream (each information to be sent in Global.input_info)
         for curr_frame in self.message_obj.getBitstreamFrames():
-            if self.DEBUG:
-                print(f'curr_frame = {curr_frame}')
-                pass
+            
+            # if self.DEBUG:
+            #     print(f'curr_frame = {curr_frame}')
+            #     pass
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> FOR THAT BITSTREAM, STARTS MODULATION, GIVEN MODULATION CONFIG
@@ -90,7 +103,7 @@ class Main(object):
             )
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> CREATES MODULATION OBJECT, DEPENDING ON THE TYPE (EX: OFDM)
@@ -99,7 +112,7 @@ class Main(object):
             self.modulator_obj.createModulator()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> APPLY MODULATION GIVEN CHOOSEN TYPE (EX: OFDM)
@@ -108,7 +121,7 @@ class Main(object):
             self.modulator_obj.applyModulation()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> GET THE LIST OF DATA TO BE TRANSMITTED, AFTER MODULATION
@@ -120,7 +133,7 @@ class Main(object):
             self.tx_data_list = self.modulator_obj.getTxDataList()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> STARTS TRANSMITTER, GIVEN CONFIG
@@ -133,7 +146,7 @@ class Main(object):
             )
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> APPLY DAC ON TX_DATA, CONVERTING TO ANALOG. CAN BE 
@@ -143,7 +156,7 @@ class Main(object):
             self.transmitter_obj.applyDAC()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> CALCULATES OPTICAL POWER, DEPENDING ON THE LIGHTSOURCES
@@ -153,7 +166,7 @@ class Main(object):
             self.transmitter_obj.calculatesOpticalPower()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> RETRIEVE TX_DATA LIST FOR THE CHANNEL
@@ -162,14 +175,14 @@ class Main(object):
             tx_data_list = self.transmitter_obj.getTxOpticalOutList()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             if self.PLOT:
                 handle = plt.figure(figsize=(8,2))
                 lib.plotTxRxDataList(tx_data_list, 'TX DATA', handle, self.sync_obj, show = False)
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             
             ###########################################################################
@@ -210,7 +223,7 @@ class Main(object):
                     self.channel_obj.setChannelResponse(Global.list_of_channel_response)
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> APPLY EACH CIR (FOR EACH LIGHTSOURCE) TO EACH TX_DATA.
@@ -219,22 +232,22 @@ class Main(object):
             self.channel_obj.applyChannelResponse()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> GET RX_DATA LIST CONVOLVED BY CHANNEL AFTER ADDING NOISE.
             
-            # Gets the list of optical powers at the receiver, after convolution on channel response, and noise addition.
+            # Gets the list of optical powers at the receiver, after convolution on channel response, and noise additi-YCon.
             rx_data_list = self.channel_obj.getRxDataOut()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             if self.PLOT:
                 lib.plotTxRxDataList(rx_data_list, 'RX DATA', handle, self.sync_obj, show = True)
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> STARTS RECEIVER, GIVEN CONFIG
@@ -248,7 +261,7 @@ class Main(object):
             )
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> CALCULATES PHOTOCURRENTS, DEPENDING ON THE DETECTORS
@@ -257,7 +270,7 @@ class Main(object):
             self.receiver_obj.calculatesPhotocurrent()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> CALCULATES THE OUTPUT VOLTAGE
@@ -266,7 +279,7 @@ class Main(object):
             self.receiver_obj.calculatesOutVoltage()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> APPLY ADC ON RX_DATA, CONVERTING FROM ANALOG TO DIGITAL
@@ -275,41 +288,114 @@ class Main(object):
             self.receiver_obj.applyADC()
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
             ###########################################################################
             # >>>>>>>>>> GET ADC RX_DATA TO PASS FOR DE-MODULATOR
             
-            self.modulator_obj.setRxDataList
-            (
+            self.modulator_obj.setRxDataList(
                 self.receiver_obj.getAdcRxDataList()
             )
             
             # Set previous for debug
-            self.sync_obj.setPrevious("Main")
+            self.sync_obj.setPrevious("VLC")
             
+            ###########################################################################
+            # >>>>>>>>>> SET THE ACTUAL CHANNEL RESPONSE, FOR FURTHER COMPARISSONS
             
-            pp(self.receiver_obj)
+            # Sets the list of channel responses, for further comparissons with estimated ones
+            self.modulator_obj.setListOfChannelResponses(
+                self.channel_obj.getChannelResponse()
+            )
+            
+            # Set previous for debug
+            self.sync_obj.setPrevious("VLC")
+            
+            ###########################################################################
+            # >>>>>>>>>> APPLY DE-MODULATION GIVEN TYPE CHOOSEN BEFORE (EX: OFDM)
+            
+            # Applies the modulation, with modulation object just created
+            self.modulator_obj.applyDeModulation()
+            
+            self.sync_obj.setPrevious("VLC")
+            
+            ###########################################################################
+            # >>>>>>>>>> RETRIEVE RX DATA
+            
+            # Get the received frame message
+            curr_rx_frame = self.modulator_obj.getRxBitstreamFrame()
+            
+            # if self.DEBUG:
+            #     print(f'curr_rx_frame = {curr_rx_frame}')
+            #     pass
+            
+            # Append current rx frame
+            rx_frames.append(curr_rx_frame)
+            
+            # Set previous for debug
+            self.sync_obj.setPrevious("VLC")
+            
+            # pp(self.receiver_obj)
+        
+        self.sync_obj.setPrevious("VLC")
+        
+        ###########################################################################
+        # >>>>>>>>>> SET RECOVERED BITSTREAM TO MESSAGE OBJECT
+        
+        self.message_obj.setRxBitstreamFrames(rx_frames)
+        
+        self.sync_obj.setPrevious("VLC")
         
         
-        # # Merit Funcions object
-        # self.merit_functions_obj = MeritFunctions()
+        ###########################################################################
+        # >>>>>>>>>> CREATE MERIT FUNCTION OBJECT
+        
+        # Merit Funcions object
+        self.merit_functions_obj = MeritFunctions(
+            sync_obj = self.sync_obj
+        )
+        
+        self.sync_obj.setPrevious("VLC")
+        
+        
+        ###########################################################################
+        # >>>>>>>>>> GET < BER > FOR EACH FRAME
+        print()
+        print()
+        print()
+        
+        # print BER
+        BER = self.merit_functions_obj.calculateBER(
+            self.message_obj.getBitstreamFrames(),
+            self.message_obj.getRxBitstreamFrames()
+        )
         
         # Set previous for debug
-        self.sync_obj.setPrevious("Main")
-            
-        # Get recovered info from the received stream of bits, and converts back to original form.
-        recovered_info = self.message_obj.BitstreamToMessage(rx_bitstream_frames = self.message_obj.getBitstreamFrames())
+        self.sync_obj.setPrevious("VLC")
         
-        if DEBUG:
-            print(f'recovered_info = {recovered_info}')
-            # print(f'type = {type(info[0])}')
+        
+        ###########################################################################
+        # >>>>>>>>>> SHOW RX AND TX VALUES
+        
+        if self.DEBUG:
             pass
+            
+        self.message_obj.compareMessages(
+            Global.input_info["data"],
+            self.message_obj.BitstreamToMessage()
+        )
+            
+            
         
-        # Prints full simulation path
-        print(self.sync_obj.getSimulationPath())
         
-        pass
+        ###########################################################################
+        # >>>>>>>>>> PRINTS FULL SIMUL PATH, FOR DEBUG
+        
+        if self.DEBUG:
+            # Prints full simulation path
+            # print(self.sync_obj.getSimulationPath())
+            self.total_time = timer() - self.start_timer
+            print(f"\nTotal execution time was << {self.total_time} >> seconds.\n")
 
     def getMessageObj(self):
         """Returns value of self.message_obj"""
@@ -386,7 +472,5 @@ if __name__ == "__main__":
     
     print("Starting VLC Simulator...")
     
-    
-    main_obj = Main(DEBUG=True, PLOT=True)
-    # main_obj = Main(DEBUG=False, PLOT=True)
+    main_obj = VLC()
     

@@ -1,12 +1,14 @@
 from tabulate import tabulate
 
 class SimulationSync(object):
-    def __init__(self, previous, DEBUG=False):
+    def __init__(self, previous, DEBUG=False, PLOT=False):
         """Constructor of SimulationSync. Used for overral simulation control and debug."""
         
         self.DEBUG = DEBUG
         
-        if self.DEBUG:
+        self.PLOT = PLOT
+        
+        if self.DEBUG["all"] or self.DEBUG["SimulationSync"]:
             print('Running SimulationSync...')
         
         # String with the followed path for the whole simulation
@@ -55,15 +57,25 @@ class SimulationSync(object):
         
         self.simulation_path = simulation_path
     
-    def getDebug(self):
+    def getDebug(self, module = "all"):
         """Returns value of self.DEBUG"""
         
-        return self.DEBUG
+        return self.DEBUG[module]
 
-    def setDebug(self, DEBUG):
+    def setDebug(self, DEBUG, module = "all"):
         """Set new value for self.DEBUG"""
         
-        self.DEBUG = DEBUG
+        self.DEBUG = DEBUG[module]
+    
+    def getPlot(self, module = "all"):
+        """Returns value of self.PLOT"""
+        
+        return self.PLOT[module]
+
+    def setPlot(self, PLOT, module = "all"):
+        """Set new value for self.PLOT"""
+        
+        self.PLOT = PLOT[module]
     
     def getPrevious(self):
         """Returns value of self.previous"""
