@@ -34,8 +34,6 @@ class MeritFunctions(object):
 
         # Average datarate for the whole process.
         self.DataRate = None
-    
-        pass
 
     @sync_track
     def calculateBER(self, tx_data_list, rx_data_list):
@@ -63,7 +61,7 @@ class MeritFunctions(object):
             print (f"Number of bits with error << {self.numb_bit_err} >> ")
             print (f"Obtained Bit error rate << {self.BER} >> % ")
         
-        return self.BER
+        return self.BER, self.numb_bit_err
     
 
     @sync_track

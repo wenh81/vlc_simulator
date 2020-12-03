@@ -48,8 +48,6 @@ class Receiver(object):
         """Get the receiver_config, and for each position (each dict), create a different detector array."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Receiver")
         
         # start all_detector_array
         self.all_detector_arrays = []
@@ -63,8 +61,6 @@ class Receiver(object):
             # For each detector in the detector array
             for idx in range(0, len(detector_array_dict["detector_type"])):
                 
-                # Set previous for debug
-                self.sync_obj.setPrevious("Receiver")
                 
                 # Create array of detectors
                 detector_array.append(
@@ -84,8 +80,6 @@ class Receiver(object):
         """Create a detector array, i.e. an array of Detector objects."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Receiver")
             
         # Create detector object
         detector_obj = Detector(
@@ -102,8 +96,6 @@ class Receiver(object):
         """Calculates what is the photocurrent provided for each time step, as rx_photocurrent_list."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Receiver")
         
         # If not bypassing the detector, calculate photocurrent based on it.
         if not Global.bypass_dict["Detector"]:
@@ -117,8 +109,6 @@ class Receiver(object):
             for detector_arrays in self.all_detector_arrays:
                 for detector in detector_arrays:
                     
-                    # Set previous for debug
-                    self.sync_obj.setPrevious("Receiver")
                     
                     # do conversion to photocurrent
                     self.rx_photocurrent_list = detector.convertsToPhotocurrent(self.rx_data_in_list)
@@ -133,8 +123,6 @@ class Receiver(object):
         """Get the roic_config, and for each position create a different roic array."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Receiver")
         
         # start all_roic_array
         self.all_roic_arrays = []
@@ -148,8 +136,6 @@ class Receiver(object):
             # For each roic in the roic array
             for idx in range(0, len(roic_array_dict["circuit_type"])):
                 
-                # Set previous for debug
-                self.sync_obj.setPrevious("Receiver")
                 
                 # Create array of roics
                 roic_array.append(
@@ -167,8 +153,6 @@ class Receiver(object):
         """Create a ROIC array, i.e. an array of ROIC objects."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Receiver")
         
         if circuit_type == "BouncingPixel":
         
@@ -190,8 +174,6 @@ class Receiver(object):
         """Calculates what is the voltage associated with each photocurrent provided for each time step, as rx_voltage."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Receiver")
         
         # If not bypassing the detector, calculate photocurrent based on it.
         if not Global.bypass_dict["ROIC"]:
@@ -205,14 +187,10 @@ class Receiver(object):
             for roic_arrays in self.all_roic_arrays:
                 for roic in roic_arrays:
                     
-                    # Set previous for debug
-                    self.sync_obj.setPrevious("Receiver")
                     
                     # list of lists for all waves
                     all_waves = roic.convertsToWaves(self.rx_photocurrent_list)
                     
-                    # Set previous for debug
-                    self.sync_obj.setPrevious("Receiver")
                     
                     if roic.getCircuitType() == "BouncingPixel":
                         
@@ -240,8 +218,6 @@ class Receiver(object):
         """Converts rx_voltage into adc values, given input rx_voltage."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Receiver")
         
         # if not bypassing adc
         if not Global.bypass_dict["ADC"]:
@@ -252,14 +228,10 @@ class Receiver(object):
                 sync_obj = self.sync_obj
             )
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("Receiver")
             
             # Converts the 'rx_data' list into 'dac_rx_data' list
             self.adc_obj.convertsToDigital()
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("Receiver")
             
             # Get the list of dac rx_data
             self.adc_rx_data_list = self.adc_obj.getAdcRxData()

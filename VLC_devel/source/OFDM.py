@@ -70,26 +70,18 @@ class OFDM(object):
         
         # OFDM symbol list
         self.ofdm_symbol_list = []
-    
-        pass
-    
+        
     @sync_track
-    @timer_dec
+    # @timer_dec
     def applyModulation(self):
         """Wrapper for all functions to apply the OFDM modulation on the mapped info."""
-        
-        
-        
-        self.sync_obj.setPrevious("OFDM")
         
         # Before mapping, we need to setup the data for each OFDM symbol.
         self.setupBitstreamList()
         
-        self.sync_obj.setPrevious("OFDM")
-        
         # for each chunk of information to become an OFDM symbol, to the Mapping
         for bitstream_ofdm_frame in self.bitstream_list:
-        
+            
             # Starts by creating the mapping object.
             self.mapping_obj = Mapping(
                 bitstream_frame = bitstream_ofdm_frame,
@@ -98,37 +90,30 @@ class OFDM(object):
                 sync_obj = self.sync_obj
             )
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Set number of data carriers, before applying the mapping
             self.mapping_obj.setNumberOfDataCarriers(self.number_of_data_carriers)
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Apply the mapping for such information frame (bitstream_ofdm_frame)
             self.mapping_obj.applyMapping()
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Get the mapped info
             self.mapped_info = self.mapping_obj.getMappedInfo()
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Create the OFDM symbol data adding pilots and mapped data
             self.generateOFDMSymbol()
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Do the IDFT on the OFDM symbol data
             self.applyIFFT()
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Add the cyclic prefix in the OFDM symbol
             self.applyCp()
             
-            self.sync_obj.setPrevious("OFDM")
             
             self.ofdm_symbol_list.append(self.ofdm_symbol_tx)
             
@@ -237,12 +222,10 @@ class OFDM(object):
         
     
     @sync_track
-    @timer_dec
+    # @timer_dec
     def applyDeModulation(self):
         """Wrapper for all functions to apply the OFDM de-modulation on the rx_data."""
         
-        
-        self.sync_obj.setPrevious("OFDM")
         
         # when de-mapping, the ouput starts as an empty list (temp_list)
         temp_list = []
@@ -253,23 +236,18 @@ class OFDM(object):
             # Set the current RX OFDM symbol
             self.setOFDMSymbolRx(rx_ofdm_symbol)
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Remove the cyclic prefix in the OFDM symbol
             self.removeCp()
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Applies the FFT
             self.applyFFT()
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Estimates the channel response
             self.estimateChannel()
-            
-            self.sync_obj.setPrevious("OFDM")
-            
+                        
             if self.PLOT:
                 
                 ### TODO - Get contribution of multiple CIRs... not sure how to do that yet
@@ -284,17 +262,14 @@ class OFDM(object):
                         show = show
                     )
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Applies equalization, given the channel response
             self.applyEqualization()
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Get the mapped ouput signal, with its associated constellation
             self.getConstellation()
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Creates the de-mapping object.
             self.de_mapping_obj = Mapping(
@@ -304,12 +279,10 @@ class OFDM(object):
                 sync_obj = self.sync_obj
             )
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Set demapping from mapped_output
             self.de_mapping_obj.applyDemapping()
             
-            self.sync_obj.setPrevious("OFDM")
             
             if self.PLOT:
                 # Given de-mapping, plot found constelattions from mapped_output
@@ -320,12 +293,10 @@ class OFDM(object):
                     show = show
                 )
             
-            self.sync_obj.setPrevious("OFDM")
             
             # Get seriallized data of interest
             temp_list.append(self.de_mapping_obj.getRxBitstreamFrame())
             
-            self.sync_obj.setPrevious("OFDM")
             
         self.bitstream_frame = []
         

@@ -41,8 +41,6 @@ class Transmitter(object):
         """Get the transmitter_config, and for each position (each dict), create a different lamp."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Transmitter")
         
         # start all_lamp_array
         self.all_lamp_arrays = []
@@ -56,8 +54,6 @@ class Transmitter(object):
             # For each lamp in the lamp array
             for idx in range(0, len(lamp_array_dict["light_type"])):
                 
-                # Set previous for debug
-                self.sync_obj.setPrevious("Transmitter")
                 
                 # Create array of lamps
                 lamp_array.append(
@@ -76,8 +72,6 @@ class Transmitter(object):
         """Create a lamp, which is an array of LightSource objects."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Transmitter")
             
         # Create light source object
         light_obj = LightSource(
@@ -95,8 +89,6 @@ class Transmitter(object):
         """Converts tx_data into dac values."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Transmitter")
         
         # if not bypassing dac
         if not Global.bypass_dict["DAC"]:
@@ -107,14 +99,10 @@ class Transmitter(object):
                 sync_obj = self.sync_obj
             )
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("Transmitter")
             
             # Converts the 'tx_data' list into 'dac_tx_data' list
             self.dac_obj.convertsToAnalog()
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("Transmitter")
             
             # Get the list of dac tx_data
             self.dac_tx_data_list = self.dac_obj.getDacTxData()
@@ -129,8 +117,6 @@ class Transmitter(object):
         """Calculates what is the optical power provided for each time step, as tx_optical (given input dac_values)."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Transmitter")
         
         # If not bypassing the light source, calculate optical power based on it.
         if not Global.bypass_dict["LightSource"]:

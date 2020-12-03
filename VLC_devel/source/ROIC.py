@@ -48,8 +48,6 @@ class ROIC(object):
         """Converts a given photocurrent list into associated waves (simulated or not). If flag to use circuit_simulation is active, then calls the Simulator"""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("ROIC")
         
         if self.circuit_simulation:
             
@@ -77,8 +75,6 @@ class ROIC(object):
         """Calls the desired circuit simulator, given the 'circuit_type', and arrat of currents to be simulated."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("ROIC")
         
         raise ValueError(f"\n\n***Error --> ROIC simulation is not supported yet, at Global.which_simulator = True\n")
         
@@ -105,20 +101,14 @@ class ROIC(object):
         roic_out_list = []
         for current in current_list:
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("ROIC")
             
             # Setup the simulator
             simulator.setup(currents = current)
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("ROIC")
             
             # Start the simulator
             simulator.start()
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("ROIC")
             
             abort = False
             # Keep doing simulation while not aborted
@@ -127,8 +117,6 @@ class ROIC(object):
                 # abort simulation
                 abort = simulator.stop()
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("ROIC")
             
             waves_list = []
             # Get the desired waves, depending on the circuit

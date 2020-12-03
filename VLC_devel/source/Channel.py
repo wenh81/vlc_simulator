@@ -52,8 +52,6 @@ class Channel(object):
         """Calculates the channel response. Must set the channel response before, if raytrace is off."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Channel")
         
         if self.raytrace:
             
@@ -74,13 +72,9 @@ class Channel(object):
     
     
     @sync_track
-    @timer_dec
+    # @timer_dec
     def applyChannelResponse(self):
         """Convolves the tx_data with the channel, and get the rx_data."""
-        
-        
-        # Set previous for debug
-        self.sync_obj.setPrevious("Channel")
         
         # If raytrace is on, calculates the SNR.
         if self.raytrace:
@@ -100,14 +94,10 @@ class Channel(object):
                 # Apply convolution
                 convolved = np.convolve(tx_data, CIR)
                 
-                # Set previous for debug
-                self.sync_obj.setPrevious("Channel")
                 
                 # Apply noise to a signal
                 noisy_signal = self.applyChannelNoise(convolved)
                 
-                # Set previous for debug
-                self.sync_obj.setPrevious("Channel")
                 
                 summed_noisy_signal += noisy_signal
                 counter += 1
@@ -125,8 +115,6 @@ class Channel(object):
         """Calculates the SNR at the side of the receiver. If raytrace is on, it is calculated; if not, must pass the expected value."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Channel")
         
         raise ValueError(f"\n\n***Error --> Calculation of rx_SNR not implemented yet!\n")
     
@@ -135,8 +123,6 @@ class Channel(object):
         """Apply the noise in the channel, given the rx_SNR, and outputs the final value for the rx_data_out."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Channel")
         
         # Average power for the convolved signal
         signal_power = np.mean(abs(signal**2))
@@ -196,8 +182,6 @@ class Channel(object):
         """Returns value of self.rx_SNR"""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Channel")
         
         return self.rx_SNR
 
@@ -206,8 +190,6 @@ class Channel(object):
         """Set new value for self.rx_SNR"""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Channel")
         
         self.rx_SNR = rx_SNR
 

@@ -8,7 +8,7 @@ DEBUG = {
     "Transmitter": False,
     "Mapping": False,
     "Modulator": False,
-    "OFDM": True,
+    "OFDM": False,
     "DAC": False,
     "Channel": False,
     "LightSource": False,
@@ -27,7 +27,7 @@ DEBUG = {
 # global plot flag
 PLOT = {
     "all": False,
-    "VLC": True,
+    "VLC": False,
     "Message": False,
     "Transmitter": False,
     "Mapping": False,
@@ -72,6 +72,7 @@ list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
 # rx_SNR (dB) is ued if not set, if not calculated.
 rx_SNR_dB = 30
 # rx_SNR_dB = 25
+# rx_SNR_dB = 20
 # rx_SNR_dB = 10
 
 # TODO --- add timeunits to the program
@@ -94,6 +95,7 @@ temperature = 273
 
 # Defines the simulator to be used, if appliable.
 which_simulator = "Virtuoso"
+# which_simulator = "Tanner"
 
 
 ################################### < FLAGS > ###################################
@@ -120,15 +122,18 @@ multi_theading = [False, None]
 ################################### > FLAGS < ###################################
 
 # Input info structure
-input_info = {"type": "str", "data": ["Primeiro", "Segundo"]}
-input_info = {"type": "str", "data": ["mini msg!"]}
-input_info = {"type": "str", "data": ["mensagem media...!"]}
-input_info = {"type": "str", "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
-input_info = {"type": "str", "data": ["A vida eh curta, por isso viva a vida bem vivida!"]}
-# input_info = {"type": "image", "data": [r"../images/test.png"], "n_bytes": [3]}
-input_info = {"type": "image", "data": [r"../images/test_larger.png"], "n_bytes": [3]}
-# input_info = {"type": "image", "data": [r"../images/zebra.png"], "n_bytes": [3]}
-# input_info = {"type": "image", "data": [r"../images/zebra_large.png"], "n_bytes": [3]}
+input_info = {"type": ["str", "str"], "data": ["Primeiro", "Segundo"]}
+input_info = {"type": ["str", "str"], "data": ["Primeiro", "Uma frase beeeem longaaaaaaaaaaa!"]}
+# input_info = {"type": ["str"], "data": ["mini msg!"]}
+# # input_info = {"type": ["str"], "data": ["mensagem media...!"]}
+# input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
+# # input_info = {"type": ["str"], "data": ["A vida eh curta, por isso viva a vida bem vivida!"]}
+# input_info = {"type": ["image"], "data": [r"../images/test.png"], "n_bytes": [3]}
+# input_info = {"type": ["image"]*2, "data": [r"../images/test.png", r"../images/test_larger.png"], "n_bytes": [3]*2}
+# input_info = {"type": ["image", "str"], "data": [r"../images/test.png", "Uma frase beeeem longaaaaaaaaaaa!"], "n_bytes": [3]*2}
+# input_info = {"type": ["image"], "data": [r"../images/test_larger.png"], "n_bytes": [3]}
+# input_info = {"type": ["image"], "data": [r"../images/zebra.png"], "n_bytes": [3]}
+# input_info = {"type": ["image"], "data": [r"../images/zebra_large.png"], "n_bytes": [3]}
 
 # supported input_info types
 supported_input_info = ["str", "image", "audio"]
@@ -138,9 +143,9 @@ modulation_config = {
                 0: {"type": "OFDM",
                     "ofdm_type": "ACO-OFDM",
                     "pilot_value": 3+3j,
-                    "n_carriers": 512,
-                    "n_pilots": int(512*0.125),
-                    "n_cp": 512//4
+                    "n_carriers": 256,
+                    "n_pilots": int(256*0.125),
+                    "n_cp": 256//4
                     },
                 
                 1: {"type": "OOK"
@@ -160,4 +165,5 @@ mapping_config = {
 }
 
 # Choose mapping type from the above.
-mapping_index = 3
+mapping_index = 2
+

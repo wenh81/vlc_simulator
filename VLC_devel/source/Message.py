@@ -45,6 +45,12 @@ class Message(object):
 
         # dict with all recovered received information.
         self.output_info = None
+        
+        # Add to the message dict in sync object, the number of frames (messages) to be sent
+        # self.sync_obj.message_dict["n_frames"] = n_frames
+        # self.sync_obj.message_dict["type"] = Global.input_info["type"]
+        self.sync_obj.appendToMessageDict("n_frames", n_frames)
+        self.sync_obj.appendToMessageDict("type", Global.input_info["type"])
     
     
     # @sync_track
@@ -67,34 +73,32 @@ class Message(object):
     def convertsToBitstream(self):
         """Converts 'input_info' into a list of bistream (bitstream_frames) for transmission, depending on the number of frames to divide the input info."""
         
-        
         local_dict = {}
-        if self.input_info['type'] == 'str':
-            for data in self.input_info['data']:
-                exec(f'tx_array = BitArray(b"{data}").bin', globals(), local_dict)
+        # for each frame to be sent, check data type, and apply conversion to bitstream
+        for idx, in_data in enumerate(self.input_info['data']):
+            
+            if self.input_info['type'][idx] == 'str':
+                exec(f'tx_array = BitArray(b"{in_data}").bin', globals(), local_dict)
                 # print(local_dict["tx_array"])
                 self.bitstream_frames.append(local_dict["tx_array"])
-                
-        elif self.input_info['type'] == 'image_raw':
-            for img_path in self.input_info['data']:
-                
-                with open(img_path, "rb") as image:
+            
+            elif self.input_info['type'][idx] == 'image_raw':
+                with open(in_data, "rb") as image:
                     data = image.read()
                     exec(f'tx_array = BitArray({data}).bin', globals(), local_dict)
                     self.bitstream_frames.append(local_dict["tx_array"])
                     
-        elif self.input_info['type'] == 'image':
-            for img_idx, img_path in enumerate(self.input_info['data']):
-                
+            elif self.input_info['type'][idx] == 'image':
                 # Set number of bytes to transmit, for each integer in nparray
-                self.number_of_bytes = self.input_info['n_bytes'][img_idx]
+                self.number_of_bytes = self.input_info['n_bytes'][idx]
                 
                 # Codify image into bitstream
-                bitstream = self.codifyImageForTransmission(img_path)
+                bitstream = self.codifyImageForTransmission(in_data)
                 # print(len(bitstream))
                 self.bitstream_frames.append(bitstream)
-        else:
-            raise ValueError(f"\n\n***Error --> Not supported input_info type: <{self.input_info['type']}>!\nValid types are <{','.join(Global.supported_input_info)}>\n")
+                
+            else:
+                raise ValueError(f"\n\n***Error --> Not supported input_info type: <{self.input_info['type'][idx]}>!\nValid types are <{','.join(Global.supported_input_info)}>\n")
     
 
     @sync_track
@@ -104,9 +108,17 @@ class Message(object):
         
         local_dict = {}
         output_array = []
-        if self.input_info['type'] == 'str':
-            for frame in self.rx_bitstream_frames:
-                # check if not multiple to 8. Complete with zeros.
+        
+        
+        frame_count = 0
+        
+        for frame, data_in in zip(self.rx_bitstream_frames, self.input_info['data']):
+            
+            # get frame type for that bitstream
+            bitstream_type = self.input_info['type'][frame_count]
+            
+            if bitstream_type == 'str':
+                
                 if len(frame) % 8 != 0:
                     remainder = len(frame) % 8
                     frame = ['0']*remainder + list(frame)
@@ -115,15 +127,33 @@ class Message(object):
                 exec(f'rx_array = BitArray(bin="{frame}").bytes', globals(), local_dict)
                 # remove padded zeros, if not removed before.
                 # if Global.remove_padded_zeros_at_message:
-                if not Global.remove_padded_zeros:
-                    local_dict["rx_array"] = local_dict["rx_array"].decode('utf-8').replace("\x00", "")
-                else:
-                    local_dict["rx_array"] = local_dict["rx_array"].decode('utf-8')
+                
+                
+                _errors_ = True
+                while _errors_:
+                    
+                    try:
+                        if not Global.remove_padded_zeros:
+                            local_dict["rx_array"] = local_dict["rx_array"].decode('utf-8').replace("\x00", "")
+                            # local_dict["rx_array"] = local_dict["rx_array"].replace(str.encode("\x00"), str.encode("")).decode('utf-8')
+                        else:
+                            # if byte_error is not None:
+                            #     # local_dict["rx_array"] = local_dict["rx_array"].decode('utf-8')
+                            #     # print(byte_error)
+                            #     local_dict["rx_array"] = local_dict["rx_array"].replace(str.encode(byte_error), new_byte).decode('utf-8')
+                            # else:
+                            #     local_dict["rx_array"] = local_dict["rx_array"].decode('utf-8')
+                            
+                            local_dict["rx_array"] = ''.join([chr(local) for local in local_dict["rx_array"]])
+                        
+                        _errors_ = False
+                    except Exception as identifier:
+                        raise ValueError(f"\n\n***Error --> Could not convert <{local_dict['rx_array']}> to string @ BitstreamToMessage.\n Error message:\n{identifier}\n")
+                
                 output_array.append(local_dict["rx_array"])
-            return output_array
             
-        elif self.input_info['type'] == 'image_raw':
-            for frame, img_path in zip(self.rx_bitstream_frames, self.input_info['data']):
+            elif bitstream_type == 'image_raw':
+                
                 # check if not multiple to 8. Complete with zeros.
                 if len(frame) % 8 != 0:
                     remainder = len(frame) % 8
@@ -132,12 +162,11 @@ class Message(object):
                 exec(f'rx_array = BitArray(bin="{frame}").bytes', globals(), local_dict)
                 # output_array.append(rx_array.decode('utf-8'))
                 output_array.append(local_dict["rx_array"])
-                with open(img_path.replace('images','images/out').replace('.png', '_____out.png'), "wb") as image:
+                with open(data_in.replace('images','images/out').replace('.png', '_____out.png'), "wb") as image:
                     image.write(local_dict["rx_array"])
-            return output_array
-        
-        elif self.input_info['type'] == 'image':
-            for frame, img_path in zip(self.rx_bitstream_frames, self.input_info['data']):
+                    
+            elif bitstream_type == 'image':
+                
                 # check if not multiple to 8. Complete with zeros.
                 if len(frame) % 8 != 0:
                     remainder = len(frame) % 8
@@ -145,11 +174,17 @@ class Message(object):
                     frame = ''.join(frame)
                 # Codify bitstream back to image
                 image = self.decodifyImageForReceiving(frame)
-                image.save(img_path.replace('images','images/out').replace('.png', '_____out.png'))
+                new_img = data_in.replace('images','images/out').replace('.png', '_____out.png')
+                image.save(new_img)
                 # image.show()
-            return output_array
-        else:
-            raise ValueError(f"\n\n***Error --> Not supported input_info type: <{self.input_info['type']}>!\nValid types are <{','.join(Global.supported_input_info)}>\n")
+                output_array.append(new_img)
+                
+            else:
+                raise ValueError(f"\n\n***Error --> Not supported input_info type: <{bitstream_type}>!\nValid types are <{','.join(Global.supported_input_info)}>\n")
+            
+            frame_count += 1
+        
+        return output_array
         
     
     @sync_track
@@ -438,12 +473,13 @@ class Message(object):
     def compareMessages(self, tx_info, rx_info):
         """Compares the input and received output info."""
         
+        if self.DEBUG:
         
-        print(f'\nn_bits = {[len(bitstream) for bitstream in tx_info]}\n')
-        
-        print(f'tx_info = {tx_info}\n')
-        
-        print(f'rx_info = {rx_info}\n')
+            print(f'\nn_bits = {[len(bitstream) for bitstream in tx_info]}\n')
+            
+            print(f'tx_info = {tx_info}\n')
+            
+            print(f'rx_info = {rx_info}\n')
     
 
     @sync_track

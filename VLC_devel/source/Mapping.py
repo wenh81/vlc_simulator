@@ -67,7 +67,6 @@ class Mapping(object):
     def setupMappingTable(self):
         """Setup mapping table, depending on the choosen mapping scheme."""
         
-        self.sync_obj.setPrevious("Mapping")
         
         if self.mapping_type == "QAM":
             
@@ -122,7 +121,6 @@ class Mapping(object):
         """Converts each 'bitstream_frame' into 2D numpy array, as [bits_per_symbol, len(bitstream_info)/bits_per_symbol]"""
         
         
-        self.sync_obj.setPrevious("Mapping")
         
         if self.number_of_data_carriers is not None:
             self.parallelized_info = self.bitstream_frame.reshape((self.number_of_data_carriers, self.bits_per_symbol))
@@ -137,17 +135,14 @@ class Mapping(object):
         """Given 'bits_per_symbol' and 'mapping_type', generates the 'mapped_info'."""
         
         
-        self.sync_obj.setPrevious("Mapping")
         
         if self.mapping_type == "QAM":
             
             self.setupMappingTable()
             
-            self.sync_obj.setPrevious("Mapping")
             
             self.serialToParallel()
             
-            self.sync_obj.setPrevious("Mapping")
             
             # calculate the mapped info, depending on the modulations scheme
             self.mapped_info = np.array([self.mapping_table[tuple(symbol)] for symbol in self.parallelized_info])
@@ -161,13 +156,11 @@ class Mapping(object):
         """Given 'mapped_output', returns the closest values for the demapping."""
         
         
-        self.sync_obj.setPrevious("Mapping")
         
         if self.mapping_type == "QAM":
             
             self.setupMappingTable()
             
-            self.sync_obj.setPrevious("Mapping")
             
             # Given the demapping table, get all possible constellation points
             constellation = np.array([x for x in self.demapping_table.keys()])
@@ -184,11 +177,9 @@ class Mapping(object):
             # Do the de-mapping transofrmation, back to bit list values
             self.rx_bitstream_frame = np.vstack([self.demapping_table[C] for C in self.found_constellation])
             
-            self.sync_obj.setPrevious("Mapping")
             
             self.ParallelToserial()
             
-            self.sync_obj.setPrevious("Mapping")
             
         else:
             raise ValueError(f"\n\n***Error --> Not supported mapping_type: <{self.mapping_type}>!\n")
@@ -199,7 +190,6 @@ class Mapping(object):
         """Converts each parllelized constellation into a serial stream of data 'rx_bitstream_frame'."""
         
         
-        self.sync_obj.setPrevious("Mapping")
                 
         self.rx_bitstream_frame = self.rx_bitstream_frame.reshape((-1,))
         
@@ -300,7 +290,6 @@ class Mapping(object):
         """Set new value for self.number_of_data_carriers"""
         
         
-        self.sync_obj.setPrevious("Mapping")
         
         self.number_of_data_carriers = number_of_data_carriers
 

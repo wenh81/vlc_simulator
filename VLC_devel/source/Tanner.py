@@ -34,8 +34,6 @@ class Tanner(Simulator):
         """Setup simulation, like loading netlist."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Tanner")
         
         raise ValueError(f"\n\n***Error --> setup not supported yet!\n")
     
@@ -45,8 +43,6 @@ class Tanner(Simulator):
         """Fire simulation, and stops after it finishes (or timeout or abort). Populate 'waves' as the output."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Tanner")
         
         raise ValueError(f"\n\n***Error --> start not supported yet!\n")
     

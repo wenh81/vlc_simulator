@@ -29,8 +29,6 @@ class DAC(object):
         """Converts the digital values to analog. Can employ circuit simulation. Outputs 'dac_tx_data'."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("DAC")
         
         # Starts the list of DAC
         self.dac_tx_data = []

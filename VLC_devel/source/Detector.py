@@ -46,8 +46,6 @@ class Detector(object):
         """Converts a given optical power list into photocurrent."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Detector")
         
         raise ValueError(f"\n\n***Error --> Photocurrent calculation from optical power not supported yet!\n")
         

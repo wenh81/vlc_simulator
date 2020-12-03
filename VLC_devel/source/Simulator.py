@@ -29,8 +29,6 @@ class Simulator(object):
         """Abort simulation, by user command or timeout."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Simulator")
         
         # Get abort from timeout or user command, for example
         abort = True

@@ -47,8 +47,6 @@ class BouncingPixel(ROIC):
     def calculatesReconstructedVoltage(self, all_waves):
         """Depending on circuit simulator, calculates the reconstructed voltage from simulation."""
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("BouncingPixel")
         
         # Calculates the reconstructed voltage depending on the simulator.
         if self.which_simulator == "Virtuoso":

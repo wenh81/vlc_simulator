@@ -33,8 +33,6 @@ class Virtuoso(Simulator):
         """Setup simulation, like loading netlist."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Virtuoso")
         
         raise ValueError(f"\n\n***Error --> setup not supported yet!\n")
     
@@ -44,8 +42,6 @@ class Virtuoso(Simulator):
         """Fire simulation, and stops after it finishes (or timeout or abort). Populate 'waves' as the output."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Virtuoso")
         
         raise ValueError(f"\n\n***Error --> start not supported yet!\n")
     
@@ -67,8 +63,6 @@ class Virtuoso(Simulator):
         """For a given wave name, return its corresponding value."""
         
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Virtuoso")
         
         raise ValueError(f"\n\n***Error --> getWave not implemented yet\n")
         

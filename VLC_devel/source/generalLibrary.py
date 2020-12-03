@@ -77,36 +77,56 @@ def sync_track(function):
         # # print('curframe:', curframe)
         # print('caller name:', calframe[1][3])
         
-        # frame = inspect.stack()[1]
-        # module = inspect.getmodule(frame[0])
-        # filename = module.__file__
-        
-        # print(frame)
-        # print()
-        # print(module)
-        # print()
-        # print(filename)
-        # print()
-        
-        
         # Get sync object
         sync_obj = self.__class__.getSyncObj(self)
         
-        # # sync_obj.setPrevious("OFDM")
+        # If NO debug i set
+        if not sync_obj.DEBUG["all"] and not sync_obj.DEBUG["SimulationSync"]:
+            
+            # apply function, and get result (with no DEBUG)
+            result = function(self, *args, **kw)
+            return result
+        
+        
+        frame = inspect.stack()[1]
+        module = inspect.getmodule(frame[0])
+        # filename = module.__file__
+        module_name = module.__name__
+        
+        
         # Set previous for debug
+        sync_obj.setPrevious(f"{module_name}")
         # sync_obj.setPrevious(f"{self.__class__.__name__}")
         
-        # Add function, called from given class
-        sync_obj.appendToSimulationPath(f"{function.__name__} @ {self.__class__.__name__}")
+        # SUPPORTS ONLY TWO NESTED DECORATORS!
+        # Check if function name is one of the inner functions for decorators
+        if function.__name__ in ["timed_function"]:
+            # print()
+            # print(function.__name__)
+            # # print(frame.function)
+            # print(frame.code_context)
+            # print(frame.code_context[0].strip().replace("\n","").split('.')[-1])
+            
+            # Add function, called from within a decorator
+            function_from_decorator = frame.code_context[0].strip().replace("\n","").split(".")[-1]
+            sync_obj.appendToSimulationPath(f'{self.__class__.__name__}.{function_from_decorator} -- @{function.__name__}')
         
+        else:
+            # Add function, called from given class
+            sync_obj.appendToSimulationPath(f"{self.__class__.__name__}.{function.__name__}()")
+        
+        
+        # Set sync object
         self.__class__.setSyncObj(self, sync_obj)
         
+        # # Print whole simul path
         # print(sync_obj.getSimulationPath())
         
         # apply function, and get result
         result = function(self, *args, **kw)
         
         return result
+    
     return synced_function
 
 

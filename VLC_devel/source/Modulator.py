@@ -62,8 +62,6 @@ class Modulator(object):
         
         # self.sync_obj.appendToSimulationPath("createModulator @ Modulator")
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Modulator")
             
         if self.modulation_type == "OFDM":
             
@@ -89,9 +87,6 @@ class Modulator(object):
         
         # self.sync_obj.appendToSimulationPath("applyModulation @ Modulator")
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Modulator")
-        
         if not Global.bypass_dict['Modulator']:
         
             if self.modulation_type == "OFDM":
@@ -99,14 +94,15 @@ class Modulator(object):
                 # Before modulation, we need to setup the carrier inexes.
                 self.ofdm_obj.setupOFDMCarriersIndexes()
                 
-                # Set previous for debug
-                self.sync_obj.setPrevious("Modulator")
                 
                 # Apply OFDM modulation
                 self.ofdm_obj.applyModulation()
                 
-                # Set previous for debug
-                self.sync_obj.setPrevious("Modulator")
+                # Get number of packets to be sent
+                temp = self.sync_obj.getMessageDict().copy()
+                temp["packets"][-1] = temp["packets"][-1] + len(self.ofdm_obj.getBitstreamList())
+                self.sync_obj.setMessageDict(temp)
+                
                 
                 # Returns a list of OFDM symbols to be transmitted. The input stream data is
                 # splitted into various symbols, depending on the throughput of the modulator.
@@ -133,35 +129,26 @@ class Modulator(object):
         
         # self.sync_obj.appendToSimulationPath("applyDeModulation @ Modulator")
         
-        # Set previous for debug
-        self.sync_obj.setPrevious("Modulator")
         
         if self.modulation_type == "OFDM":
             
             # Before de-modulation, we need to setup the rx_data_list.
             self.ofdm_obj.setOFDMRxDataList(self.rx_data_list)
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("Modulator")
             
             # Set the actual channel responses, for further comparissons with estimated ones
             self.ofdm_obj.setListOfChannelResponses(
                 self.list_of_channel_response
             )
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("Modulator")
             
             # Apply OFDM De-modulation
             self.ofdm_obj.applyDeModulation()
             
-            # Set previous for debug
-            self.sync_obj.setPrevious("Modulator")
             
             # Get the RX reconstructed frame data
             self.rx_bitstream_frame = self.ofdm_obj.getBitstreamFrame()
             
-            self.sync_obj.setPrevious("Modulator")
             
         elif self.modulation_type == "OOK":
             
