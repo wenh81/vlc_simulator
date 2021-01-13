@@ -266,6 +266,9 @@ class VLC(object):
             # Get the received frame message
             curr_rx_frame = self.modulator_obj.getRxBitstreamFrame()
             
+            # handle = plt.figure(figsize=(8,2))
+            # lib.plotTxRxDataList(curr_rx_frame, 'TEST', handle, self.sync_obj, show = True)
+            
             # if self.DEBUG:
             #     print(f'curr_rx_frame = {curr_rx_frame}')
             #     pass

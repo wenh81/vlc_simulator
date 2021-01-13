@@ -78,7 +78,9 @@ class Message(object):
         for idx, in_data in enumerate(self.input_info['data']):
             
             if self.input_info['type'][idx] == 'str':
+                
                 exec(f'tx_array = BitArray(b"{in_data}").bin', globals(), local_dict)
+                
                 # print(local_dict["tx_array"])
                 self.bitstream_frames.append(local_dict["tx_array"])
             
@@ -86,6 +88,16 @@ class Message(object):
                 with open(in_data, "rb") as image:
                     data = image.read()
                     exec(f'tx_array = BitArray({data}).bin', globals(), local_dict)
+                    self.bitstream_frames.append(local_dict["tx_array"])
+            
+            elif self.input_info['type'][idx] == 'text':
+                
+                with open(in_data, "rb") as text_data:
+                    
+                    get_text_bytes = text_data.read()
+                    
+                    exec(f'tx_array = BitArray({get_text_bytes}).bin', globals(), local_dict)
+                    
                     self.bitstream_frames.append(local_dict["tx_array"])
                     
             elif self.input_info['type'][idx] == 'image':
@@ -152,6 +164,31 @@ class Message(object):
                 
                 output_array.append(local_dict["rx_array"])
             
+            elif bitstream_type == 'text':
+                
+                if len(frame) % 8 != 0:
+                    remainder = len(frame) % 8
+                    frame = ['0']*remainder + list(frame)
+                    frame = ''.join(frame)
+                # Convert the stream of bits (as str) into bytes, to recover info.
+                exec(f'rx_array = BitArray(bin="{frame}").bytes', globals(), local_dict)
+                # remove padded zeros, if not removed before.
+                # if Global.remove_padded_zeros_at_message:
+                
+                if not Global.remove_padded_zeros:
+                    local_dict["rx_array"] = local_dict["rx_array"].decode('utf-8').replace("\x00", "")
+                else:
+                    local_dict["rx_array"] = ''.join([chr(local) for local in local_dict["rx_array"]])
+                
+                # Remove the added line breaks
+                local_dict["rx_array"] = local_dict["rx_array"].replace("\n", "")
+                
+                file_name = data_in.replace('data','data/out').replace('.txt', '_rx.txt')
+                output_array.append(file_name)
+                
+                with open(file_name, "w") as text_data:
+                    text_data.write(local_dict["rx_array"])
+                
             elif bitstream_type == 'image_raw':
                 
                 # check if not multiple to 8. Complete with zeros.
@@ -162,7 +199,7 @@ class Message(object):
                 exec(f'rx_array = BitArray(bin="{frame}").bytes', globals(), local_dict)
                 # output_array.append(rx_array.decode('utf-8'))
                 output_array.append(local_dict["rx_array"])
-                with open(data_in.replace('images','images/out').replace('.png', '_____out.png'), "wb") as image:
+                with open(data_in.replace('data','data/out').replace('.png', '_rx.png'), "wb") as image:
                     image.write(local_dict["rx_array"])
                     
             elif bitstream_type == 'image':
@@ -174,7 +211,7 @@ class Message(object):
                     frame = ''.join(frame)
                 # Codify bitstream back to image
                 image = self.decodifyImageForReceiving(frame)
-                new_img = data_in.replace('images','images/out').replace('.png', '_____out.png')
+                new_img = data_in.replace('data','data/out').replace('.png', '_rx.png')
                 image.save(new_img)
                 # image.show()
                 output_array.append(new_img)

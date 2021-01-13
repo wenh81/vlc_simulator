@@ -96,8 +96,7 @@ class OFDM(object):
             
             
             # Apply the mapping for such information frame (bitstream_ofdm_frame)
-            self.mapping_obj.applyMapping()
-            
+            self.mapping_obj.applyMapping()            
             
             # Get the mapped info
             self.mapped_info = self.mapping_obj.getMappedInfo()
@@ -109,6 +108,140 @@ class OFDM(object):
             
             # Do the IDFT on the OFDM symbol data
             self.applyIFFT()
+            
+            # Add the cyclic prefix in the OFDM symbol
+            self.applyCp()
+            
+            
+            self.ofdm_symbol_list.append(self.ofdm_symbol_tx)
+        
+    @sync_track
+    # @timer_dec
+    def applyModulationIMDD(self):
+        """Wrapper for all functions to apply the OFDM modulation on the mapped info, for IM/DD."""
+        
+        # Before mapping, we need to setup the data for each OFDM symbol.
+        
+        ############### BITSTREAM LENGTH MUST CHANGE DUE TO HERMITIAN
+        self.setupBitstreamList()
+        
+        # for each chunk of information to become an OFDM symbol, to the Mapping
+        for bitstream_ofdm_frame in self.bitstream_list:
+            
+            # Starts by creating the mapping object.
+            self.mapping_obj = Mapping(
+                bitstream_frame = bitstream_ofdm_frame,
+                mapping_config = self.mapping_config,
+                mapped_info = self.mapped_info,
+                sync_obj = self.sync_obj
+            )
+            
+            
+            # Set number of data carriers, before applying the mapping
+            self.mapping_obj.setNumberOfDataCarriers(self.number_of_data_carriers)
+            
+            
+            # Apply the mapping for such information frame (bitstream_ofdm_frame)
+            self.mapping_obj.applyMapping()            
+            
+            # Get the mapped info
+            self.mapped_info = self.mapping_obj.getMappedInfo()
+            
+            # Create the OFDM symbol data adding pilots and mapped data
+            self.generateOFDMSymbol()
+            
+            # Apply hermitian simetry ----- EMPTY FOR NOW
+            self.applyHermitianSymetry()
+            
+            print(self.ofdm_symbol_data.shape)
+            
+            print(len(self.data_subcarriers))
+            print(len(self.pilot_subcarriers))
+            
+            # Y_hermit = [0;Y;0;flipud(conj(Y))];
+            
+            N_BITS = int(self.number_of_carriers*0.8)//2 - 1
+            # Signal must have less than (N_IFFT//2 - 1)
+            x = self.ofdm_symbol_data[:N_BITS]
+            # x = self.ofdm_symbol_data[:200//2 - 1]
+            # print(x.shape)
+            # asd
+            # x = np.array([0 + 3j, 1 + 9j, 1 - 5j, -1 - 2j])
+            
+            # add zeros and convert data to hermitian symetry
+            y = list(x) + list(np.conj(np.flipud(x)))
+            # y = [0] + list(x) + [0] + list(np.conj(np.flipud(x)))
+            # y = [0] + list(np.conj(np.flipud(x))) + [0] + list(x)
+            hermitian = np.array(y)
+            
+            # N = len(y)
+            # print('--------------------------')
+            # print(N)
+            # print(y)
+            # for k in range(0, N):
+            #     print(y[k])
+            #     print(np.conj(y[N - k - 1]))
+            #     print()
+            # asdasd
+            
+            # starts vector with all subcarriers
+            y_tx = np.zeros(self.number_of_carriers, dtype=complex)
+            # y_tx = np.zeros(self.number_of_carriers)
+            
+            print('N_BITS')
+            print(N_BITS)
+            
+            print('y_tx')
+            print(len(hermitian))
+            print(hermitian)
+            
+            y_tx[0:N_BITS] = hermitian[0:N_BITS]
+            # print(y_tx[0:N_BITS])
+            # print(len(y_tx[0:N_BITS]))
+            # print(len(y_tx[(self.number_of_carriers-N_BITS-1):self.number_of_carriers-1]))
+            print(len(y_tx[(self.number_of_carriers-N_BITS-1):self.number_of_carriers-1]))
+            # print(len(hermitian[0:N_BITS]))
+            # print(hermitian[0:N_BITS])
+            # print(len(hermitian[N_BITS:]))
+            # print(hermitian[N_BITS:])
+            print('**************')
+            print(self.number_of_carriers-N_BITS)
+            print(self.number_of_carriers-1)
+            print(y_tx[-1])
+            print(y_tx[self.number_of_carriers-1])
+            y_tx[(self.number_of_carriers-N_BITS):] = hermitian[N_BITS:]
+            
+            print('y_tx 2')
+            print(y_tx)
+            
+            # hermitian = np.zeros(self.number_of_carriers, dtype=complex)
+            
+            # N_BITS = N/2-1
+            
+            # hermitian(1:N_BITS+1) = Y_hermit(1:N_BITS+1);
+            
+            print('hermitian')
+            print(hermitian)
+            
+            
+            self.ofdm_symbol_data = y_tx
+            # asd
+            
+            # self.ofdm_symbol_data = np.fft.ihfft(self.ofdm_symbol_data)
+            print(self.ofdm_symbol_data.shape)
+            # asdasd
+            
+            
+            # Do the IDFT on the OFDM symbol data
+            self.applyIFFT()
+            
+            # THIS MUST BE A PURELY REAL SIGNAL!
+            print('self.digital_ofdm')
+            # print(self.digital_ofdm)
+            print(np.fft.ihfft(self.ofdm_symbol_data))
+            # plt.plot(np.fft.ihfft(self.ofdm_symbol_data))
+            # plt.show()
+            asdasd
             
             
             # Add the cyclic prefix in the OFDM symbol
@@ -186,6 +319,13 @@ class OFDM(object):
                 counter = 1
     
     @sync_track
+    def applyHermitianSymetry(self):
+        """Applies the Hermitian Symetry, to make sure IFFT of signal is Real. Input (N/2 - 1); Output (N)."""
+        
+        pass
+        
+        
+    @sync_track
     def generateOFDMSymbol(self):
         """Generate OFDM symbols, adding pilots and data carriers."""
         
@@ -205,9 +345,13 @@ class OFDM(object):
         
         
         if self.use_pyfft:
+            # self.digital_ofdm = np.fft.ihfft(self.ofdm_symbol_data)
             self.digital_ofdm = pyfftw.interfaces.numpy_fft.ifft(self.ofdm_symbol_data)
         else:
             self.digital_ofdm = np.fft.ifft(self.ofdm_symbol_data)
+            
+        print(self.digital_ofdm)
+        print(self.digital_ofdm.shape)
     
     @sync_track
     def applyCp(self):
@@ -333,6 +477,7 @@ class OFDM(object):
         
         
         if self.use_pyfft:
+            # self.ofdm_symbol_rx = np.fft.hfft(self.ofdm_symbol_rx)
             self.ofdm_symbol_rx = pyfftw.interfaces.numpy_fft.fft(self.ofdm_symbol_rx)
         else:
             self.ofdm_symbol_rx = np.fft.fft(self.ofdm_symbol_rx)

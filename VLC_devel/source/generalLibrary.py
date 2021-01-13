@@ -29,6 +29,7 @@ def plotTxRxData(data, label, handle, sync_obj, show = False):
     
     # plt.figure(figsize=(8,2))
     plt.plot((data), label=label)
+    # plt.plot((np.fft.ifft(data)), label=label)
     plt.legend(fontsize=10)
     plt.xlabel('Time'); plt.ylabel('$|x(t)|$')
     plt.grid(True)

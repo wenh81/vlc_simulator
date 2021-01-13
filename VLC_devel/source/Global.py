@@ -3,7 +3,7 @@ import numpy as np
 # global debug flag
 DEBUG = {
     "all": False,
-    "VLC": False,
+    "VLC": True,
     "Message": False,
     "Transmitter": False,
     "Mapping": False,
@@ -27,12 +27,12 @@ DEBUG = {
 # global plot flag
 PLOT = {
     "all": False,
-    "VLC": False,
+    "VLC": True,
     "Message": False,
     "Transmitter": False,
     "Mapping": False,
     "Modulator": False,
-    "OFDM": False,
+    "OFDM": True,
     "DAC": False,
     "Channel": False,
     "LightSource": False,
@@ -67,11 +67,14 @@ bypass_dict = {
 
 # list of channel responses for each lamp, when bypassig Channel.
 list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
+import numpy as np
+list_of_channel_response = [1*np.array([np.random.uniform()+np.random.uniform()*1j, (np.random.uniform()+np.random.uniform()*1j)/2, (np.random.uniform()+np.random.uniform()*1j)/4])]
+# h = [(np.random.uniform()+j*np.random.uniform()) (np.random.uniform()+j*np.random.uniform())/2 (np.random.uniform()+j*np.random.uniform())/4]
 # list_of_channel_response = [0.1*np.array([1, 0, 0.3+0.3j])]
 
 # rx_SNR (dB) is ued if not set, if not calculated.
 rx_SNR_dB = 30
-# rx_SNR_dB = 25
+rx_SNR_dB = 25
 # rx_SNR_dB = 20
 # rx_SNR_dB = 10
 
@@ -97,6 +100,9 @@ temperature = 273
 which_simulator = "Virtuoso"
 # which_simulator = "Tanner"
 
+# Intensity Modulation / Direct Detection (IM_DD) -- always on for VLC/LiFi [flag kept only for completion]
+IM_DD = True
+IM_DD = False
 
 ################################### < FLAGS > ###################################
 # Flag to remove padded zeros before analysis (must be setup for images... fix later)
@@ -123,17 +129,18 @@ multi_theading = [False, None]
 
 # Input info structure
 input_info = {"type": ["str", "str"], "data": ["Primeiro", "Segundo"]}
-input_info = {"type": ["str", "str"], "data": ["Primeiro", "Uma frase beeeem longaaaaaaaaaaa!"]}
+input_info = {"type": ["str", "str"], "data": ["Hello, Motto!", "Uma frase beeeem longaaaaaaaaaaa!"]}
+# input_info = {"type": ["text"], "data": [r"../data/test.txt"]}
 # input_info = {"type": ["str"], "data": ["mini msg!"]}
-# # input_info = {"type": ["str"], "data": ["mensagem media...!"]}
-# input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
+# input_info = {"type": ["str"], "data": ["mensagem media...!"]}
+input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
 # # input_info = {"type": ["str"], "data": ["A vida eh curta, por isso viva a vida bem vivida!"]}
-# input_info = {"type": ["image"], "data": [r"../images/test.png"], "n_bytes": [3]}
-# input_info = {"type": ["image"]*2, "data": [r"../images/test.png", r"../images/test_larger.png"], "n_bytes": [3]*2}
-# input_info = {"type": ["image", "str"], "data": [r"../images/test.png", "Uma frase beeeem longaaaaaaaaaaa!"], "n_bytes": [3]*2}
-# input_info = {"type": ["image"], "data": [r"../images/test_larger.png"], "n_bytes": [3]}
-# input_info = {"type": ["image"], "data": [r"../images/zebra.png"], "n_bytes": [3]}
-# input_info = {"type": ["image"], "data": [r"../images/zebra_large.png"], "n_bytes": [3]}
+# input_info = {"type": ["image"], "data": [r"../data/test.png"], "n_bytes": [3]}
+# input_info = {"type": ["image"]*2, "data": [r"../data/test.png", r"../data/test_larger.png"], "n_bytes": [3]*2}
+# input_info = {"type": ["image", "str"], "data": [r"../data/test.png", "Uma frase beeeem longaaaaaaaaaaa!"], "n_bytes": [3]*2}
+# input_info = {"type": ["image"], "data": [r"../data/test_larger.png"], "n_bytes": [3]}
+# input_info = {"type": ["image"], "data": [r"../data/zebra.png"], "n_bytes": [3]}
+# input_info = {"type": ["image"], "data": [r"../data/zebra_large.png"], "n_bytes": [3]}
 
 # supported input_info types
 supported_input_info = ["str", "image", "audio"]
@@ -166,4 +173,3 @@ mapping_config = {
 
 # Choose mapping type from the above.
 mapping_index = 2
-

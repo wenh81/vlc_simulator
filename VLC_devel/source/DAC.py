@@ -29,7 +29,6 @@ class DAC(object):
         """Converts the digital values to analog. Can employ circuit simulation. Outputs 'dac_tx_data'."""
         
         
-        
         # Starts the list of DAC
         self.dac_tx_data = []
         
@@ -43,6 +42,7 @@ class DAC(object):
                 Warning (f"\n\n***Warning --> Still not done quantization for DAC!\n")
                 
                 self.dac_tx_data.append(abs(tx_symbol))
+                # self.dac_tx_data.append((tx_symbol))
                 
             pass
         else: # if circuit simulation

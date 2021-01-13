@@ -94,10 +94,13 @@ class Modulator(object):
                 # Before modulation, we need to setup the carrier inexes.
                 self.ofdm_obj.setupOFDMCarriersIndexes()
                 
-                
-                # Apply OFDM modulation
-                self.ofdm_obj.applyModulation()
-                
+                if Global.IM_DD:
+                    # Apply OFDM modulation for IM/DD
+                    self.ofdm_obj.applyModulationIMDD()
+                else:
+                    # Apply OFDM modulation
+                    self.ofdm_obj.applyModulation()
+                    
                 # Get number of packets to be sent
                 temp = self.sync_obj.getMessageDict().copy()
                 temp["packets"][-1] = temp["packets"][-1] + len(self.ofdm_obj.getBitstreamList())
