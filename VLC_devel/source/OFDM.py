@@ -528,7 +528,8 @@ class OFDM(object):
         plt.ylabel('$|H(f)|$')
         plt.legend(fontsize=10)
         plt.ylim(0, 1.5)
-        plt.show(show)
+        plt.show(block=show)
+        # plt.show(show)
         
         
     @sync_track
@@ -547,7 +548,8 @@ class OFDM(object):
         plt.xlabel('Real')
         plt.ylabel('Imagingary')
         plt.legend(fontsize=10)
-        plt.show(show)
+        plt.show(block=show)
+        # plt.show(show)
         
 
     @sync_track    
