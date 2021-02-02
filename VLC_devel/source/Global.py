@@ -32,7 +32,7 @@ PLOT = {
     "Transmitter": False,
     "Mapping": False,
     "Modulator": False,
-    "OFDM": True,
+    "OFDM": False,
     "DAC": False,
     "Channel": False,
     "LightSource": False,
@@ -57,7 +57,7 @@ bypass_dict = {
     "DAC_rounding_or_simul": True,
     "Channel": True,
     "Detector": True,
-    "ROIC": True,
+    "ROIC": True, ## Read-Out Integrated Circuit
     "ADC": True,
     "ADC_rounding_or_simul": True
 }
@@ -102,7 +102,7 @@ which_simulator = "Virtuoso"
 
 # Intensity Modulation / Direct Detection (IM_DD) -- always on for VLC/LiFi [flag kept only for completion]
 IM_DD = True
-IM_DD = False
+# IM_DD = False
 
 ################################### < FLAGS > ###################################
 # Flag to remove padded zeros before analysis (must be setup for images... fix later)
@@ -131,9 +131,9 @@ multi_theading = [False, None]
 input_info = {"type": ["str", "str"], "data": ["Primeiro", "Segundo"]}
 input_info = {"type": ["str", "str"], "data": ["Hello, Motto!", "Uma frase beeeem longaaaaaaaaaaa!"]}
 # input_info = {"type": ["text"], "data": [r"../data/test.txt"]}
-# input_info = {"type": ["str"], "data": ["mini msg!"]}
+input_info = {"type": ["str"], "data": ["mini msg!"]}
 # input_info = {"type": ["str"], "data": ["mensagem media...!"]}
-input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
+# input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
 # # input_info = {"type": ["str"], "data": ["A vida eh curta, por isso viva a vida bem vivida!"]}
 # input_info = {"type": ["image"], "data": [r"../data/test.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"]*2, "data": [r"../data/test.png", r"../data/test_larger.png"], "n_bytes": [3]*2}
@@ -150,9 +150,9 @@ modulation_config = {
                 0: {"type": "OFDM",
                     "ofdm_type": "ACO-OFDM",
                     "pilot_value": 3+3j,
-                    "n_carriers": 256,
-                    "n_pilots": int(256*0.125),
-                    "n_cp": 256//4
+                    "n_carriers": 32, # number of IFFT stages
+                    "n_pilots": int(32*0.125),
+                    "n_cp": 32//4
                     },
                 
                 1: {"type": "OOK"
@@ -172,4 +172,4 @@ mapping_config = {
 }
 
 # Choose mapping type from the above.
-mapping_index = 2
+mapping_index = 0
