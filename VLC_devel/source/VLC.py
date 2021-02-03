@@ -140,6 +140,7 @@ class VLC(object):
             # Applies DAC
             self.transmitter_obj.applyDAC()
             
+            
             ###########################################################################
             # >>>>>>>>>> CALCULATES OPTICAL POWER, DEPENDING ON THE LIGHTSOURCES
             # >>>>>>>>>> OR CAN BE BYPASSED BY Global.bypass_dict["LightSource"]
@@ -166,6 +167,7 @@ class VLC(object):
                 tx_data_in = tx_data_list,
                 sync_obj = self.sync_obj
             )
+            
             
             # If not bypassing Channel, calculates the channel impulse response (CIR)
             if not Global.bypass_dict["Channel"]:
@@ -200,6 +202,7 @@ class VLC(object):
             
             # After channel reponse set, apply it to each lamp.
             self.channel_obj.applyChannelResponse()
+
             
             ###########################################################################
             # >>>>>>>>>> GET RX_DATA LIST CONVOLVED BY CHANNEL AFTER ADDING NOISE.
@@ -238,6 +241,7 @@ class VLC(object):
             
             # Applies ADC
             self.receiver_obj.applyADC()
+            
             
             ###########################################################################
             # >>>>>>>>>> GET ADC RX_DATA TO PASS FOR DE-MODULATOR

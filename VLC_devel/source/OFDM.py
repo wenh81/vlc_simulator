@@ -63,6 +63,9 @@ class OFDM(object):
 
         # Length of the cyclic prefix  per OFDM symbol.
         self.number_of_cyclic_prefix = modulation_config["n_cp"]
+
+        # Modulation config info
+        self.modulation_config = modulation_config
         
         # List of all input info to be transmitted. Will be converted into ofdm_symbol_list.
         # It depends on the frame_size, bits_per_symbol and number_of_carriers
@@ -154,32 +157,36 @@ class OFDM(object):
             
             # Do the IDFT on the OFDM symbol data
             self.applyIFFT()
-
-
+            
+            # Check if imaginary part is non-zero
+            if np.abs(np.sum(self.digital_ofdm.imag)) > Global.hermitian_slack :
+                raise ValueError(f"\n\n***Error --> Hermitian symmetry generated a signal with non-zero imaginary part :\n{self.digital_ofdm}\n")
+            
             # Convert to real, by removing imaginary part
             self.digital_ofdm = self.digital_ofdm.real
-            # self.digital_ofdm = np.abs(self.digital_ofdm)
             
-            # THIS MUST BE A PURELY REAL SIGNAL!
-            print('self.digital_ofdm')
-            print(self.digital_ofdm)
+            # Get OFDM type
+            OFDM_type = next(iter(self.ofdm_type.keys()))
             
-            # # # CONVERT TO INTENSITY!
-            # # # DEPENDING ON TYPE OF MODULATION, ADD DC HEAR....
-            # dc_value = 10
-            # self.digital_ofdm = np.abs(self.digital_ofdm + dc_value)
-            # # self.digital_ofdm = self.digital_ofdm + dc_value
-            
-            print('self.digital_ofdm')
-            print(self.digital_ofdm)
-            # print(np.fft.ihfft(self.ofdm_symbol_data))
-            # plt.plot(np.fft.ihfft(self.ofdm_symbol_data))
-            # plt.show()
-            
+            if OFDM_type == "DCO-OFDM":
+                ofdm_dict = self.ofdm_type[OFDM_type]
+                
+                # get DCO-OFDM DC value
+                dc_value = ofdm_dict[0]
+
+                # Add DC value and apply absolute value
+                self.digital_ofdm = np.abs(self.digital_ofdm + dc_value)
+
+            elif OFDM_type == "ACO-OFDM":
+                raise ValueError(f"\n\n***Error --> Not yet supported OFDM type: < {OFDM_type} >\n")
+            else:
+                raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
             
             # Add the cyclic prefix in the OFDM symbol
             self.applyCp()
-            
+
+            # print('self.ofdm_symbol_tx')
+            # print(self.ofdm_symbol_tx)
             
             self.ofdm_symbol_list.append(self.ofdm_symbol_tx)
             
@@ -289,36 +296,24 @@ class OFDM(object):
     def applyHermitianSymetry(self):
         """Applies the Hermitian Symetry, to make sure IFFT of signal is Real. Input (N/2 - 1); Output (N)."""
 
-        print('\n>>>>>>>> Hermitian <<<<<<<<<<\n')
-
         # actual data with N/2 - 1 bits
         actual_data = self.ofdm_symbol_data[0:self.number_of_carriers//2 - 1]
-
+        
         # Build hermitian vector
         hermitian = [0] + list(actual_data) + [0] + list(np.conj(np.flipud(actual_data)))
         hermitian = np.array(hermitian)
 
         # Use hermitian
         self.ofdm_symbol_data = hermitian
+        del hermitian
+    
+    @sync_track
+    def applyHermitianDemodulation(self):
+        """Applies the Hermitian Demodulation, to retrieve FFT signal."""
 
-        # y = [0] + list(x) + [0] + list(np.conj(np.flipud(x)))
-        # y = [0] + list(np.conj(np.flipud(x))) + [0] + list(x)
+        # Get actual data from the correct positions
+        self.ofdm_symbol_rx = self.ofdm_symbol_rx[1:self.number_of_carriers//2]
 
-        # for index in range(0, self.number_of_carriers//2):
-        #     print('first: ', index, ' -- ', hermitian[index])
-        #     print('second: ', self.number_of_carriers - 1 - index, ' -- ', hermitian[self.number_of_carriers - 1 - index])
-        #     print()
-        
-        # print("self.ofdm_symbol_data = ", self.ofdm_symbol_data)
-        # print()
-        # print("actual_data = ", actual_data)
-        # print()
-        # print("hermitian = ", hermitian)
-        # print()
-        # print("len(hermitian) = ", len(hermitian))
-
-        # Hermitian
-        
         
     @sync_track
     def generateOFDMSymbol(self):
@@ -350,10 +345,6 @@ class OFDM(object):
             self.digital_ofdm = pyfftw.interfaces.numpy_fft.ifft(self.ofdm_symbol_data)
         else:
             self.digital_ofdm = np.fft.ifft(self.ofdm_symbol_data)
-        
-        # # MUST BE REAL!
-        # print(self.digital_ofdm)
-        # print(self.digital_ofdm.shape)
     
     @sync_track
     def applyCp(self):
@@ -393,6 +384,129 @@ class OFDM(object):
             
             # Estimates the channel response
             self.estimateChannel()
+            
+            
+            if self.PLOT:
+                
+                ### TODO - Get contribution of multiple CIRs... not sure how to do that yet
+                
+                # For each CIR in the CIR list (one CIR for each lamp, if appliable)
+                for idx_cir, CIR in enumerate(self.list_of_channel_response):
+                    
+                    # show = idx_cir == len(self.list_of_channel_response) - 1
+                    show = True
+                    self.compareOFDMChannelResponse(
+                        CIR,
+                        show = show
+                    )
+            
+            
+            # Applies equalization, given the channel response
+            self.applyEqualization()
+            
+            
+            # Get the mapped ouput signal, with its associated constellation
+            self.getConstellation()
+            
+            
+            # Creates the de-mapping object.
+            self.de_mapping_obj = Mapping(
+                bitstream_frame = None,
+                mapping_config = self.mapping_config,
+                mapped_info = self.mapped_output,
+                sync_obj = self.sync_obj
+            )
+            
+            
+            # Set demapping from mapped_output
+            self.de_mapping_obj.applyDemapping()
+            
+            
+            if self.PLOT:
+                # Given de-mapping, plot found constelattions from mapped_output
+                # show = idx_data == len(self.ofdm_rx_data_list) - 1
+                show = True
+                self.showFoundConstellation(
+                    self.de_mapping_obj.getFoundConstellation(),
+                    show = show
+                )
+            
+            
+            # Get seriallized data of interest
+            temp_list.append(self.de_mapping_obj.getRxBitstreamFrame())
+            
+            
+        self.bitstream_frame = []
+        
+        for bitstream in temp_list:
+            self.bitstream_frame = self.bitstream_frame + list(bitstream)
+        
+        zero_pad_counter = 0
+        temp_frame = ''
+        for bit in list(self.bitstream_frame):
+            # print(bit)
+            if self.remove_padded_zeros:
+                if zero_pad_counter >= self.zeros_to_pad:
+                    temp_frame += str(bit)
+            else:
+                temp_frame += str(bit)
+            zero_pad_counter += 1
+        self.bitstream_frame = temp_frame
+        del temp_list
+        del temp_frame
+    
+    @sync_track
+    # @timer_dec
+    def applyDeModulationIMDD(self):
+        """Wrapper for all functions to apply the OFDM de-modulation on the rx_data, for IM/DD"""
+        
+        # when de-mapping, the ouput starts as an empty list (temp_list)
+        temp_list = []
+        
+        # for each chunk of information to become an OFDM symbol, to the Mapping
+        for idx_data, rx_ofdm_symbol in enumerate(self.ofdm_rx_data_list):
+            
+
+            # Set the current RX OFDM symbol
+            self.setOFDMSymbolRx(rx_ofdm_symbol)
+            
+            # Remove the cyclic prefix in the OFDM symbol
+            self.removeCp()
+
+            # Get OFDM type
+            OFDM_type = next(iter(self.ofdm_type.keys()))
+
+            if OFDM_type == "DCO-OFDM":
+                ofdm_dict = self.ofdm_type[OFDM_type]
+                
+                # get DCO-OFDM DC value
+                dc_value = ofdm_dict[0]
+
+                # Subtract DC value
+                self.ofdm_symbol_rx = self.ofdm_symbol_rx - dc_value
+
+            elif OFDM_type == "ACO-OFDM":
+                raise ValueError(f"\n\n***Error --> Not yet supported OFDM type: < {OFDM_type} >\n")
+            else:
+                raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
+            
+            # Check if imaginary part is non-zero
+            if np.abs(np.sum(self.ofdm_symbol_rx.imag)) > Global.hermitian_slack :
+                raise ValueError(f"\n\n***Error --> Hermitian symmetry generated a signal with non-zero imaginary part :\n{self.ofdm_symbol_rx}\n")
+            
+            # Applies the FFT
+            self.applyFFT()
+            
+            # Apply hermitian demodulation
+            self.applyHermitianDemodulation()
+            
+            # Estimates the channel response
+            self.estimateChannel()
+            # print(self.estimated_channel_response)
+            # print(self.estimated_pilots_response)
+            # print(self.pilot_subcarriers)
+            # print(self.ofdm_symbol_rx)
+            # DEBUG
                         
             if self.PLOT:
                 

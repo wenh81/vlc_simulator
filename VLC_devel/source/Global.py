@@ -67,14 +67,15 @@ bypass_dict = {
 
 # list of channel responses for each lamp, when bypassig Channel.
 list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
-import numpy as np
-list_of_channel_response = [1*np.array([np.random.uniform()+np.random.uniform()*1j, (np.random.uniform()+np.random.uniform()*1j)/2, (np.random.uniform()+np.random.uniform()*1j)/4])]
+# import numpy as np
+# list_of_channel_response = [1*np.array([np.random.uniform()+np.random.uniform()*1j, (np.random.uniform()+np.random.uniform()*1j)/2, (np.random.uniform()+np.random.uniform()*1j)/4])]
+# list_of_channel_response = [1]
 # h = [(np.random.uniform()+j*np.random.uniform()) (np.random.uniform()+j*np.random.uniform())/2 (np.random.uniform()+j*np.random.uniform())/4]
 # list_of_channel_response = [0.1*np.array([1, 0, 0.3+0.3j])]
 
 # rx_SNR (dB) is ued if not set, if not calculated.
 rx_SNR_dB = 30
-rx_SNR_dB = 25
+# rx_SNR_dB = 25
 # rx_SNR_dB = 20
 # rx_SNR_dB = 10
 
@@ -134,25 +135,35 @@ input_info = {"type": ["str", "str"], "data": ["Hello, Motto!", "Uma frase beeee
 input_info = {"type": ["str"], "data": ["mini msg!"]}
 # input_info = {"type": ["str"], "data": ["mensagem media...!"]}
 # input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
-# # input_info = {"type": ["str"], "data": ["A vida eh curta, por isso viva a vida bem vivida!"]}
+# input_info = {"type": ["str"], "data": ["A vida eh curta, por isso viva a vida bem vivida!"]}
 # input_info = {"type": ["image"], "data": [r"../data/test.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"]*2, "data": [r"../data/test.png", r"../data/test_larger.png"], "n_bytes": [3]*2}
 # input_info = {"type": ["image", "str"], "data": [r"../data/test.png", "Uma frase beeeem longaaaaaaaaaaa!"], "n_bytes": [3]*2}
-# input_info = {"type": ["image"], "data": [r"../data/test_larger.png"], "n_bytes": [3]}
+input_info = {"type": ["image"], "data": [r"../data/test_larger.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"], "data": [r"../data/zebra.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"], "data": [r"../data/zebra_large.png"], "n_bytes": [3]}
 
 # supported input_info types
 supported_input_info = ["str", "image", "audio"]
 
+OFDM_CONFIG = {"DCO-OFDM": [1.9]}
+# OFDM_CONFIG = {"ACO-OFDM": [2]}
+
+# slack for hermitian imaginary part
+hermitian_slack = 1e-6
+
+# Number of FFT points
+# N_FFT = 32
+N_FFT = 1024
+
 # Type of modulation. OFDM, OOK, etc.
 modulation_config = {
                 0: {"type": "OFDM",
-                    "ofdm_type": "ACO-OFDM",
+                    "ofdm_type": OFDM_CONFIG,
                     "pilot_value": 3+3j,
-                    "n_carriers": 32, # number of IFFT stages
-                    "n_pilots": int(32*0.125),
-                    "n_cp": 32//4
+                    "n_carriers": N_FFT, # number of IFFT stages
+                    "n_pilots": int(N_FFT*0.125),
+                    "n_cp": N_FFT//4
                     },
                 
                 1: {"type": "OOK"
@@ -172,4 +183,4 @@ mapping_config = {
 }
 
 # Choose mapping type from the above.
-mapping_index = 0
+mapping_index = 2

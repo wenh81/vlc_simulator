@@ -93,7 +93,11 @@ class Channel(object):
                 
                 # Apply convolution
                 convolved = np.convolve(tx_data, CIR)
-                
+
+                # TODO --  IS THAT CORRECT? APPLY CIR AND THEN ABS
+                if Global.IM_DD:
+                    convolved = np.abs(convolved)
+
                 
                 # Apply noise to a signal
                 noisy_signal = self.applyChannelNoise(convolved)
@@ -122,16 +126,19 @@ class Channel(object):
     def applyChannelNoise(self, signal):
         """Apply the noise in the channel, given the rx_SNR, and outputs the final value for the rx_data_out."""
         
-        
-        
         # Average power for the convolved signal
         signal_power = np.mean(abs(signal**2))
+
         
         # Calculate the std for given signal power, based on rx_SNR
         sigma2 = signal_power * 10**( -self.rx_SNR/10)
         
         # Generate noise given std
         noise = np.sqrt(sigma2/2) * (np.random.randn(*signal.shape)+1j*np.random.randn(*signal.shape))
+        
+        # TODO --  IS THAT CORRECT? APPLY CIR AND THEN ABS
+        if Global.IM_DD:
+            noise = np.abs(noise)
         
         return noise + signal
     

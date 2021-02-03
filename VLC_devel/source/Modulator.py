@@ -85,8 +85,6 @@ class Modulator(object):
     def applyModulation(self):
         """Applies the modulation on the frame to send, and returns the 'tx_data_list'."""
         
-        # self.sync_obj.appendToSimulationPath("applyModulation @ Modulator")
-        
         if not Global.bypass_dict['Modulator']:
         
             if self.modulation_type == "OFDM":
@@ -105,7 +103,6 @@ class Modulator(object):
                 temp = self.sync_obj.getMessageDict().copy()
                 temp["packets"][-1] = temp["packets"][-1] + len(self.ofdm_obj.getBitstreamList())
                 self.sync_obj.setMessageDict(temp)
-                
                 
                 # Returns a list of OFDM symbols to be transmitted. The input stream data is
                 # splitted into various symbols, depending on the throughput of the modulator.
@@ -130,8 +127,6 @@ class Modulator(object):
     def applyDeModulation(self):
         """Applies the de-modulation on the received info 'rx_data_list', and returns the symbols"""
         
-        # self.sync_obj.appendToSimulationPath("applyDeModulation @ Modulator")
-        
         
         if self.modulation_type == "OFDM":
             
@@ -144,9 +139,12 @@ class Modulator(object):
                 self.list_of_channel_response
             )
             
-            
-            # Apply OFDM De-modulation
-            self.ofdm_obj.applyDeModulation()
+            if Global.IM_DD:
+                # Apply OFDM De-modulation for IM/DD
+                self.ofdm_obj.applyDeModulationIMDD()
+            else:
+                # Apply OFDM De-modulation
+                self.ofdm_obj.applyDeModulation()
             
             
             # Get the RX reconstructed frame data
