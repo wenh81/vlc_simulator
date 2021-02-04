@@ -67,8 +67,8 @@ bypass_dict = {
 
 # list of channel responses for each lamp, when bypassig Channel.
 list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
-# import numpy as np
-# list_of_channel_response = [1*np.array([np.random.uniform()+np.random.uniform()*1j, (np.random.uniform()+np.random.uniform()*1j)/2, (np.random.uniform()+np.random.uniform()*1j)/4])]
+import numpy as np
+list_of_channel_response = [1*np.array([np.random.uniform()+np.random.uniform()*1j, (np.random.uniform()+np.random.uniform()*1j)/2, (np.random.uniform()+np.random.uniform()*1j)/4])]
 # list_of_channel_response = [1]
 # h = [(np.random.uniform()+j*np.random.uniform()) (np.random.uniform()+j*np.random.uniform())/2 (np.random.uniform()+j*np.random.uniform())/4]
 # list_of_channel_response = [0.1*np.array([1, 0, 0.3+0.3j])]
@@ -139,7 +139,7 @@ input_info = {"type": ["str"], "data": ["mini msg!"]}
 # input_info = {"type": ["image"], "data": [r"../data/test.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"]*2, "data": [r"../data/test.png", r"../data/test_larger.png"], "n_bytes": [3]*2}
 # input_info = {"type": ["image", "str"], "data": [r"../data/test.png", "Uma frase beeeem longaaaaaaaaaaa!"], "n_bytes": [3]*2}
-input_info = {"type": ["image"], "data": [r"../data/test_larger.png"], "n_bytes": [3]}
+# input_info = {"type": ["image"], "data": [r"../data/test_larger.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"], "data": [r"../data/zebra.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"], "data": [r"../data/zebra_large.png"], "n_bytes": [3]}
 
@@ -147,6 +147,7 @@ input_info = {"type": ["image"], "data": [r"../data/test_larger.png"], "n_bytes"
 supported_input_info = ["str", "image", "audio"]
 
 OFDM_CONFIG = {"DCO-OFDM": [1.9]}
+# OFDM_CONFIG = {"DCO-OFDM": [0]}
 # OFDM_CONFIG = {"ACO-OFDM": [2]}
 
 # slack for hermitian imaginary part
@@ -154,7 +155,13 @@ hermitian_slack = 1e-6
 
 # Number of FFT points
 # N_FFT = 32
-N_FFT = 1024
+N_FFT = 64
+# N_FFT = 128
+# N_FFT = 1024
+
+# percentage of pilots, depending on number of FFT carriers 
+percentage_of_pilots = 0.125
+percentage_of_pilots = 0.2
 
 # Type of modulation. OFDM, OOK, etc.
 modulation_config = {
@@ -162,7 +169,7 @@ modulation_config = {
                     "ofdm_type": OFDM_CONFIG,
                     "pilot_value": 3+3j,
                     "n_carriers": N_FFT, # number of IFFT stages
-                    "n_pilots": int(N_FFT*0.125),
+                    "n_pilots": int(N_FFT*percentage_of_pilots),
                     "n_cp": N_FFT//4
                     },
                 

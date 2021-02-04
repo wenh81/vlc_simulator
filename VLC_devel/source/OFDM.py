@@ -174,8 +174,14 @@ class OFDM(object):
                 # get DCO-OFDM DC value
                 dc_value = ofdm_dict[0]
 
-                # Add DC value and apply absolute value
-                self.digital_ofdm = np.abs(self.digital_ofdm + dc_value)
+                # Add DC value and remove negative valuesabsolute value
+                self.digital_ofdm = self.digital_ofdm + dc_value
+                self.digital_ofdm = np.array([item if item >= 0 else 0 for item in self.digital_ofdm])
+                # print('DEBUG')
+                # print(type(self.digital_ofdm))
+                # print(self.digital_ofdm)
+                # print(self.digital_ofdm < 0)
+                # DEBUG
 
             elif OFDM_type == "ACO-OFDM":
                 raise ValueError(f"\n\n***Error --> Not yet supported OFDM type: < {OFDM_type} >\n")
@@ -484,6 +490,12 @@ class OFDM(object):
 
                 # Subtract DC value
                 self.ofdm_symbol_rx = self.ofdm_symbol_rx - dc_value
+                self.digital_ofdm = np.array([item if item >= 0 else 0 for item in self.digital_ofdm])
+                # print('DEBUG')
+                # print(type(self.digital_ofdm))
+                # print(self.digital_ofdm)
+                # print(self.digital_ofdm < 0)
+                # DEBUG
 
             elif OFDM_type == "ACO-OFDM":
                 raise ValueError(f"\n\n***Error --> Not yet supported OFDM type: < {OFDM_type} >\n")
