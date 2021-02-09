@@ -134,7 +134,7 @@ input_info = {"type": ["str", "str"], "data": ["Hello, Motto!", "Uma frase beeee
 # input_info = {"type": ["text"], "data": [r"../data/test.txt"]}
 input_info = {"type": ["str"], "data": ["mini msg!"]}
 # input_info = {"type": ["str"], "data": ["mensagem media...!"]}
-# input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
+input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
 # input_info = {"type": ["str"], "data": ["A vida eh curta, por isso viva a vida bem vivida!"]}
 # input_info = {"type": ["image"], "data": [r"../data/test.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"]*2, "data": [r"../data/test.png", r"../data/test_larger.png"], "n_bytes": [3]*2}
@@ -146,9 +146,9 @@ input_info = {"type": ["str"], "data": ["mini msg!"]}
 # supported input_info types
 supported_input_info = ["str", "image", "audio"]
 
-OFDM_CONFIG = {"DCO-OFDM": [1.9]}
+DCO_OFDM_CONFIG = {"DCO-OFDM": [1.9]}
 # OFDM_CONFIG = {"DCO-OFDM": [0]}
-# OFDM_CONFIG = {"ACO-OFDM": [2]}
+ACO_OFDM_CONFIG = {"ACO-OFDM": [2]}
 
 # slack for hermitian imaginary part
 hermitian_slack = 1e-6
@@ -157,16 +157,25 @@ hermitian_slack = 1e-6
 # N_FFT = 32
 N_FFT = 64
 # N_FFT = 128
+N_FFT = 256
 # N_FFT = 1024
 
 # percentage of pilots, depending on number of FFT carriers 
 percentage_of_pilots = 0.125
-percentage_of_pilots = 0.2
+percentage_of_pilots = 0.05
 
 # Type of modulation. OFDM, OOK, etc.
 modulation_config = {
                 0: {"type": "OFDM",
-                    "ofdm_type": OFDM_CONFIG,
+                    "ofdm_type": DCO_OFDM_CONFIG,
+                    "pilot_value": 7+7j,
+                    "n_carriers": N_FFT, # number of IFFT stages
+                    "n_pilots": int(N_FFT*percentage_of_pilots),
+                    "n_cp": N_FFT//4
+                    },
+                
+                1: {"type": "OFDM",
+                    "ofdm_type": ACO_OFDM_CONFIG,
                     "pilot_value": 3+3j,
                     "n_carriers": N_FFT, # number of IFFT stages
                     "n_pilots": int(N_FFT*percentage_of_pilots),
@@ -190,4 +199,4 @@ mapping_config = {
 }
 
 # Choose mapping type from the above.
-mapping_index = 2
+mapping_index = 0

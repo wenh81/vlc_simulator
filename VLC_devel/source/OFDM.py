@@ -596,13 +596,11 @@ class OFDM(object):
     def removeCp(self):
         """Removes the cyclic prefix from 'ofdm_symbol_rx'."""
         
-        
         self.ofdm_symbol_rx = self.ofdm_symbol_rx[self.number_of_cyclic_prefix:(self.number_of_cyclic_prefix + self.number_of_carriers)]
         
     @sync_track
     def applyFFT(self):
         """Applies the DFT on the OFDM symbols."""
-        
         
         if self.use_pyfft:
             # self.ofdm_symbol_rx = np.fft.hfft(self.ofdm_symbol_rx)
