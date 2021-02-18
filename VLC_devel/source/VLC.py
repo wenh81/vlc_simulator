@@ -139,6 +139,8 @@ class VLC(object):
             
             # Applies DAC
             self.transmitter_obj.applyDAC()
+
+            ## TODO ---- ADD HERE THE ADDITION OF THE DC VALUE OF DCO-OFDM MODULATION (VOLTAGE DOMAIN)
             
             
             ###########################################################################
@@ -239,6 +241,8 @@ class VLC(object):
             ###########################################################################
             # >>>>>>>>>> APPLY ADC ON RX_DATA, CONVERTING FROM ANALOG TO DIGITAL
             
+            ## TODO ---- ADD HERE THE REMOVAL OF THE DC VALUE OF DCO-OFDM DEMODULATION  (VOLTAGE DOMAIN)
+
             # Applies ADC
             self.receiver_obj.applyADC()
             

@@ -4,6 +4,8 @@ import Global
 
 from generalLibrary import timer_dec, sync_track
 
+import generalLibrary as lib
+
 class Channel(object):
     
     def __init__(self, tx_data_in, sync_obj):
@@ -93,15 +95,17 @@ class Channel(object):
                 
                 # Apply convolution
                 convolved = np.convolve(tx_data, CIR)
-
-                # TODO --  IS THAT CORRECT? APPLY CIR AND THEN ABS
-                if Global.IM_DD:
-                    convolved = np.abs(convolved)
-
                 
                 # Apply noise to a signal
                 noisy_signal = self.applyChannelNoise(convolved)
                 
+                # TODO --  IS THAT CORRECT? APPLY CIR AND THEN ABS (or clip to zero)
+                if Global.IM_DD:
+                    noisy_signal = lib.zeroClip(noisy_signal)
+                    print(noisy_signal)
+                    noisy_signal = np.abs(noisy_signal)
+                    print(noisy_signal)
+                    
                 
                 summed_noisy_signal += noisy_signal
                 counter += 1
@@ -118,13 +122,15 @@ class Channel(object):
     def calculatesReceiverSNR(self, SNR=None):
         """Calculates the SNR at the side of the receiver. If raytrace is on, it is calculated; if not, must pass the expected value."""
         
-        
-        
         raise ValueError(f"\n\n***Error --> Calculation of rx_SNR not implemented yet!\n")
     
     @sync_track
     def applyChannelNoise(self, signal):
         """Apply the noise in the channel, given the rx_SNR, and outputs the final value for the rx_data_out."""
+        
+        # If noise not applieable
+        if self.rx_SNR == None:
+            return signal
         
         # Average power for the convolved signal
         signal_power = np.mean(abs(signal**2))
@@ -195,8 +201,6 @@ class Channel(object):
     @sync_track
     def setRxSNR(self, rx_SNR):
         """Set new value for self.rx_SNR"""
-        
-        
         
         self.rx_SNR = rx_SNR
 

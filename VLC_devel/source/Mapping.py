@@ -155,24 +155,21 @@ class Mapping(object):
     def applyDemapping(self):
         """Given 'mapped_output', returns the closest values for the demapping."""
         
-        
-        
         if self.mapping_type == "QAM":
             
             self.setupMappingTable()
             
-            
             # Given the demapping table, get all possible constellation points
-            constellation = np.array([x for x in self.demapping_table.keys()])
+            self.constellation = np.array([x for x in self.demapping_table.keys()])
             
             # calculates what is the distance between each received data, and each constellation point
-            euclidean_dist = abs(self.mapped_info.reshape((-1,1)) - constellation.reshape((1,-1)))
+            euclidean_dist = abs(self.mapped_info.reshape((-1,1)) - self.constellation.reshape((1,-1)))
             
             # Get the minimum distance index
             min_distance = euclidean_dist.argmin(axis=1)
             
             # get back the real constellation point
-            self.found_constellation = constellation[min_distance]
+            self.found_constellation = self.constellation[min_distance]
             
             # Do the de-mapping transofrmation, back to bit list values
             self.rx_bitstream_frame = np.vstack([self.demapping_table[C] for C in self.found_constellation])
@@ -266,6 +263,18 @@ class Mapping(object):
         """Set new value for self.rx_bitstream_frame"""
         
         self.rx_bitstream_frame = rx_bitstream_frame
+    
+    @sync_track
+    def getConstellation(self):
+        """Returns value of self.constellation"""
+        
+        return self.constellation
+    
+    @sync_track
+    def setConstellation(self, constellation):
+        """Set new value for self.constellation"""
+        
+        self.constellation = constellation
     
     @sync_track
     def getFoundConstellation(self):

@@ -27,12 +27,12 @@ DEBUG = {
 # global plot flag
 PLOT = {
     "all": False,
-    "VLC": True,
+    "VLC": False,
     "Message": False,
     "Transmitter": False,
     "Mapping": False,
     "Modulator": False,
-    "OFDM": False,
+    "OFDM": True,
     "DAC": False,
     "Channel": False,
     "LightSource": False,
@@ -44,7 +44,7 @@ PLOT = {
     "Simulator": False,
     "Virtuoso": False,
     "Tanner": False,
-    "MeritFunctions": True,
+    "MeritFunctions": False,
     "SimulationSync": False
 }
 
@@ -66,15 +66,17 @@ bypass_dict = {
 # abs of signal is passed through. Needs to apply hermitian symetry in this case!
 
 # list of channel responses for each lamp, when bypassig Channel.
-list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
 import numpy as np
+# Unitary channel
+list_of_channel_response = [1*np.array([1])]
 list_of_channel_response = [1*np.array([np.random.uniform()+np.random.uniform()*1j, (np.random.uniform()+np.random.uniform()*1j)/2, (np.random.uniform()+np.random.uniform()*1j)/4])]
-# list_of_channel_response = [1]
-# h = [(np.random.uniform()+j*np.random.uniform()) (np.random.uniform()+j*np.random.uniform())/2 (np.random.uniform()+j*np.random.uniform())/4]
+list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
 # list_of_channel_response = [0.1*np.array([1, 0, 0.3+0.3j])]
 
-# rx_SNR (dB) is ued if not set, if not calculated.
-rx_SNR_dB = 30
+# rx_SNR (dB) is ued if not set, if not calculated. Can use <None> to ignore noise
+rx_SNR_dB = None
+# rx_SNR_dB = 50
+# rx_SNR_dB = 30
 # rx_SNR_dB = 25
 # rx_SNR_dB = 20
 # rx_SNR_dB = 10
@@ -98,12 +100,13 @@ wavelenghts = [550]
 temperature = 273
 
 # Defines the simulator to be used, if appliable.
-which_simulator = "Virtuoso"
-# which_simulator = "Tanner"
+# which_simulator = "Virtuoso"
+which_simulator = "Tanner"
+# which_simulator = "None"
 
 # Intensity Modulation / Direct Detection (IM_DD) -- always on for VLC/LiFi [flag kept only for completion]
 IM_DD = True
-# IM_DD = False
+IM_DD = False
 
 ################################### < FLAGS > ###################################
 # Flag to remove padded zeros before analysis (must be setup for images... fix later)
@@ -146,29 +149,43 @@ input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
 # supported input_info types
 supported_input_info = ["str", "image", "audio"]
 
-DCO_OFDM_CONFIG = {"DCO-OFDM": [1.9]}
-# OFDM_CONFIG = {"DCO-OFDM": [0]}
-ACO_OFDM_CONFIG = {"ACO-OFDM": [2]}
+# DCO_OFDM_CONFIG = {"DCO-OFDM": [0]}
+# DCO_OFDM_CONFIG = {"DCO-OFDM": [0.5]}
+# DCO_OFDM_CONFIG = {"DCO-OFDM": [1.5]}
+DCO_OFDM_CONFIG = {"DCO-OFDM": [5]}
+# DCO_OFDM_CONFIG = {"DCO-OFDM": [19]}
+
+ACO_OFDM_CONFIG = {"ACO-OFDM": []}
 
 # slack for hermitian imaginary part
 hermitian_slack = 1e-6
 
 # Number of FFT points
-# N_FFT = 32
+N_FFT = 32
 N_FFT = 64
 # N_FFT = 128
 N_FFT = 256
+N_FFT = 512
 # N_FFT = 1024
 
 # percentage of pilots, depending on number of FFT carriers 
-percentage_of_pilots = 0.125
-percentage_of_pilots = 0.05
+percentage_of_pilots = 0.3
+# percentage_of_pilots = 0.125
+# percentage_of_pilots = 0.5
+
+# pilot_value
+# pilot_value = 15+15j
+pilot_value = 7-7j
+# pilot_value = -7-7j
+# pilot_value = 5-5j
+# pilot_value = 3+3j
+# pilot_value = 1-1j
 
 # Type of modulation. OFDM, OOK, etc.
 modulation_config = {
                 0: {"type": "OFDM",
                     "ofdm_type": DCO_OFDM_CONFIG,
-                    "pilot_value": 7+7j,
+                    "pilot_value": pilot_value,
                     "n_carriers": N_FFT, # number of IFFT stages
                     "n_pilots": int(N_FFT*percentage_of_pilots),
                     "n_cp": N_FFT//4
@@ -176,27 +193,29 @@ modulation_config = {
                 
                 1: {"type": "OFDM",
                     "ofdm_type": ACO_OFDM_CONFIG,
-                    "pilot_value": 3+3j,
+                    "pilot_value": pilot_value,
                     "n_carriers": N_FFT, # number of IFFT stages
                     "n_pilots": int(N_FFT*percentage_of_pilots),
                     "n_cp": N_FFT//4
                     },
                 
-                1: {"type": "OOK"
+                2: {"type": "OOK"
                     }
 }
 # Choose modulation type from the above.
 modulation_index = 0
+modulation_index = 1
 
-# Type of mapping. 4-QAM, 8-QAM, 16-QAM, etc.
+# Type of mapping. 4-QAM, 16-QAM, 64-QAM, 256-QAM
 mapping_config = {
                 0: ["QAM", 4],
-                1: ["QAM", 8],
-                2: ["QAM", 16],
-                3: ["QAM", 64],
-                4: ["QAM", 128],
-                5: ["QAM", 256]
+                1: ["QAM", 16],
+                2: ["QAM", 64],
+                3: ["QAM", 256]
 }
 
 # Choose mapping type from the above.
 mapping_index = 0
+mapping_index = 1
+mapping_index = 2
+# mapping_index = 3

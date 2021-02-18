@@ -215,9 +215,7 @@ class Receiver(object):
 
     @sync_track
     def applyADC(self):
-        """Converts rx_voltage into adc values, given input rx_voltage."""
-        
-        
+        """Converts rx_voltage into adc values, given input rx_voltage."""        
         
         # if not bypassing adc
         if not Global.bypass_dict["ADC"]:

@@ -19,6 +19,11 @@ import inspect
 # ONLY FOR LINUX
 # import skcuda.fft as cu_fft
 
+def zeroClip(signal):
+    """Returns the same signal, but clipped to zero"""
+    
+    return np.array([item if item >= 0 else 0 for item in signal])
+
 def plotTxRxData(data, label, handle, sync_obj, show = False):
     """Plots Tx/Rx data."""
     

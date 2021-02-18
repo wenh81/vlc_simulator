@@ -108,7 +108,6 @@ class OFDM(object):
             # Create the OFDM symbol data adding pilots and mapped data
             self.generateOFDMSymbol()
             
-            
             # Do the IDFT on the OFDM symbol data
             self.applyIFFT()
             
@@ -157,13 +156,16 @@ class OFDM(object):
             
             # Do the IDFT on the OFDM symbol data
             self.applyIFFT()
+
+            # Add the cyclic prefix in the OFDM symbol
+            self.applyCp()
             
             # Check if imaginary part is non-zero
-            if np.abs(np.sum(self.digital_ofdm.imag)) > Global.hermitian_slack :
-                raise ValueError(f"\n\n***Error --> Hermitian symmetry generated a signal with non-zero imaginary part :\n{self.digital_ofdm}\n")
+            if np.abs(np.sum(self.ofdm_symbol_tx.imag)) > Global.hermitian_slack :
+                raise ValueError(f"\n\n***Error --> Hermitian symmetry generated a signal with non-zero imaginary part :\n{self.ofdm_symbol_tx}\n")
             
             # Convert to real, by removing imaginary part
-            self.digital_ofdm = self.digital_ofdm.real
+            self.ofdm_symbol_tx = self.ofdm_symbol_tx.real
             
             # Get OFDM type
             OFDM_type = next(iter(self.ofdm_type.keys()))
@@ -175,24 +177,30 @@ class OFDM(object):
                 dc_value = ofdm_dict[0]
 
                 # Add DC value and remove negative valuesabsolute value
-                self.digital_ofdm = self.digital_ofdm + dc_value
-                self.digital_ofdm = np.array([item if item >= 0 else 0 for item in self.digital_ofdm])
+                ## TODO --- ACTUALLY THIS MUST BE APPLIED AFTER THE DAC!
+                self.ofdm_symbol_tx = self.ofdm_symbol_tx + dc_value
+                
+                # print(self.ofdm_symbol_tx < 0)
+                # print(self.ofdm_symbol_tx)
+                self.ofdm_symbol_tx = lib.zeroClip(self.ofdm_symbol_tx)
                 # print('DEBUG')
-                # print(type(self.digital_ofdm))
-                # print(self.digital_ofdm)
-                # print(self.digital_ofdm < 0)
+                # print(self.ofdm_symbol_tx)
                 # DEBUG
 
             elif OFDM_type == "ACO-OFDM":
-                raise ValueError(f"\n\n***Error --> Not yet supported OFDM type: < {OFDM_type} >\n")
+                
+                print('before zero clip')
+                print(self.ofdm_symbol_tx)
+                self.ofdm_symbol_tx = lib.zeroClip(self.ofdm_symbol_tx)
+                # print(self.ofdm_symbol_tx)
+                # DEBUG
+                # plt.plot(self.ofdm_symbol_tx.real, label='DEBUG FOR ACO')
+                # plt.show()
+                
+                # raise ValueError(f"\n\n***Error --> Not yet supported OFDM type: < {OFDM_type} >\n")
             else:
                 raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
             
-            # Add the cyclic prefix in the OFDM symbol
-            self.applyCp()
-
-            # print('self.ofdm_symbol_tx')
-            # print(self.ofdm_symbol_tx)
             
             self.ofdm_symbol_list.append(self.ofdm_symbol_tx)
             
@@ -201,16 +209,40 @@ class OFDM(object):
     def setupOFDMCarriersIndexes(self):
         """Setup carriers indexes for ofdm calculation."""
         
-        
+        # Get OFDM type
+        OFDM_type = next(iter(self.ofdm_type.keys()))
+                
         # Indexes for all carriers (data carriers + pilot carriers)
         if Global.IM_DD: # N/2 - 1 actual carriers
-            self.all_subcarriers = np.arange(self.number_of_carriers//2 - 1)
+            if OFDM_type == "DCO-OFDM":
+                self.all_subcarriers = np.arange(self.number_of_carriers//2 - 1)
+            elif OFDM_type == "ACO-OFDM":
+                # self.all_subcarriers = np.arange(self.number_of_carriers//2)
+                self.all_subcarriers = np.arange(self.number_of_carriers//2 - 1)
+                # set as negative all components to become 0
+                # (in the even position, since will move to odd after hermitian)
+                # for index in np.arange(1, self.number_of_carriers//2, 2):
+                for index in np.arange(1, self.number_of_carriers//2 - 1, 2):
+                    self.all_subcarriers[index] = -1
+                # self.all_subcarriers = np.arange(1, self.number_of_carriers//2, 2)
+                # self.all_subcarriers = np.arange((self.number_of_carriers//2)//2)
+                # print(self.all_subcarriers)
+                # print(self.number_of_carriers)
+                # print((self.number_of_carriers//2))
+                # print(((self.number_of_carriers//2)//2))
+            else:
+                raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
         else:
             self.all_subcarriers = np.arange(self.number_of_carriers)
         
         # set indexes for pilot subcarriers
         if Global.IM_DD:
-            self.pilot_subcarriers = self.all_subcarriers[::(self.number_of_carriers//2 - 1)//(self.number_of_pilots//2 -1)]
+            if OFDM_type == "DCO-OFDM":
+                self.pilot_subcarriers = self.all_subcarriers[::(self.number_of_carriers//2 - 1)//(self.number_of_pilots//2 -1)]
+            elif OFDM_type == "ACO-OFDM":
+                self.pilot_subcarriers = self.all_subcarriers[0::(self.number_of_carriers//2 - 1)//(self.number_of_pilots//2 - 1)]
+            else:
+                raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
         else:
             self.pilot_subcarriers = self.all_subcarriers[::self.number_of_carriers//self.number_of_pilots]
         
@@ -218,18 +250,21 @@ class OFDM(object):
         # make last subcarrier also as a pilot (and increment number of pilots)
         self.pilot_subcarriers = np.hstack([self.pilot_subcarriers, np.array([self.all_subcarriers[-1]])])
         self.number_of_pilots += 1
+        # remove duplicates (and -1)
+        self.pilot_subcarriers = list(set([item for item in self.pilot_subcarriers if item != -1]))
         
         # set the indexes for the data subcarriers
         self.data_subcarriers = np.delete(self.all_subcarriers, self.pilot_subcarriers)
         
         # set number of actual data carriers (through FFT)
-        self.number_of_data_carriers = len(self.data_subcarriers)
-
-        # print('self.number_of_data_carriers = ', self.number_of_data_carriers)
-        # print('self.pilot_subcarriers = ', self.pilot_subcarriers)
-        # print('self.data_subcarriers = ', self.data_subcarriers)
-        # print('self.all_subcarriers = ', self.all_subcarriers)
-        # asdasd
+        # self.number_of_data_carriers = len(self.data_subcarriers)
+        self.number_of_data_carriers = len([item for item in self.data_subcarriers if item != -1])
+        
+        print('self.pilot_subcarriers = ', self.pilot_subcarriers)
+        print('self.all_subcarriers = ', self.all_subcarriers)
+        print('self.data_subcarriers = ', self.data_subcarriers)
+        print('self.number_of_data_carriers = ', self.number_of_data_carriers)
+        
         
     @sync_track
     def setupBitstreamList(self):
@@ -237,6 +272,7 @@ class OFDM(object):
         
         # Converts bitstream to numpy array
         self.bitstream_frame = np.array([bit for bit in self.bitstream_frame], dtype=int)
+
         
         # get frame_size and bits_per_symbol
         frame_size = len(self.bitstream_frame)
@@ -244,7 +280,12 @@ class OFDM(object):
         
         # total number of symbols for transmition for each frame
         number_of_symbols_to_transmit_per_frame = frame_size//bits_per_symbol
-
+        # print('bitstream_frame')
+        # print(self.bitstream_frame)
+        # print(self.number_of_data_carriers)
+        # print(frame_size)
+        # print(number_of_symbols_to_transmit_per_frame)
+        
         # number of symbols per OFDM symbol is the number of data carriers that can be transmitted at once
         # number_of_symbols_per_ofdm_symbol = self.number_of_data_carriers//bits_per_symbol
         
@@ -268,17 +309,7 @@ class OFDM(object):
             # actual zero padded bitstream
             self.bitstream_frame = np.array([0]*self.zeros_to_pad + list(self.bitstream_frame), dtype=int)
             
-        # print('frame_size = ', frame_size)
-        # print('bits_per_symbol = ', bits_per_symbol)
-        # print('number_of_symbols_to_transmit_per_frame = ', number_of_symbols_to_transmit_per_frame)
-        # print('n_ofdm_symbols = ', n_ofdm_symbols)
-        # print('self.number_of_data_carriers = ', self.number_of_data_carriers)
-        # print('self.zeros_to_pad = ', self.zeros_to_pad)
-        # print('self.bitstream_frame = ', self.bitstream_frame)
-        # print('self.bits_per_ofdm_symbol = ', self.bits_per_ofdm_symbol)
-        # print(len(self.bitstream_frame))
-        # asd
-
+        
         temp_bitstream = []
         self.bitstream_list = []
         counter = 0
@@ -297,13 +328,28 @@ class OFDM(object):
                 temp_bitstream = []
                 temp_bitstream.append(self.bitstream_frame[index])
                 counter = 1
+        
+        print('frame_size = ', frame_size)
+        print('bits_per_symbol = ', bits_per_symbol)
+        print('number_of_symbols_to_transmit_per_frame = ', number_of_symbols_to_transmit_per_frame)
+        print('n_ofdm_symbols = ', n_ofdm_symbols)
+        print('self.number_of_data_carriers = ', self.number_of_data_carriers)
+        print('self.zeros_to_pad = ', self.zeros_to_pad)
+        print('self.bitstream_frame = ', self.bitstream_frame)
+        print('self.bits_per_ofdm_symbol = ', self.bits_per_ofdm_symbol)
+        # DEBUG
     
     @sync_track
     def applyHermitianSymetry(self):
         """Applies the Hermitian Symetry, to make sure IFFT of signal is Real. Input (N/2 - 1); Output (N)."""
 
+        print('\nofdm_symbol_data')
+        print(self.number_of_carriers)
+        print(self.ofdm_symbol_data)
+        print(len(self.ofdm_symbol_data))
         # actual data with N/2 - 1 bits
         actual_data = self.ofdm_symbol_data[0:self.number_of_carriers//2 - 1]
+        print(actual_data)
         
         # Build hermitian vector
         hermitian = [0] + list(actual_data) + [0] + list(np.conj(np.flipud(actual_data)))
@@ -311,14 +357,50 @@ class OFDM(object):
 
         # Use hermitian
         self.ofdm_symbol_data = hermitian
+        
+        print()
+        print(self.number_of_carriers)
+        print(self.ofdm_symbol_data)
+        # HERMITIAN
         del hermitian
     
     @sync_track
     def applyHermitianDemodulation(self):
         """Applies the Hermitian Demodulation, to retrieve FFT signal."""
 
+        # Get OFDM type
+        OFDM_type = next(iter(self.ofdm_type.keys()))
+        
         # Get actual data from the correct positions
-        self.ofdm_symbol_rx = self.ofdm_symbol_rx[1:self.number_of_carriers//2]
+        if OFDM_type == "DCO-OFDM":
+            self.ofdm_symbol_rx = self.ofdm_symbol_rx[1:self.number_of_carriers//2]
+            # print(self.number_of_carriers)
+            # print(type(self.ofdm_symbol_rx))
+            # print(len(self.ofdm_symbol_rx))
+        elif OFDM_type == "ACO-OFDM":
+            self.ofdm_symbol_rx = self.ofdm_symbol_rx[1:self.number_of_carriers//2]
+            # # print(type(self.ofdm_symbol_rx))
+            # # print(self.ofdm_symbol_rx)
+            # # Get upper and lower data parts (excluding the zeros)
+            # # upper_data = self.ofdm_symbol_rx[1:self.number_of_carriers//2]
+            # # lower_data = self.ofdm_symbol_rx[self.number_of_carriers//2+1:]
+            # upper_data = self.ofdm_symbol_rx[1:self.number_of_carriers//2][::2]
+            # lower_data = self.ofdm_symbol_rx[self.number_of_carriers//2+1:][::2]
+            # self.ofdm_symbol_rx = np.array(list(upper_data) + list(lower_data))
+            # print('upper_data')
+            # print(upper_data)
+            # print(len(upper_data))
+            # print('lower_data')
+            # print(lower_data)
+            # print(len(lower_data))
+            # print('self.ofdm_symbol_rx')
+            # print(self.ofdm_symbol_rx)
+            # print(len(self.ofdm_symbol_rx))
+            # print(type(self.ofdm_symbol_rx))
+
+            # self.ofdm_symbol_rx = self.ofdm_symbol_rx[1::2]
+        else:
+            raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
 
         
     @sync_track
@@ -333,13 +415,18 @@ class OFDM(object):
         self.ofdm_symbol_data[self.pilot_subcarriers] = self.pilot_value
         
         # Introduce the actual mapped data in the ofdm symbol
-        self.ofdm_symbol_data[self.data_subcarriers] = self.mapped_info
+        # self.ofdm_symbol_data[self.data_subcarriers] = self.mapped_info
+        self.only_data_carriers = [item for item in self.data_subcarriers if item != -1]
+        self.ofdm_symbol_data[self.only_data_carriers] = self.mapped_info
         
+        print('self.ofdm_symbol_data = ', self.ofdm_symbol_data)
         # print('self.number_of_carriers = ', self.number_of_carriers)
-        # print('self.ofdm_symbol_data = ', self.ofdm_symbol_data)
         # print('self.pilot_subcarriers = ', self.pilot_subcarriers)
         # print('self.data_subcarriers = ', self.data_subcarriers)
-        # print(len(self.ofdm_symbol_data))
+        # print('self.number_of_data_carriers = ', self.number_of_data_carriers)
+        print('self.mapped_info =\n', self.mapped_info)
+        print('self.mapped_info = ', len(self.mapped_info))
+        
         
     @sync_track
     def applyIFFT(self):
@@ -362,6 +449,10 @@ class OFDM(object):
         
         # And pass to the beginning of te vector
         self.ofdm_symbol_tx = np.hstack([self.ofdm_symbol_tx, self.digital_ofdm])
+        # print('here')
+        # print(self.ofdm_symbol_tx)
+        # print(self.digital_ofdm)
+        # asd
         
     
     @sync_track
@@ -434,6 +525,7 @@ class OFDM(object):
                 show = True
                 self.showFoundConstellation(
                     self.de_mapping_obj.getFoundConstellation(),
+                    self.de_mapping_obj.getConstellation(),
                     show = show
                 )
             
@@ -472,7 +564,6 @@ class OFDM(object):
         # for each chunk of information to become an OFDM symbol, to the Mapping
         for idx_data, rx_ofdm_symbol in enumerate(self.ofdm_rx_data_list):
             
-
             # Set the current RX OFDM symbol
             self.setOFDMSymbolRx(rx_ofdm_symbol)
             
@@ -490,7 +581,8 @@ class OFDM(object):
 
                 # Subtract DC value
                 self.ofdm_symbol_rx = self.ofdm_symbol_rx - dc_value
-                self.digital_ofdm = np.array([item if item >= 0 else 0 for item in self.digital_ofdm])
+                
+                self.digital_ofdm = lib.zeroClip(self.digital_ofdm)
                 # print('DEBUG')
                 # print(type(self.digital_ofdm))
                 # print(self.digital_ofdm)
@@ -498,7 +590,9 @@ class OFDM(object):
                 # DEBUG
 
             elif OFDM_type == "ACO-OFDM":
-                raise ValueError(f"\n\n***Error --> Not yet supported OFDM type: < {OFDM_type} >\n")
+                print()
+                print(self.ofdm_symbol_rx)
+                # raise ValueError(f"\n\n***Error --> Not yet supported OFDM type: < {OFDM_type} >\n")
             else:
                 raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
             
@@ -506,19 +600,40 @@ class OFDM(object):
             if np.abs(np.sum(self.ofdm_symbol_rx.imag)) > Global.hermitian_slack :
                 raise ValueError(f"\n\n***Error --> Hermitian symmetry generated a signal with non-zero imaginary part :\n{self.ofdm_symbol_rx}\n")
             
+            print('DEBUG')
+            print(self.ofdm_symbol_rx)
             # Applies the FFT
             self.applyFFT()
+            print('AFTER FFT')
+            print(self.ofdm_symbol_rx)
+            # print(self.ofdm_symbol_rx.imag)
+            print(len(self.ofdm_symbol_rx))
             
             # Apply hermitian demodulation
             self.applyHermitianDemodulation()
+
+            print('AFTER HERMIT')
+            # print(self.ofdm_symbol_rx)
+            print(self.ofdm_symbol_rx[::2]*2)
+            # print(len(self.ofdm_symbol_rx))
+            print(len(self.ofdm_symbol_rx[::2]*2))
+            
+            print('self.ofdm_symbol_data =\n', self.ofdm_symbol_data)
+            print('self.ofdm_symbol_data =\n', self.ofdm_symbol_data[1::2])
+            print('self.ofdm_symbol_data = ', len(self.ofdm_symbol_data))
+            print('self.mapped_info =\n', self.mapped_info)
+            print('self.mapped_info = ', len(self.mapped_info))
+            
+            ## TODO --- should revise, and take care of the correct data being transfered here
             
             # Estimates the channel response
             self.estimateChannel()
+            
             # print(self.estimated_channel_response)
             # print(self.estimated_pilots_response)
             # print(self.pilot_subcarriers)
-            # print(self.ofdm_symbol_rx)
-            # DEBUG
+            print(self.ofdm_symbol_rx)
+            print(len(self.ofdm_symbol_rx))
                         
             if self.PLOT:
                 
@@ -534,10 +649,9 @@ class OFDM(object):
                         show = show
                     )
             
-            
-            # Applies equalization, given the channel response
-            self.applyEqualization()
-            
+            # DEBUG
+            # # Applies equalization, given the channel response
+            self.applyEqualization()            
             
             # Get the mapped ouput signal, with its associated constellation
             self.getConstellation()
@@ -562,6 +676,7 @@ class OFDM(object):
                 show = True
                 self.showFoundConstellation(
                     self.de_mapping_obj.getFoundConstellation(),
+                    self.de_mapping_obj.getConstellation(),
                     show = show
                 )
             
@@ -612,62 +727,165 @@ class OFDM(object):
     def estimateChannel(self):
         """Analyze pilots to get the channel estimation."""
         
+        if not Global.IM_DD:
+            OFDM_type = None
+            self.estimated_pilots_response = self.ofdm_symbol_rx[self.pilot_subcarriers] / self.pilot_value
+            channel_response_modulus = interpolate.interp1d(self.pilot_subcarriers, abs(self.estimated_pilots_response), kind='linear')(np.arange(0, len(self.all_subcarriers) , 1))
+            channel_response_angle = interpolate.interp1d(self.pilot_subcarriers, np.angle(self.estimated_pilots_response), kind='linear')(np.arange(0, len(self.all_subcarriers) , 1))
+        else:
+            # Get OFDM type
+            OFDM_type = next(iter(self.ofdm_type.keys()))
+            
+            # Get the channel response by dividing the pilot subcarriers by the known pilot value.
+            if OFDM_type == "DCO-OFDM":
+                self.estimated_pilots_response = self.ofdm_symbol_rx[self.pilot_subcarriers] / self.pilot_value
+                # interpolates the estimated response, to get the actual modulus and angle for estimated channel response
+                channel_response_modulus = interpolate.interp1d(self.pilot_subcarriers, abs(self.estimated_pilots_response), kind='linear')(np.arange(0, len(self.all_subcarriers) , 1))
+                channel_response_angle = interpolate.interp1d(self.pilot_subcarriers, np.angle(self.estimated_pilots_response), kind='linear')(np.arange(0, len(self.all_subcarriers) , 1))
+                print('self.all_subcarriers')
+                print(self.all_subcarriers)
+            elif OFDM_type == "ACO-OFDM":
+                # multiply by 2 at RX, because the ACO simmetry makes the IFFT output 2x smaller at TX
+                self.ofdm_symbol_rx = self.ofdm_symbol_rx*2
+                print(self.ofdm_symbol_rx*2)
+                # Correct positions for ACO pilot carriers
+                self.estimated_pilots_response = self.ofdm_symbol_rx[self.pilot_subcarriers] / self.pilot_value
+                # self.estimated_pilots_response = self.ofdm_symbol_rx[[int(item//2) for item in self.pilot_subcarriers]] / self.pilot_value            
+
+                print('CHANNEL')
+                print(self.ofdm_symbol_rx[self.pilot_subcarriers])
+                print(self.ofdm_symbol_rx)
+                print(self.pilot_subcarriers)
+                print(self.pilot_value)
+                print(self.estimated_pilots_response)
+                print('self.all_subcarriers')
+                print(self.all_subcarriers)
+                
+                self.valid_carriers = [item if item != -1 else self.all_subcarriers[idx-1]+1 for idx,item in enumerate(self.all_subcarriers) ]
+                
+                # self.valid_carriers = [int(item//2) for item in self.all_subcarriers if item != -1]
+                # self.all_subcarriers = self.valid_carriers
+                # self.valid_carriers = self.all_subcarriers
+                print('self.valid_carriers')
+                print(self.valid_carriers)
+                print(len(self.valid_carriers))
+
+                channel_response_modulus = interpolate.interp1d(self.pilot_subcarriers, abs(self.estimated_pilots_response), kind='linear', fill_value="extrapolate")(np.arange(0, len(self.all_subcarriers) , 1))
+                print(channel_response_modulus)
+                channel_response_angle = interpolate.interp1d(self.pilot_subcarriers, np.angle(self.estimated_pilots_response), kind='linear', fill_value="extrapolate")(np.arange(0, len(self.all_subcarriers) , 1))
+                print(channel_response_angle)
+                
+                # join modulus and phase to create the estimated channel response
+            
+            elif OFDM_type is not None:
+                raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
         
-        # Get the channel response by dividing the pilot subcarriers by the known pilot value.
-        self.estimated_pilots_response = self.ofdm_symbol_rx[self.pilot_subcarriers] / self.pilot_value
-        
-        # interpolates the estimated response, to get the actual modulus and angle for estimated channel response
-        channel_response_modulus = interpolate.interp1d(self.pilot_subcarriers, abs(self.estimated_pilots_response), kind='linear')(self.all_subcarriers)
-        channel_response_angle = interpolate.interp1d(self.pilot_subcarriers, np.angle(self.estimated_pilots_response), kind='linear')(self.all_subcarriers)
-        
-        # join modulus and phase to create the estimated channel response
+        # self.valid_carriers = self.all_subcarriers
+        self.valid_carriers = np.arange(0, len(self.all_subcarriers))
         self.estimated_channel_response = channel_response_modulus * np.exp(1j*channel_response_angle)
+        print(self.estimated_channel_response)
+        print(len(self.estimated_channel_response))
         
     @sync_track
     def applyEqualization(self):
         """Equalize, given OFDM symbols from DFT operation, and the channel estimate."""
         
-        
+        print('applyEqualization')
+        print(self.estimated_channel_response)
+        print(len(self.estimated_channel_response))
+        print(self.ofdm_symbol_rx)
+        print(len(self.ofdm_symbol_rx))
+        # self.mapped_output_pilots = self.ofdm_symbol_rx[self.pilot_subcarriers]
         self.ofdm_symbol_rx = self.ofdm_symbol_rx / self.estimated_channel_response
+        print(self.ofdm_symbol_rx)
 
     @sync_track
     def getConstellation(self):
         """Given equalized data, return the 'mapped_output'."""
         
+        print('self.ofdm_symbol_rx')
+        print(self.ofdm_symbol_rx)
+        print(self.data_subcarriers)
+        print([item for item in self.data_subcarriers if item != -1])
+        print(self.ofdm_symbol_rx[self.data_subcarriers])
+        print(self.ofdm_symbol_rx[[item for item in self.data_subcarriers if item != -1]])
         
-        self.mapped_output = self.ofdm_symbol_rx[self.data_subcarriers]
+        print('self.ofdm_symbol_rx RAW= ', self.ofdm_symbol_rx)
+        print('self.ofdm_symbol_rx =\n', self.ofdm_symbol_rx[[item for item in self.data_subcarriers if item != -1]])
+        print('self.ofdm_symbol_rx = ', len(self.ofdm_symbol_rx[[item for item in self.data_subcarriers if item != -1]]))
+        print('self.mapped_info =\n', self.mapped_info)
+        print('self.mapped_info = ', len(self.mapped_info))
+        # self.mapped_output = self.ofdm_symbol_rx[self.data_subcarriers]
+        self.mapped_output = self.ofdm_symbol_rx[[item for item in self.data_subcarriers if item != -1]]
+        # self.mapped_output_pilots = self.ofdm_symbol_rx[self.pilot_subcarriers]
     
     @sync_track
     def compareOFDMChannelResponse(self, current_channel, show = False):
         """Compares the OFDM channel response with estimated. Must first set all channel responses."""
         
-        
+        temp_sub_carriers = [item for item in self.all_subcarriers if item != -1]
         # Calculates the actual CIR
-        CIR = np.fft.fft(current_channel, self.number_of_carriers)
+        # CIR = np.fft.fft(current_channel, self.number_of_carriers)
+        # CIR = np.fft.fft(current_channel, len(self.all_subcarriers))
+        # CIR = np.fft.fft(current_channel, len(temp_sub_carriers))
+        # CIR = np.fft.fft(current_channel, len(self.valid_carriers))
+        # x = [int(item*2) for item in self.valid_carriers]
+        # x = np.arange(0, 64)
+        # freq = np.arange(self.number_of_carriers, 0, -3)
+        ## TODO --- DEBUG WHY THE 'ACTUAL' CHANNEL RESPONSE IS NOT MATCHING THE PILOTS ESTIMATES
+        freq = np.arange(0, self.number_of_carriers, 1) - 4
+        # freq = np.arange(0, self.number_of_carriers, 1)
+        print(freq)
+        CIR = np.fft.fft(current_channel, len(freq))
+        # CIR = np.fft.fft(current_channel, self.valid_carriers)
+        # CIR = np.fft.fft(current_channel, self.number_of_carriers)
+        print('current_channel')
+        print(self.number_of_carriers)
+        print(current_channel)
+        print(temp_sub_carriers)
+        print(self.all_subcarriers)
+        print('self.pilot_subcarriers')
+        print(self.pilot_subcarriers)
+        print(self.estimated_pilots_response)
+        print('self.valid_carriers')
+        print(self.valid_carriers)
+        print(len(self.valid_carriers))
+        print(CIR)
+        print(len(CIR))
+        # asd
         
-        plt.plot(self.all_subcarriers, abs(CIR), label='Actual channel response')
-        plt.stem(self.pilot_subcarriers, abs(self.estimated_pilots_response), label='Estimated pilots')
-        plt.plot(self.all_subcarriers, abs(self.estimated_channel_response), label='Interpolated estimated channel')
+        # plt.plot(np.arange(self.number_of_carriers), abs(CIR), label='Actual channel response')
+        # plt.plot(self.valid_carriers, abs(CIR), 'r-', label='Actual channel response')
+        # plt.plot(abs(CIR), 'r-', label='Actual channel response')
+        plt.plot(freq, abs(CIR), 'ro-', label='Actual channel response')
+        plt.plot(self.valid_carriers, abs(self.estimated_channel_response), 'ko-', label='Interpolated estimated channel')
+        # plt.plot(np.arange(0, self.number_of_carriers), abs(self.estimated_channel_response), 'bo', label='Interpolated estimated channel')
+        # plt.plot(self.all_subcarriers, abs(self.estimated_channel_response), 'bo', label='Interpolated estimated channel')
+        plt.stem(np.array(self.pilot_subcarriers), abs(self.estimated_pilots_response), label='Estimated pilots')
         plt.grid(True)
         plt.title('Channel response estimations')
         plt.xlabel('Subcarrier indexes')
         plt.ylabel('$|H(f)|$')
         plt.legend(fontsize=10)
-        plt.ylim(0, 1.5)
+        plt.ylim(0, np.max([np.max(abs(self.estimated_channel_response)), np.max(abs(CIR))])*1.1)
         plt.show(block=show)
         # plt.show(show)
         
         
     @sync_track
-    def showFoundConstellation(self, found_constellation, show = False):
+    def showFoundConstellation(self, found_constellation, constellation, show = False):
         """Plots the found constellation."""
-        
         
         # plot all the estimated constellations
         for qam, estimated in zip(self.mapped_output, found_constellation):
+            plt.plot(constellation.real, constellation.imag, 'ko')
             plt.plot([qam.real, estimated.real], [qam.imag, estimated.imag], 'b-o')
             plt.plot(found_constellation.real, found_constellation.imag, 'ro')
+            # plt.plot(found_constellation.real, found_constellation.imag, 'ro')
         
+        # for qam in self.mapped_output_pilots:
+        #     plt.plot([qam.real, self.pilot_value.real], [qam.imag, self.pilot_value.imag], 'g-*')
+        #     # plt.plot(qam.real, qam.imag, 'g-o')
         
         plt.grid(True)
         plt.title('Estimated constellation')
@@ -677,7 +895,7 @@ class OFDM(object):
         plt.show(block=show)
         # plt.show(show)
         
-
+    
     @sync_track    
     def getOfdmType(self):
         """Returns value of self.ofdm_type"""
