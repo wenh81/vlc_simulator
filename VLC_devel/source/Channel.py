@@ -93,8 +93,25 @@ class Channel(object):
             # For each CIR in the CIR list (one CIR for each lamp), apply the convolve
             for CIR in self.channel_response:
                 
+                ## TODO --- DEBUG WHY THE 'ACTUAL' CHANNEL RESPONSE IS NOT MATCHING THE PILOTS ESTIMATES??
+                ## TODO --- LOOKS LIKE THE 'ABS' HELPS, SINCE THE OFDM FOR LIFI USES ONLY 'REAL' DATA.
+                ## TODO --- IS THERE AN ISSUE WITH THE CONVOLUTION FOR THIS OFDM?
+
+                # if Global.IM_DD:
+                #     CIR = np.abs(CIR)
+
+                print('CIR')
+                print(CIR)
+
                 # Apply convolution
                 convolved = np.convolve(tx_data, CIR)
+                from scipy import signal
+                convolved = signal.convolve(tx_data, CIR, mode='same')
+                print(tx_data)
+                print(convolved)
+
+                ### TODO --- NEED TO DEFINE THE OFDM TIME DELTA, AND CORRELATE IT TO THE FFT NUMBER, SAMPLING, ETC.
+                ### TODO --- HOW TO DESCRIBE THE CHANNEL MATCHEMATICALLY?
                 
                 # Apply noise to a signal
                 noisy_signal = self.applyChannelNoise(convolved)
@@ -134,7 +151,6 @@ class Channel(object):
         
         # Average power for the convolved signal
         signal_power = np.mean(abs(signal**2))
-
         
         # Calculate the std for given signal power, based on rx_SNR
         sigma2 = signal_power * 10**( -self.rx_SNR/10)

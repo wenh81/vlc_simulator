@@ -19,6 +19,53 @@ import inspect
 # ONLY FOR LINUX
 # import skcuda.fft as cu_fft
 
+def plotDebug(signal, label = "", symbols='r-'):
+    """Fast plot for debug."""
+
+    if label == "":
+        # Get function call
+        function_call = inspect.stack()[1][-2][0].strip()
+        # Extract function name
+        func_name = function_call.split('(')[0]
+        # Extract 
+        label = function_call.split(func_name)[1].\
+            replace('(','').replace(')','').split(',')[0]
+        
+    plt.plot(signal, symbols, label=label)
+    plt.grid(True)
+    # plt.ylim(np.min(signal)*1.1, np.max(signal)*1.1)
+    plt.legend(fontsize=10)
+    plt.show()
+
+def printDebug(signal, details = False, plot = False):
+    """Pretty debug signal print. Use details = True for more information"""
+
+    print('\n---------------------------------------------------------------------------')
+    
+    # Get function call
+    function_call = inspect.stack()[1][-2][0].strip()
+    # Extract function name
+    func_name = function_call.split('(')[0]
+    # Extract 
+    signal_name = function_call.split(func_name)[1].\
+        replace('(','').replace(')','').split(',')[0]
+    
+    print('> START <' + f"\t-->\t<{signal_name}>")
+    # Actual print with value
+    print(f"{type(signal)}")
+    print(f"Value :\n{signal}")
+    
+    if details:
+        print('\n>>> More details <<<\n')
+        print(f">> All methods for {type(signal)}:")
+        print(f"{dir(signal)}")
+    
+    if plot:
+        plotDebug(signal, label = signal_name)
+
+    print('>  END  <' + f"\t-->\t<{signal_name}>")
+    print('---------------------------------------------------------------------------\n')
+
 def zeroClip(signal):
     """Returns the same signal, but clipped to zero"""
     

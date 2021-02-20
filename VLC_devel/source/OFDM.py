@@ -832,10 +832,16 @@ class OFDM(object):
         # x = [int(item*2) for item in self.valid_carriers]
         # x = np.arange(0, 64)
         # freq = np.arange(self.number_of_carriers, 0, -3)
-        ## TODO --- DEBUG WHY THE 'ACTUAL' CHANNEL RESPONSE IS NOT MATCHING THE PILOTS ESTIMATES
-        freq = np.arange(0, self.number_of_carriers, 1) - 4
-        # freq = np.arange(0, self.number_of_carriers, 1)
-        print(freq)
+        # freq = np.arange(0, self.number_of_carriers, 1) - 4
+        freq = np.arange(0, self.number_of_carriers, 1)
+        
+        ## TODO --- DEBUG WHY THE 'ACTUAL' CHANNEL RESPONSE IS NOT MATCHING THE PILOTS ESTIMATES??
+        ## TODO --- LOOKS LIKE THE 'ABS' HELPS, SINCE THE OFDM FOR LIFI USES ONLY 'REAL' DATA.
+        ## TODO --- IS THERE AN ISSUE WITH THE CONVOLUTION FOR THIS OFDM?
+
+        # if Global.IM_DD:
+        #     current_channel = abs(current_channel)
+
         CIR = np.fft.fft(current_channel, len(freq))
         # CIR = np.fft.fft(current_channel, self.valid_carriers)
         # CIR = np.fft.fft(current_channel, self.number_of_carriers)
@@ -854,10 +860,12 @@ class OFDM(object):
         print(len(CIR))
         # asd
         
+        
         # plt.plot(np.arange(self.number_of_carriers), abs(CIR), label='Actual channel response')
         # plt.plot(self.valid_carriers, abs(CIR), 'r-', label='Actual channel response')
-        # plt.plot(abs(CIR), 'r-', label='Actual channel response')
+        # plt.plot(freq, CIR, 'ro-', label='Actual channel response')
         plt.plot(freq, abs(CIR), 'ro-', label='Actual channel response')
+        plt.plot(current_channel, 'go-', label='Actual channel response')
         plt.plot(self.valid_carriers, abs(self.estimated_channel_response), 'ko-', label='Interpolated estimated channel')
         # plt.plot(np.arange(0, self.number_of_carriers), abs(self.estimated_channel_response), 'bo', label='Interpolated estimated channel')
         # plt.plot(self.all_subcarriers, abs(self.estimated_channel_response), 'bo', label='Interpolated estimated channel')

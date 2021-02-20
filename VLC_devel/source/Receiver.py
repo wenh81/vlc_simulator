@@ -12,6 +12,8 @@ from BouncingPixel import BouncingPixel
 
 import Global
 
+from generalLibrary import printDebug, plotDebug
+
 class Receiver(object):
     
     def __init__(self, receiver_config, roic_config, rx_data_list, sync_obj):
@@ -122,8 +124,6 @@ class Receiver(object):
     def createAllROIC(self):
         """Get the roic_config, and for each position create a different roic array."""
         
-        
-        
         # start all_roic_array
         self.all_roic_arrays = []
         
@@ -136,33 +136,43 @@ class Receiver(object):
             # For each roic in the roic array
             for idx in range(0, len(roic_array_dict["circuit_type"])):
                 
-                
                 # Create array of roics
                 roic_array.append(
                     self.createROIC(
-                        circuit_type = roic_array_dict["circuit_type"][idx]
+                        circuit_type = roic_array_dict["circuit_type"][idx],
+                        gain = roic_array_dict["gain"][idx],
+                        circuit_simulation = roic_array_dict["circuit_simulation"][idx],
+                        waves_name = roic_array_dict["waves_name"][idx]
                     )
                 )
-                
+            
             # List of all roic arrays
             self.all_roic_arrays.append(roic_array)
             
             
     @sync_track
-    def createROIC(self, circuit_type):
+    def createROIC(self, circuit_type, gain, circuit_simulation, waves_name):
         """Create a ROIC array, i.e. an array of ROIC objects."""
         
-        
-        
         if circuit_type == "BouncingPixel":
-        
+            
             roic_obj = BouncingPixel(
+                gain = gain,
+                circuit_simulation = circuit_simulation,
+                waves_name = waves_name,
                 sync_obj = self.sync_obj
             )
 
         elif circuit_type == "APS":
             
             raise ValueError(f"\n\n***Error --> APS not supported yet!\n")
+            
+            # roic_obj = APS(
+            #     gain = self.gain,
+            #     circuit_simulation = self.circuit_simulation,
+            #     waves_name = self.waves_name,
+            #     sync_obj = self.sync_obj
+            # )
             
         else:
             raise ValueError(f"\n\n***Error --> circuit_type < {circuit_type} > is not supported!\n")
@@ -172,8 +182,6 @@ class Receiver(object):
     @sync_track
     def calculatesOutVoltage(self):
         """Calculates what is the voltage associated with each photocurrent provided for each time step, as rx_voltage."""
-        
-        
         
         # If not bypassing the detector, calculate photocurrent based on it.
         if not Global.bypass_dict["ROIC"]:
@@ -187,10 +195,8 @@ class Receiver(object):
             for roic_arrays in self.all_roic_arrays:
                 for roic in roic_arrays:
                     
-                    
-                    # list of lists for all waves
+                    # list of lists for all waves (voltage) -- convertsToWaves belongs to ROIC
                     all_waves = roic.convertsToWaves(self.rx_photocurrent_list)
-                    
                     
                     if roic.getCircuitType() == "BouncingPixel":
                         
@@ -205,8 +211,11 @@ class Receiver(object):
                         
                     else:
                         raise ValueError(f"\n\n***Error --> circuit_type < {roic.getCircuitType()} > is not supported!\n")
+                    
+                    # TODO --- CREATE THE ARRAY FOR EACH ROIC ARRAY....
+                    # roic_array_photocurrent.append(self.rx_voltage_list)
             
-            raise ValueError(f"\n\n***Error --> Simulation for ROICs not supported yet, at bypass_dict['ROIC'] = <{Global.bypass_dict['ROIC']}>!\n")
+            # raise ValueError(f"\n\n***Error --> Simulation for ROICs not supported yet, at bypass_dict['ROIC'] = <{Global.bypass_dict['ROIC']}>!\n")
         
         else:
             # If bypassing, just pass the rx photocurrent list

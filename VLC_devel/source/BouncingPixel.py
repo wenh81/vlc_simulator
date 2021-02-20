@@ -4,10 +4,12 @@ import Global
 
 from generalLibrary import timer_dec, sync_track
 
+from generalLibrary import printDebug, plotDebug
+
 class BouncingPixel(ROIC):
     
-    def __init__(self, sync_obj):
-        """Constructor of LightSource. Receives the light_type"""
+    def __init__(self, gain, circuit_simulation, waves_name, sync_obj):
+        """Constructor of BouncingPixel."""
         
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
@@ -23,12 +25,22 @@ class BouncingPixel(ROIC):
         self.circuit_type = "BouncingPixel"
         
         # Stores the list of wave names to be derived
-        self.waves_name = None
+        self.waves_name = waves_name
         
-        ROIC.__init__(self, circuit_type = self.circuit_type, waves_name = self.waves_name, sync_obj = sync_obj)
+        # Default value of transconductance gain (V/A) -- 60 mV/uA = 60*1e3
+        self.transconductance_gain = gain
         
         # Flag to indicate use of circuit simulation.
-        self.circuit_simulation = Global.circuit_simulation
+        self.circuit_simulation = circuit_simulation
+
+        ROIC.__init__(self, 
+            circuit_type = self.circuit_type,
+            waves_name = self.waves_name,
+            transconductance_gain = self.transconductance_gain,
+            circuit_simulation = self.circuit_simulation,
+            sync_obj = sync_obj
+            )
+        
 
         # Curve that translates how to convert from photocurrent to voltage.
         self.linearity_curve = {"photocurrent": [], "voltage": []}
@@ -41,32 +53,40 @@ class BouncingPixel(ROIC):
 
         # Path to netlist of the circuit.
         self.netlist_path = None
+
         
 
     @sync_track
     def calculatesReconstructedVoltage(self, all_waves):
         """Depending on circuit simulator, calculates the reconstructed voltage from simulation."""
         
+        if self.circuit_simulation:
+
+            # Calculates the reconstructed voltage depending on the simulator.
+            if self.which_simulator == "Virtuoso":
+                
+                raise ValueError(f"\n\n***Error --> Analysis for the waves to get the output voltage from Virtuoso not supported yet!\n")
+                
+                rx_voltage_list = None
+                # return rx_voltage_list = FUNTION(all_waves)
+            
+            elif self.which_simulator == "Tanner":
+                
+                raise ValueError(f"\n\n***Error --> Analysis for the waves to get the output voltage from Tanner not supported yet!\n")
+                
+                # return rx_voltage_list = FUNTION(all_waves)
+                rx_voltage_list = None
+                
+            else:
+                raise ValueError(f"\n\n***Error --> Simulator < {self.which_simulator} > at Global.which_simulator is not supported!\n")
+
+            return rx_voltage_list
         
-        # Calculates the reconstructed voltage depending on the simulator.
-        if self.which_simulator == "Virtuoso":
-            
-            raise ValueError(f"\n\n***Error --> Analysis for the waves to get the output voltage from Virtuoso not supported yet!\n")
-            
-            rx_voltage_list = None
-            # return rx_voltage_list = FUNTION(all_waves)
-        
-        elif self.which_simulator == "Tanner":
-            
-            raise ValueError(f"\n\n***Error --> Analysis for the waves to get the output voltage from Tanner not supported yet!\n")
-            
-            # return rx_voltage_list = FUNTION(all_waves)
-            rx_voltage_list = None
-            
         else:
-            raise ValueError(f"\n\n***Error --> Simulator < {self.which_simulator} > at Global.which_simulator is not supported!\n")
-        
-        return rx_voltage_list
+            # If circuit simulation is off, then no need for voltage reconstruction
+            # since the transconductance gain was directly applied to the input current
+            return all_waves
+                
     
     @sync_track
     def editNetlist(self):
@@ -143,7 +163,7 @@ class BouncingPixel(ROIC):
     @sync_track
     def setNetlistPath(self, netlist_path):
         """Set new value for self.netlist_path"""
-        
+
         self.netlist_path = netlist_path
 
     def getSyncObj(self):
