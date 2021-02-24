@@ -12,6 +12,8 @@ from numba import njit, jit, vectorize
 
 from generalLibrary import timer_dec, sync_track
 
+from generalLibrary import printDebug, plotDebug
+
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import as_completed
@@ -77,11 +79,14 @@ class Message(object):
         # for each frame to be sent, check data type, and apply conversion to bitstream
         for idx, in_data in enumerate(self.input_info['data']):
             
-            if self.input_info['type'][idx] == 'str':
+            if self.input_info['type'][idx] == 'bin':
+
+                self.bitstream_frames.append(in_data)
+            
+            elif self.input_info['type'][idx] == 'str':
                 
                 exec(f'tx_array = BitArray(b"{in_data}").bin', globals(), local_dict)
                 
-                # print(local_dict["tx_array"])
                 self.bitstream_frames.append(local_dict["tx_array"])
             
             elif self.input_info['type'][idx] == 'image_raw':
@@ -129,7 +134,11 @@ class Message(object):
             # get frame type for that bitstream
             bitstream_type = self.input_info['type'][frame_count]
             
-            if bitstream_type == 'str':
+            if bitstream_type == 'bin':
+                
+                output_array.append(frame)
+
+            elif bitstream_type == 'str':
                 
                 if len(frame) % 8 != 0:
                     remainder = len(frame) % 8
@@ -162,6 +171,10 @@ class Message(object):
                     except Exception as identifier:
                         raise ValueError(f"\n\n***Error --> Could not convert <{local_dict['rx_array']}> to string @ BitstreamToMessage.\n Error message:\n{identifier}\n")
                 
+                printDebug(data_in)
+                printDebug(local_dict["rx_array"])
+                asd
+
                 output_array.append(local_dict["rx_array"])
             
             elif bitstream_type == 'text':

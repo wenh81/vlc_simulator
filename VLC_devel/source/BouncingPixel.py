@@ -8,7 +8,7 @@ from generalLibrary import printDebug, plotDebug
 
 class BouncingPixel(ROIC):
     
-    def __init__(self, gain, circuit_simulation, waves_name, sync_obj):
+    def __init__(self, gain, circuit_simulation, waves_name, DR, current_noise, SNR, sync_obj):
         """Constructor of BouncingPixel."""
         
         # Create sync object, and set debug and simulation path
@@ -33,11 +33,23 @@ class BouncingPixel(ROIC):
         # Flag to indicate use of circuit simulation.
         self.circuit_simulation = circuit_simulation
 
+        # Dynamic range (in dB)
+        self.DR = DR
+
+        # input referred current noise (in A)
+        self.current_noise = current_noise
+        
+        # SNR (in dB)
+        self.SNR = SNR
+
         ROIC.__init__(self, 
             circuit_type = self.circuit_type,
             waves_name = self.waves_name,
             transconductance_gain = self.transconductance_gain,
             circuit_simulation = self.circuit_simulation,
+            DR = self.DR,
+            current_noise = self.current_noise,
+            SNR = self.SNR,
             sync_obj = sync_obj
             )
         

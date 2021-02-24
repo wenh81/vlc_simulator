@@ -14,7 +14,7 @@ import generalLibrary as lib
 
 class ROIC(object):
     
-    def __init__(self, circuit_type, waves_name, transconductance_gain, circuit_simulation, sync_obj):
+    def __init__(self, circuit_type, waves_name, transconductance_gain, circuit_simulation, DR, current_noise, SNR, sync_obj):
         """Constructor of ROIC. Base class of circuit handling"""
         
         # Create sync object, and set debug and simulation path
@@ -53,14 +53,14 @@ class ROIC(object):
         self.transconductance_gain = transconductance_gain
         
         # Dynamic range (in dB)
-        self.DR = 130
+        self.DR = DR
         
         # input referred current noise (in A)
-        self.current_noise = 1e-9
+        self.current_noise = current_noise
         
         # Maximum SNR (in dB) --- TODO : Change it to a SNR curve (vs. current) instead?
         # TODO -- DO WE NEED SNR?? SINCE WE HAVE THE CURRENT NOISE AND GAIN
-        self.SNR = 144
+        self.SNR = SNR
 
         # # input referred voltage noise
         # self.voltage_noise = self.current_noise * self.transconductance_gain
@@ -90,7 +90,7 @@ class ROIC(object):
             # Calls simulator to get voltage waves from currents
             roic_waves_list = self.callSimulator(current_list)
             
-            raise ValueError(f"\n\n***Error --> ROIC simulation is not supported yet, at Global.which_simulator = True\n")
+            raise ValueError(f"\n\n***Error --> ROIC simulation is not supported yet, at roic_config['circuit_simulation'] = True\n")
         
         else:
             
@@ -104,27 +104,38 @@ class ROIC(object):
                 # TODO -- Adding non-linearuty to gain (JUST TO SEE THE EFFECT )
                 # self.transconductance_gain = np.random.normal(self.transconductance_gain, self.transconductance_gain*0.1)
                 # self.transconductance_gain = np.sqrt(self.transconductance_gain)
-                # self.transconductance_gain = (np.sqrt(np.arange(0, len(self.transconductance_gain)))*1e-5 + 1)*self.transconductance_gain
-                self.transconductance_gain = (np.power(np.arange(0, len(self.transconductance_gain)), 2)*1e-5 + 1)*self.transconductance_gain
+                # self.transconductance_gain = (np.sqrt(np.arange(0, len(self.transconductance_gain)))*5e-6 + 1)*self.transconductance_gain
+                # self.transconductance_gain = (np.power(np.arange(0, len(self.transconductance_gain)), 2)*5e-6 + 1)*self.transconductance_gain
                 
                 # current_wave = current_wave * 5e-8
                 # printDebug(current_wave, plot = True)
                 
-                # Add noise to current_wave. Average = current_wave ; std = self.current_noise
-                current_wave = np.random.normal(current_wave, self.current_noise)
+                if not Global.IM_DD:
+                    print(f"\n\n***Warning --> ROIC simulation, but using RF OFMD (Global.IM_DD off).\
+                        \nApplied gain to each channel real and imaginary instead...")
+                    
+                    # Add noise to current_wave. Average = current_wave ; std = self.current_noise
+                    current_wave_real = np.random.normal(current_wave.real, self.current_noise)
+                    current_wave_imag = np.random.normal(current_wave.imag, self.current_noise)
+                    
+                    # Get from SNR the noise to be applied on the current wave.
+                    voltage = self.transconductance_gain*current_wave_real + (1j)*self.transconductance_gain*current_wave_imag
+                    # voltage = 1*current_wave_real + (1j)*1*current_wave_imag
+
+                else:
+                    # Add noise to current_wave. Average = current_wave ; std = self.current_noise
+                    current_wave = np.random.normal(current_wave, self.current_noise)
                 
-                # clip current_wave at zero after noise application
-                current_wave = lib.zeroClip(current_wave)
-                # plotDebug(current_wave)
+                    # clip current_wave at zero after noise application
+                    current_wave = lib.zeroClip(current_wave)
                 
-                # Get from SNR the noise to be applied on the current wave.
-                voltage = self.transconductance_gain*current_wave
-                # voltage = 1*current_wave
-                
-                # printDebug(voltage, plot = True)
-                
+                    # Get from SNR the noise to be applied on the current wave.
+                    voltage = self.transconductance_gain*current_wave
+                    # voltage = 1*current_wave
+                    
+                # plotDebug(voltage)
                 roic_waves_list.append(voltage)
-            
+
             # raise ValueError(f"\n\n***Error --> ROIC voltage calculations while not bypassed, and circuit_simulation off, is not supported yet.\n")
                 
         return roic_waves_list
@@ -134,7 +145,7 @@ class ROIC(object):
     def callSimulator(self, current_list):
         """Calls the desired circuit simulator, given the 'circuit_type', and arrat of currents to be simulated."""
         
-        raise ValueError(f"\n\n***Error --> ROIC simulation is not supported yet, at Global.which_simulator = True\n")
+        # raise ValueError(f"\n\n***Error --> ROIC simulation is not supported yet, at Global.which_simulator = True\n")
         
         # Needs to use 'self.circuit_type' an 'self.which_simulator'
         # Uses ssh to call simulator
@@ -148,6 +159,7 @@ class ROIC(object):
 
         elif self.which_simulator == "Tanner":
             
+            TANNER
             simulator = Tanner(
                 netlist = "MY_NETLIST",
                 sync_obj = self.sync_obj
@@ -259,6 +271,42 @@ class ROIC(object):
         """Set new value for self.transconductance_gain"""
         
         self.transconductance_gain = transconductance_gain
+    
+    @sync_track
+    def getDR(self):
+        """Returns value of self.DR"""
+        
+        return self.DR
+
+    @sync_track
+    def setDR(self, DR):
+        """Set new value for self.DR"""
+        
+        self.DR = DR
+    
+    @sync_track
+    def getSNR(self):
+        """Returns value of self.SNR"""
+        
+        return self.SNR
+
+    @sync_track
+    def setSNR(self, SNR):
+        """Set new value for self.SNR"""
+        
+        self.SNR = SNR
+    
+    @sync_track
+    def getCurrentNoise(self):
+        """Returns value of self.current_noise"""
+        
+        return self.current_noise
+
+    @sync_track
+    def setCurrentNoise(self, current_noise):
+        """Set new value for self.current_noise"""
+        
+        self.current_noise = current_noise
 
     @sync_track
     def getNetlistPath(self):

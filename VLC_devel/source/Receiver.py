@@ -10,6 +10,8 @@ from BouncingPixel import BouncingPixel
 
 # from APS import APS
 
+import numpy as np
+
 import Global
 
 from generalLibrary import printDebug, plotDebug
@@ -142,7 +144,10 @@ class Receiver(object):
                         circuit_type = roic_array_dict["circuit_type"][idx],
                         gain = roic_array_dict["gain"][idx],
                         circuit_simulation = roic_array_dict["circuit_simulation"][idx],
-                        waves_name = roic_array_dict["waves_name"][idx]
+                        waves_name = roic_array_dict["waves_name"][idx],
+                        DR = roic_array_dict["DR"][idx],
+                        current_noise = roic_array_dict["current_noise"][idx],
+                        SNR = roic_array_dict["SNR"][idx]
                     )
                 )
             
@@ -151,7 +156,7 @@ class Receiver(object):
             
             
     @sync_track
-    def createROIC(self, circuit_type, gain, circuit_simulation, waves_name):
+    def createROIC(self, circuit_type, gain, circuit_simulation, waves_name, DR, current_noise, SNR):
         """Create a ROIC array, i.e. an array of ROIC objects."""
         
         if circuit_type == "BouncingPixel":
@@ -160,6 +165,9 @@ class Receiver(object):
                 gain = gain,
                 circuit_simulation = circuit_simulation,
                 waves_name = waves_name,
+                DR = DR,
+                current_noise = current_noise,
+                SNR = SNR,
                 sync_obj = self.sync_obj
             )
 
@@ -211,7 +219,12 @@ class Receiver(object):
                         
                     else:
                         raise ValueError(f"\n\n***Error --> circuit_type < {roic.getCircuitType()} > is not supported!\n")
+
+                    # plotDebug(self.rx_photocurrent_list[0])
+                    # self.rx_photocurrent_list = [wave/np.max(self.rx_photocurrent_list) \
+                    #     for wave in self.rx_photocurrent_list]
                     
+                    # plotDebug(self.rx_photocurrent_list[0])
                     # TODO --- CREATE THE ARRAY FOR EACH ROIC ARRAY....
                     # roic_array_photocurrent.append(self.rx_voltage_list)
             

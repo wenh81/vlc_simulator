@@ -57,8 +57,8 @@ bypass_dict = {
     "DAC_rounding_or_simul": True,
     "Channel": True,
     "Detector": True,
-    "ROIC": False, ## Read-Out Integrated Circuit
-    # "ROIC": True, ## Read-Out Integrated Circuit
+    "ROIC": False, ## Read-Out Integrated Circuit ON
+    # "ROIC": True, ## NO ROIC
     "ADC": True,
     "ADC_rounding_or_simul": True
 }
@@ -112,9 +112,6 @@ transmitter_config = [{"light_type": ["LED"], "position": [(0,0,0)], "angle": [(
 # Contains list of dicts with all information needed to configure the detectors on the receiver. Each position has a dict, with the type of detector, the position for each detector, and angle. Can be used to configure more than one array of detectors.
 receiver_config = [{"detector_type": ["photodiode"], "position": [(0,0,0)], "angle": [(0,0)], "database": ["path_to_database"]}]
 
-# # Flag to define if using circuit simulation.
-# circuit_simulation = False
-# # circuit_simulation = True
 
 # Contains list of dicts with all information needed to configure the ROICs on the receiver.
 # Each position has a dict, with the type of ROIC, associated with each corresponding detector.
@@ -123,7 +120,8 @@ receiver_config = [{"detector_type": ["photodiode"], "position": [(0,0,0)], "ang
 # Use the simularion to extract the metrics such as DR, SNR, gain, input referred current noise (current_noise), etc.
 # Then, use the metrics instead of the simulation
 roic_config = [{
-    "circuit_simulation": [False],
+    "circuit_simulation": [False], ## ROIC simulation OFF
+    # "circuit_simulation": [True], ## ROIC simulation ON
     "circuit_type": ["BouncingPixel"],
     "gain": [60*1e3],
     "DR": [130],
@@ -212,6 +210,11 @@ input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
 # input_info = {"type": ["image"], "data": [r"../data/test_larger.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"], "data": [r"../data/zebra.png"], "n_bytes": [3]}
 # input_info = {"type": ["image"], "data": [r"../data/zebra_large.png"], "n_bytes": [3]}
+# input_info = {"type": ["bin"], "data": ["10"]}
+import random
+# input_info = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 32)])]}
+input_info = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 2**3)])]}
+input_info = {"type": ["bin"], "data": ["0110011001100110"]}
 
 # supported input_info types
 supported_input_info = ["str", "image", "audio"]
@@ -246,7 +249,7 @@ pilot_value = 7+7j
 # pilot_value = -7-7j
 # pilot_value = 5-5j
 pilot_value = 3+3j
-pilot_value = 1-1j
+# pilot_value = 1-1j
 
 # Type of modulation. OFDM, OOK, etc.
 modulation_config = {
@@ -271,7 +274,8 @@ modulation_config = {
 }
 # Choose modulation type from the above.
 modulation_index = 0
-modulation_index = 1
+# modulation_index = 1
+# modulation_index = 2
 
 # Type of mapping. 4-QAM, 16-QAM, 64-QAM, 256-QAM
 mapping_config = {
@@ -283,6 +287,6 @@ mapping_config = {
 
 # Choose mapping type from the above.
 mapping_index = 0
-# mapping_index = 1
+mapping_index = 1
 # mapping_index = 2
 # mapping_index = 3

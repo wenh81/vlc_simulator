@@ -8,6 +8,8 @@ import Global
 
 from generalLibrary import timer_dec, sync_track
 
+from generalLibrary import printDebug, plotDebug
+
 class Modulator(object):
     
     def __init__(self, bitstream_frame, modulation_config, mapping_config, sync_obj):
@@ -60,8 +62,6 @@ class Modulator(object):
     def createModulator(self):
         """Create modulator object, depending on type chosen."""
         
-        # self.sync_obj.appendToSimulationPath("createModulator @ Modulator")
-        
             
         if self.modulation_type == "OFDM":
             
@@ -75,7 +75,11 @@ class Modulator(object):
             
         elif self.modulation_type == "OOK":
             
-            pass
+            printDebug(self.bitstream_frame)
+            PAUSE
+            self.ook_obj = None
+            
+            raise ValueError(f"\n\n***Error --> OOK not supported yet: <{self.modulation_type}>!\n")
         
         else:
             raise ValueError(f"\n\n***Error --> Not supported modulation_type: <{self.modulation_type}>!\n")
@@ -110,6 +114,8 @@ class Modulator(object):
                 
             elif self.modulation_type == "OOK":
                 
+                # printDebug(self.bitstream_frame)
+                # PAUSE
                 pass
             
             else:
@@ -153,6 +159,7 @@ class Modulator(object):
             
         elif self.modulation_type == "OOK":
             
+            # self.rx_data_list
             pass
         
         else:

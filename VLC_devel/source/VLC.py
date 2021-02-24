@@ -221,7 +221,7 @@ class VLC(object):
             # Receiver object.
             self.receiver_obj = Receiver(
                 receiver_config = Global.receiver_config,
-                roic_config = Global.roic_config,
+                roic_config = Global.roic_config, # read-out integrated circuit
                 rx_data_list = rx_data_list,
                 sync_obj = self.sync_obj
             )
@@ -308,13 +308,13 @@ class VLC(object):
         print()
         
         # print BER
-        BER, NBER = self.merit_functions_obj.calculateBER(
+        self.BER, self.NBER = self.merit_functions_obj.calculateBER(
             self.message_obj.getBitstreamFrames(),
             self.message_obj.getRxBitstreamFrames()
         )
         
-        self.sync_obj.appendToMessageDict("BER", BER)
-        self.sync_obj.appendToMessageDict("NBER", NBER)
+        self.sync_obj.appendToMessageDict("BER", self.BER)
+        self.sync_obj.appendToMessageDict("NBER", self.NBER)
         
         
         ###########################################################################
@@ -348,6 +348,30 @@ class VLC(object):
         # ,
         #     self.message_obj.getRxBitstreamFrames()
         print(self.sync_obj.showMessageDict())
+
+    @sync_track
+    def getBER(self):
+        """Returns value of self.BER"""
+        
+        return self.BER
+
+    @sync_track
+    def setBER(self, BER):
+        """Set new value for self.BER"""
+        
+        self.BER = BER
+    
+    @sync_track
+    def getNBER(self):
+        """Returns value of self.NBER"""
+        
+        return self.NBER
+
+    @sync_track
+    def setNBER(self, NBER):
+        """Set new value for self.NBER"""
+        
+        self.NBER = NBER
 
     @sync_track
     def getMessageObj(self):
