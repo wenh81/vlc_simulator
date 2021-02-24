@@ -123,6 +123,7 @@ roic_config = [{
     "circuit_simulation": [False], ## ROIC simulation OFF
     # "circuit_simulation": [True], ## ROIC simulation ON
     "circuit_type": ["BouncingPixel"],
+    "roic_setup": [{"vmin": "500m", "vmax": "2.5", "stepTran": "100"}],
     "gain": [60*1e3],
     "DR": [130],
     "current_noise": [1e-9],
@@ -135,14 +136,18 @@ roic_config = [{
 wavelenghts = [550]
 
 # Temperature in Kelvin.
-temperature = 273
+temperature = 300
 
 ############### CIRCUIT SIMULATOR ###############
 
 simulator_config = {
     "Tanner": {
         "Windows": {
-            "path": r"C:\IR2\bibliotecas\AMSC35_14.3"
+            "library": r"C:\IR2\bibliotecas\AMSC35_14.3\SPICE_MODELS",
+            "tspice": r"C:\Program Files\Tanner EDA\Tanner Tools v15.0\tspcmd.exe",
+            "netlist": r"C:\IR2\VLC\source_netlists\BouncingPixel.sv",
+            "data_folder": r"C:\IR2\VLC",
+            "simul_corner": "tm"
             },
         "Linux": {
             "path": r"...."

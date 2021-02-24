@@ -14,7 +14,7 @@ import generalLibrary as lib
 
 class ROIC(object):
     
-    def __init__(self, circuit_type, waves_name, transconductance_gain, circuit_simulation, DR, current_noise, SNR, sync_obj):
+    def __init__(self, circuit_type, waves_name, transconductance_gain, circuit_simulation, DR, current_noise, SNR, roic_setup, sync_obj):
         """Constructor of ROIC. Base class of circuit handling"""
         
         # Create sync object, and set debug and simulation path
@@ -41,12 +41,18 @@ class ROIC(object):
 
         # Defines the simulator to be used, if appliable.
         self.which_simulator = Global.which_simulator
+        
+        # Get the all simulator configuration.
+        self.simulator_config = Global.simulator_config
 
         # Stores the netlist of the circuit.
         self.netlist = None
 
-        # Path to netlist of the circuit.
+        # Original Path to netlist of the circuit
         self.netlist_path = None
+        
+        # Path to netlist of the circuit to be simulated
+        self.simul_netlist_path = None
 
         # Default value of transconductance gain (V/A) -- or the sensitivity
         # TODO : Change it to a GAIN curve (vs. current) instead?
@@ -61,6 +67,9 @@ class ROIC(object):
         # Maximum SNR (in dB) --- TODO : Change it to a SNR curve (vs. current) instead?
         # TODO -- DO WE NEED SNR?? SINCE WE HAVE THE CURRENT NOISE AND GAIN
         self.SNR = SNR
+
+        # Further ROIC setup (when needed)
+        self.roic_setup = roic_setup
 
         # # input referred voltage noise
         # self.voltage_noise = self.current_noise * self.transconductance_gain
@@ -139,8 +148,7 @@ class ROIC(object):
             # raise ValueError(f"\n\n***Error --> ROIC voltage calculations while not bypassed, and circuit_simulation off, is not supported yet.\n")
                 
         return roic_waves_list
-        
-        
+    
     @sync_track
     def callSimulator(self, current_list):
         """Calls the desired circuit simulator, given the 'circuit_type', and arrat of currents to be simulated."""
@@ -149,9 +157,12 @@ class ROIC(object):
         
         # Needs to use 'self.circuit_type' an 'self.which_simulator'
         # Uses ssh to call simulator
+        # self.simulator_config
         
         if self.which_simulator == "Virtuoso":
             
+            # self.editNetlist()
+
             simulator = Virtuoso(
                 netlist = "MY_NETLIST",
                 sync_obj = self.sync_obj
@@ -159,9 +170,12 @@ class ROIC(object):
 
         elif self.which_simulator == "Tanner":
             
-            TANNER
+            # Edit netlist with correct setup values, like integration time, etc.
+            self.editNetlist()
+            
             simulator = Tanner(
-                netlist = "MY_NETLIST",
+                netlist = self.simul_netlist_path,
+                tspice = self.simulator_config[self.which_simulator][Global.operating_system]['tspice'],
                 sync_obj = self.sync_obj
             )
             
@@ -172,7 +186,7 @@ class ROIC(object):
         for current in current_list:
             
             
-            # Setup the simulator
+            # Setup the simulator with desired inputs
             simulator.setup(currents = current)
             
             
@@ -198,8 +212,12 @@ class ROIC(object):
             roic_out_list.append(waves_list)
         
         return roic_out_list
-        
-        
+    
+    @sync_track
+    def editNetlist(self):
+        """Edit netlist to setup simulationt time, integration time, etc."""
+        raise ValueError(f"\n\n***Error --> This method should be overriden by its parent, ex: Bouncing Pixel, APS, etc.\n")
+
     @sync_track
     def getCircuitType(self):
         """Returns value of self.circuit_type"""
@@ -297,6 +315,18 @@ class ROIC(object):
         self.SNR = SNR
     
     @sync_track
+    def getRoicSetup(self):
+        """Returns value of self.roic_setup"""
+        
+        return self.roic_setup
+
+    @sync_track
+    def setRoicSetup(self, roic_setup):
+        """Set new value for self.roic_setup"""
+        
+        self.roic_setup = roic_setup
+    
+    @sync_track
     def getCurrentNoise(self):
         """Returns value of self.current_noise"""
         
@@ -319,6 +349,18 @@ class ROIC(object):
         """Set new value for self.netlist_path"""
         
         self.netlist_path = netlist_path
+    
+    @sync_track
+    def getSimulNetlistPath(self):
+        """Returns value of self.simul_netlist_path"""
+        
+        return self.simul_netlist_path
+
+    @sync_track
+    def setSimulNetlistPath(self, simul_netlist_path):
+        """Set new value for self.simul_netlist_path"""
+        
+        self.simul_netlist_path = simul_netlist_path
 
     def getSyncObj(self):
         """Returns value of self.sync_obj"""

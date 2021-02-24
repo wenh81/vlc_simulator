@@ -147,7 +147,8 @@ class Receiver(object):
                         waves_name = roic_array_dict["waves_name"][idx],
                         DR = roic_array_dict["DR"][idx],
                         current_noise = roic_array_dict["current_noise"][idx],
-                        SNR = roic_array_dict["SNR"][idx]
+                        SNR = roic_array_dict["SNR"][idx],
+                        roic_setup = roic_array_dict["roic_setup"][idx]
                     )
                 )
             
@@ -156,7 +157,7 @@ class Receiver(object):
             
             
     @sync_track
-    def createROIC(self, circuit_type, gain, circuit_simulation, waves_name, DR, current_noise, SNR):
+    def createROIC(self, circuit_type, gain, circuit_simulation, waves_name, DR, current_noise, SNR, roic_setup):
         """Create a ROIC array, i.e. an array of ROIC objects."""
         
         if circuit_type == "BouncingPixel":
@@ -168,6 +169,7 @@ class Receiver(object):
                 DR = DR,
                 current_noise = current_noise,
                 SNR = SNR,
+                roic_setup = roic_setup,
                 sync_obj = self.sync_obj
             )
 

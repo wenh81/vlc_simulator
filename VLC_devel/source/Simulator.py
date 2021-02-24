@@ -15,11 +15,10 @@ class Simulator(object):
         if self.DEBUG:
             print('Running Simulator...')
         
-        
         # Timeout to abort simul, after that time is passed.
         self.simul_timeout = None
 
-        # Netlist of circuit to be simulated.
+        # Netlist path of circuit to be simulated.
         self.netlist = netlist
     
         pass

@@ -6,9 +6,15 @@ from generalLibrary import timer_dec, sync_track
 
 from generalLibrary import printDebug, plotDebug
 
+import os
+
+import numpy as np
+
+from pathlib import Path
+
 class BouncingPixel(ROIC):
     
-    def __init__(self, gain, circuit_simulation, waves_name, DR, current_noise, SNR, sync_obj):
+    def __init__(self, gain, circuit_simulation, waves_name, DR, current_noise, SNR, roic_setup, sync_obj):
         """Constructor of BouncingPixel."""
         
         # Create sync object, and set debug and simulation path
@@ -41,6 +47,9 @@ class BouncingPixel(ROIC):
         
         # SNR (in dB)
         self.SNR = SNR
+        
+        # Further ROIC setup (when needed)
+        self.roic_setup = roic_setup
 
         ROIC.__init__(self, 
             circuit_type = self.circuit_type,
@@ -50,21 +59,22 @@ class BouncingPixel(ROIC):
             DR = self.DR,
             current_noise = self.current_noise,
             SNR = self.SNR,
+            roic_setup = self.roic_setup,
             sync_obj = sync_obj
             )
         
 
         # Curve that translates how to convert from photocurrent to voltage.
         self.linearity_curve = {"photocurrent": [], "voltage": []}
-
-        # Defines the simulator to be used, if appliable.
-        self.which_simulator = Global.which_simulator
-
+        
         # Stores the netlist of the circuit.
         self.netlist = None
 
-        # Path to netlist of the circuit.
+        # Original Path to netlist of the circuit
         self.netlist_path = None
+        
+        # Path to netlist of the circuit to be simulated
+        self.simul_netlist_path = None
 
         
 
@@ -103,8 +113,54 @@ class BouncingPixel(ROIC):
     @sync_track
     def editNetlist(self):
         """Edit netlist to setup simulationt time, integration time, etc."""
-        pass
-    
+        
+        if self.which_simulator == "Tanner":
+            
+            # currents_path = Path.cwd()
+            data_folder = Path(self.simulator_config[self.which_simulator][Global.operating_system]['data_folder'])
+            
+            # to store the currents files for Tanner
+            currents_path = data_folder / "currents"
+            
+            # Creates the currents folder
+            if not Path.exists(currents_path):
+                Path.mkdir(currents_path)
+            
+            # to store simulation logs for Tanner
+            simul_log_path = data_folder / "simulation_logs"
+
+            # Creates the currents folder
+            if not Path.exists(simul_log_path):
+                Path.mkdir(simul_log_path)
+            
+            # open and edit netlist
+            self.netlist_path = self.simulator_config[self.which_simulator][Global.operating_system]['netlist']
+            with open(self.netlist_path, "r") as net:
+                self.netlist = net.read().format(
+                    simul_corner = self.simulator_config[self.which_simulator][Global.operating_system]['simul_corner'],
+                    library = self.simulator_config[self.which_simulator][Global.operating_system]['library'],
+                    temperature = int(Global.temperature) - 273,
+                    vmin = self.roic_setup["vmin"],
+                    vmax = self.roic_setup["vmax"],
+                    stepTran = self.roic_setup["stepTran"],
+                    currents_path = currents_path,
+                    n_ml = "6"
+                    )
+            
+            # get path of netlist to be simulated
+            self.simul_netlist_path = simul_log_path / "BouncingPixel.sp"
+            
+            # Save netlist to a file
+            with open(self.simul_netlist_path, "w") as net:
+                net.write(self.netlist)
+
+
+        elif self.which_simulator == "Virtuoso":
+            raise ValueError(f"\n\n***Error --> Simulator < {self.which_simulator} > not supported yet for netlisting!\n")
+        
+        else:
+            raise ValueError(f"\n\n***Error --> Simulator < {self.which_simulator} > not supported yet for netlisting!\n")
+
 
     @sync_track
     def getCircuitType(self):
@@ -142,41 +198,41 @@ class BouncingPixel(ROIC):
         
         self.linearity_curve = linearity_curve
 
-    @sync_track
-    def getWhichSimulator(self):
-        """Returns value of self.which_simulator"""
+    # @sync_track
+    # def getWhichSimulator(self):
+    #     """Returns value of self.which_simulator"""
         
-        return self.which_simulator
+    #     return self.which_simulator
 
-    @sync_track
-    def setWhichSimulator(self, which_simulator):
-        """Set new value for self.which_simulator"""
+    # @sync_track
+    # def setWhichSimulator(self, which_simulator):
+    #     """Set new value for self.which_simulator"""
         
-        self.which_simulator = which_simulator
+    #     self.which_simulator = which_simulator
 
-    @sync_track
-    def getNetlist(self):
-        """Returns value of self.netlist"""
+    # @sync_track
+    # def getNetlist(self):
+    #     """Returns value of self.netlist"""
         
-        return self.netlist
+    #     return self.netlist
 
-    @sync_track
-    def setNetlist(self, netlist):
-        """Set new value for self.netlist"""
+    # @sync_track
+    # def setNetlist(self, netlist):
+    #     """Set new value for self.netlist"""
         
-        self.netlist = netlist
+    #     self.netlist = netlist
 
-    @sync_track
-    def getNetlistPath(self):
-        """Returns value of self.netlist_path"""
+    # @sync_track
+    # def getNetlistPath(self):
+    #     """Returns value of self.netlist_path"""
         
-        return self.netlist_path
+    #     return self.netlist_path
 
-    @sync_track
-    def setNetlistPath(self, netlist_path):
-        """Set new value for self.netlist_path"""
+    # @sync_track
+    # def setNetlistPath(self, netlist_path):
+    #     """Set new value for self.netlist_path"""
 
-        self.netlist_path = netlist_path
+    #     self.netlist_path = netlist_path
 
     def getSyncObj(self):
         """Returns value of self.sync_obj"""

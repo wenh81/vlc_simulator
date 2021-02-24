@@ -2,9 +2,15 @@ from generalLibrary import timer_dec, sync_track
 
 from Simulator import Simulator
 
+from generalLibrary import printDebug, plotDebug
+
+from subprocess import Popen, PIPE
+
+import os
+
 class Tanner(Simulator):
 
-    def __init__(self, netlist, sync_obj):
+    def __init__(self, netlist, tspice, sync_obj):
         """Constructor."""
         
         # Create sync object, and set debug and simulation path
@@ -17,12 +23,13 @@ class Tanner(Simulator):
         if self.DEBUG:
             print('Running Tanner...')
         
-        
         Simulator.__init__(self, netlist = netlist, sync_obj = sync_obj)
         
-
-        # Netlist of circuit to be simulated.
+        # Netlist path of circuit to be simulated.
         self.netlist = netlist
+        
+        # tspice path
+        self.tspice = tspice
 
         # Output simulation waves. Each key corresponds to a different wave.
         self.waves = None
@@ -31,22 +38,38 @@ class Tanner(Simulator):
     
     @sync_track
     def setup(self, currents):
-        """Setup simulation, like loading netlist."""
+        """Setup simulation, like loading netlist.""" 
+
+        print("MUST SETUP THE INPUT CURRENTS FOR TANNER")
         
-        
-        
-        raise ValueError(f"\n\n***Error --> setup not supported yet!\n")
+        # raise ValueError(f"\n\n***Error --> setup not supported yet!\n")
     
 
     @sync_track
     def start(self):
         """Fire simulation, and stops after it finishes (or timeout or abort). Populate 'waves' as the output."""
         
+        print("\nThe Tanner simulation has started. Please wait....")
+        process = Popen([f'{self.tspice}', f'{self.netlist}'], stdout=PIPE, stderr=PIPE)
+        stdout, stderr = process.communicate()
         
-        
+
+        STOP
         raise ValueError(f"\n\n***Error --> start not supported yet!\n")
     
 
+    @sync_track
+    def getTspice(self):
+        """Returns value of self.tspice"""
+        
+        return self.tspice
+
+    @sync_track
+    def setTspice(self, tspice):
+        """Set new value for self.tspice"""
+        
+        self.tspice = tspice
+        
     @sync_track
     def getNetlist(self):
         """Returns value of self.netlist"""

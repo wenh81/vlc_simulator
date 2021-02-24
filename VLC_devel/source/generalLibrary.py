@@ -63,6 +63,7 @@ def printDebug(signal, details = False, plot = False):
     if plot:
         plotDebug(signal, label = signal_name)
 
+    print(f"{type(signal)}")
     print('>  END  <' + f"\t-->\t<{signal_name}>")
     print('---------------------------------------------------------------------------\n')
 

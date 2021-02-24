@@ -20,7 +20,7 @@ class Virtuoso(Simulator):
         
         Simulator.__init__(self, netlist = netlist, sync_obj = sync_obj)
         
-        # Netlist of circuit to be simulated.
+        # Netlist path of circuit to be simulated.
         self.netlist = netlist
         
         # # Output simulation waves. Each key corresponds to a different wave.
