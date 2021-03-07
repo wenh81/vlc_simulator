@@ -16,6 +16,8 @@ import Global
 
 from generalLibrary import printDebug, plotDebug
 
+import generalLibrary as lib
+
 class Receiver(object):
     
     def __init__(self, receiver_config, roic_config, rx_data_list, sync_obj):
@@ -65,7 +67,6 @@ class Receiver(object):
             # For each detector in the detector array
             for idx in range(0, len(detector_array_dict["detector_type"])):
                 
-                
                 # Create array of detectors
                 detector_array.append(
                     self.createDetector(
@@ -96,11 +97,34 @@ class Receiver(object):
         return detector_obj
     
     @sync_track
+    def assembleWaveTrain(self):
+        """Get list of waves from TX, and concatanates on a single wave train."""
+
+        shift = 0
+        
+        all_zeros = np.zeros((1+len(self.rx_data_in_list))*Global.number_of_points)
+        self.rx_wave_train = all_zeros.copy()
+        for data in self.rx_data_in_list:
+            # starts vector with all zeros plus actual data
+            new_data = lib.sumVectosDiffSizes(all_zeros.copy(), data)
+            if shift >= 0:
+                shift += 1
+                new_data = np.roll(new_data, (shift-1)*Global.number_of_points)
+
+            self.rx_wave_train = lib.sumVectosDiffSizes(self.rx_wave_train, new_data)
+        
+        self.rx_wave_time = np.arange(0, len(self.rx_wave_train))*Global.time_step
+
+        # printDebug(len(self.rx_wave_train))
+        # plotDebug(self.rx_wave_train, self.rx_wave_time)
+
+    @sync_track
     def calculatesPhotocurrent(self):
         """Calculates what is the photocurrent provided for each time step, as rx_photocurrent_list."""
         
-        
-        
+        # TODO --- TEMP FIX... REMOVE LISTING ON RX END... USE rx_wave_train AND SMAPLE IT
+        self.rx_data_in_list = list(self.rx_wave_train)
+
         # If not bypassing the detector, calculate photocurrent based on it.
         if not Global.bypass_dict["Detector"]:
             
@@ -113,7 +137,6 @@ class Receiver(object):
             for detector_arrays in self.all_detector_arrays:
                 for detector in detector_arrays:
                     
-                    
                     # do conversion to photocurrent
                     self.rx_photocurrent_list = detector.convertsToPhotocurrent(self.rx_data_in_list)
             
@@ -121,6 +144,10 @@ class Receiver(object):
         else:
             # If bypassing, just pass the rx data list
             self.rx_photocurrent_list = self.rx_data_in_list
+            
+        # printDebug(len(self.rx_photocurrent_list[0]))
+        # # plotDebug(self.rx_photocurrent_list[0], symbols='ro-')
+        # plotDebug(self.rx_photocurrent_list[0], np.arange(0, len(self.rx_photocurrent_list[0]))*Global.time_step , symbols='ro-')
         
     @sync_track
     def createAllROIC(self):
@@ -235,10 +262,18 @@ class Receiver(object):
         else:
             # If bypassing, just pass the rx photocurrent list
             self.rx_voltage_list = self.rx_photocurrent_list
-    
 
+    # @sync_track
+    # def applyFilter(self, filter_order = 20, cuttof = 400e6, filter_type = 'low'):
+    #     """Apply low-pass filter before transmitting. Cutoff in Hz."""        
+
+    #     # return [lib.butterFilter(tx_data, cuttof=10e6)\
+    #     return [lib.butterFilter(tx_data, cuttof = cuttof, \
+    #         filter_order = filter_order, filter_type = filter_type)\
+    #         for tx_data in self.rx_data_list_in]
+    
     @sync_track
-    def applyADC(self):
+    def applyADC(self, sample_freq = None):
         """Converts rx_voltage into adc values, given input rx_voltage."""        
         
         # if not bypassing adc
@@ -250,10 +285,8 @@ class Receiver(object):
                 sync_obj = self.sync_obj
             )
             
-            
             # Converts the 'rx_data' list into 'dac_rx_data' list
             self.adc_obj.convertsToDigital()
-            
             
             # Get the list of dac rx_data
             self.adc_rx_data_list = self.adc_obj.getAdcRxData()
@@ -261,8 +294,46 @@ class Receiver(object):
         else:
             # Bypass DAC
             self.adc_rx_data_list = self.rx_voltage_list
-            
-            
+
+        # # Sample voltages with 'sample_freq'
+        # self.sampled_wave_time = []
+        # self.sampled_wave = []
+        # next_sample = 0
+
+        # for idx,time in enumerate(self.rx_wave_time):
+        #     if time >= next_sample:
+        #         next_sample += 1/sample_freq
+        #         self.sampled_wave_time.append(time)
+        #         self.sampled_wave.append(self.adc_rx_data_list[idx])
+                
+        # self.sampled_wave_time = np.array(self.sampled_wave_time)
+        # self.sampled_wave = np.array(self.sampled_wave)
+        
+        self.sampled_wave, self.sampled_wave_time = lib.sampleSignal(self.adc_rx_data_list, self.rx_wave_time, sample_freq)
+        
+        printDebug(len(self.adc_rx_data_list))
+        printDebug(len(self.sampled_wave))
+
+        # plotDebug(self.sampled_wave, self.sampled_wave_time)
+        
+        # x = self.adc_rx_data_list
+        # w = np.fft.fft(x)
+        # freqs = np.fft.fftfreq(len(x))
+        # plotDebug(w, freqs)
+        # x = self.sampled_wave
+        # w = np.fft.fft(x)
+        # freqs = np.fft.fftfreq(len(x))
+        # plotDebug(w, freqs)
+
+        # plotDebug(self.adc_rx_data_list, self.rx_wave_time, symbols='bo-')
+        # plotDebug(self.sampled_wave, self.sampled_wave_time, symbols='bo-')
+
+        # lib.plotBode(self.adc_rx_data_list, self.rx_wave_time, sample_freq, \
+        #     data2=(self.sampled_wave), time2=(self.sampled_wave_time))
+        # # lib.plotBode(self.adc_rx_data_list, self.rx_wave_time, sample_freq)
+        # # lib.plotBode(self.sampled_wave, self.sampled_wave_time, sample_freq)
+        
+        self.adc_rx_data_list = self.sampled_wave
 
     @sync_track
     def getReceiverConfig(self):
@@ -311,6 +382,18 @@ class Receiver(object):
         """Set new value for self.adc_rx_data_list"""
         
         self.adc_rx_data_list = adc_rx_data_list
+        
+    @sync_track
+    def getSampledWaveTime(self):
+        """Returns value of self.sampled_wave_time"""
+        
+        return self.sampled_wave_time
+
+    @sync_track
+    def setSampledWaveTime(self, sampled_wave_time):
+        """Set new value for self.sampled_wave_time"""
+        
+        self.sampled_wave_time = sampled_wave_time
 
     def getSyncObj(self):
         """Returns value of self.sync_obj"""

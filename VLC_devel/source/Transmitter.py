@@ -10,6 +10,12 @@ from matplotlib import pyplot as plt
 
 from generalLibrary import timer_dec, sync_track
 
+from generalLibrary import printDebug, plotDebug
+
+import generalLibrary as lib
+
+from scipy import signal
+
 class Transmitter(object):
     
     def __init__(self, transmitter_config, tx_data_list, sync_obj):
@@ -85,10 +91,29 @@ class Transmitter(object):
     
     
     @sync_track
-    def applyDAC(self):
+    def applyFilter(self, filter_order = 20, cuttof = 400e6, filter_type = 'low'):
+        """Apply low-pass filter before transmitting. Cutoff in Hz."""        
+        
+        # sig = tx_data
+        
+        # lib.butterFilter(tx_data, cuttof=100e6)
+        # lib.butterFilter(tx_data, cuttof=1e3, filter_type = 'hp')
+
+        # return [lib.butterFilter(tx_data, cuttof=10e6)\
+        return [lib.butterFilter(tx_data, cuttof = cuttof, \
+            filter_order = filter_order, filter_type = filter_type)\
+            for tx_data in self.tx_data_list_in]
+        
+        # for tx_data in self.tx_data_list_in:
+            
+            # plotDebug(tx_data)
+            # output_signal = signal.filtfilt(b, a, tx_data)
+            # plotDebug(output_signal)
+        
+
+    @sync_track
+    def applyDAC(self, offset_value = 0):
         """Converts tx_data into dac values."""
-        
-        
         
         # if not bypassing dac
         if not Global.bypass_dict["DAC"]:
@@ -99,18 +124,23 @@ class Transmitter(object):
                 sync_obj = self.sync_obj
             )
             
-            
             # Converts the 'tx_data' list into 'dac_tx_data' list
-            self.dac_obj.convertsToAnalog()
-            
+            self.dac_obj.convertsToAnalog(offset_value = offset_value)
             
             # Get the list of dac tx_data
             self.dac_tx_data_list = self.dac_obj.getDacTxData()
             
         else:
-            # Bypass DAC
-            self.dac_tx_data_list = self.tx_data_list_in
-    
+            #### Bypass DAC
+            # self.dac_tx_data_list = self.tx_data_list_in
+            max_tx = np.max([np.max(tx_symbol) for tx_symbol in self.tx_data_list_in])
+            min_tx = np.min([np.min(tx_symbol) for tx_symbol in self.tx_data_list_in])
+            
+            self.dac_tx_data_list = [lib.adjustRange(tx_symbol,\
+                Global.VDD, Global.VSS,\
+                    max_tx, min_tx,\
+                        offset_value) \
+                            for tx_symbol in self.tx_data_list_in]
     
     @sync_track
     def calculatesOpticalPower(self):

@@ -173,7 +173,7 @@ class Message(object):
                 
                 printDebug(data_in)
                 printDebug(local_dict["rx_array"])
-                asd
+                # asd
 
                 output_array.append(local_dict["rx_array"])
             

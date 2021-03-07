@@ -2,6 +2,12 @@ import Global
 
 from generalLibrary import timer_dec, sync_track
 
+from generalLibrary import printDebug, plotDebug
+
+import generalLibrary as lib
+
+import numpy as np
+
 class DAC(object):
     
     def __init__(self, tx_data, sync_obj):
@@ -25,7 +31,7 @@ class DAC(object):
         
         
     @sync_track
-    def convertsToAnalog(self):
+    def convertsToAnalog(self, offset_value = 0):
         """Converts the digital values to analog. Can employ circuit simulation. Outputs 'dac_tx_data'."""
         
         
@@ -35,14 +41,30 @@ class DAC(object):
         # To choose between ronding or circuit simulation
         if self.rounding_or_simul: # if rouding
             
+            max_tx = np.max([np.max(tx_symbol) for tx_symbol in self.tx_data_in])
+            min_tx = np.min([np.min(tx_symbol) for tx_symbol in self.tx_data_in])
             # for each ofdm symbol in the list, do the rounding
             for tx_symbol in self.tx_data_in:
                 
                 # TODO -- Quantization for DAC
                 Warning (f"\n\n***Warning --> Still not done quantization for DAC!\n")
+
+                # x = tx_symbol
+                # y = voltage
+                # y = a*x + b
+                # x=min(tx_data) -> vss = a*min + b -> b = vss - a*min
+                # x=max(tx_data) -> vdd = a*max + b = a*max + vss - a*min \
+                #     -> vdd = a*(max - min) + vss -> a = (vdd - vss)/(max - min)
+                # y = a*x + vss - a*min = a*(x - min) + vss -> \
+                #     y = (vdd - vss)/(max - min)*(x - min) + vss
                 
-                self.dac_tx_data.append(abs(tx_symbol))
-                # self.dac_tx_data.append((tx_symbol))
+                tx_symbol = lib.adjustRange(tx_symbol, \
+                    Global.VDD, Global.VSS,\
+                        max_tx, min_tx,\
+                            offset_value)
+                
+                # self.dac_tx_data.append(abs(tx_symbol))
+                self.dac_tx_data.append(tx_symbol)
                 
             pass
         else: # if circuit simulation

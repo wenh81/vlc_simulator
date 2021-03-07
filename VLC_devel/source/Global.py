@@ -1,5 +1,7 @@
 import numpy as np
 
+from generalLibrary import printDebug, plotDebug
+
 # global debug flag
 DEBUG = {
     "all": False,
@@ -35,6 +37,7 @@ PLOT = {
     "OFDM": True,
     "DAC": False,
     "Channel": False,
+    # "Channel": True,
     "LightSource": False,
     "Receiver": False,
     "Detector": False,
@@ -53,15 +56,20 @@ PLOT = {
 bypass_dict = {
     "Modulator": False,
     "LightSource": True,
-    "DAC": True,
+    # "DAC": True,
+    "DAC": False,
     "DAC_rounding_or_simul": True,
     "Channel": True,
     "Detector": True,
-    "ROIC": False, ## Read-Out Integrated Circuit ON
-    # "ROIC": True, ## NO ROIC
+    # "ROIC": False, ## Read-Out Integrated Circuit ON
+    "ROIC": True, ## NO ROIC
     "ADC": True,
     "ADC_rounding_or_simul": True
 }
+
+# Random SEED for all random simulation (does not work yet... 
+# try with very low SNR and reproduce BER)
+rand_seed = 10
 
 # TODO --- FIX ISSUE WITH << "DAC": False >>, where only
 # abs of signal is passed through. Needs to apply hermitian symetry in this case!
@@ -70,17 +78,117 @@ bypass_dict = {
 # TODO --- MUST ADD OPTION TO USE H(0) or h(t)
 
 
+# simulation time frame [1/(operating frequency)] for each transaction
+time_frame = 50e-6
+time_frame = 5e-6
+time_frame = 1e-6
+# time_frame = 0.3e-6
+# time_frame = 2e-6
+# time_frame = 50e-9
+
+# time step in seconds for simulation
+time_step = 1e-11
+time_step = 1e-9
+# time_step = 2e-9
+# time_step = 0.5e-9
+# time_step = 10e-9
+
+# operating frequency is inverse of time frame (???? at least for OFDM, I guess...)
+# calculated on the modulator ???
+# sample_frequency = None
+# sample_frequency = 1/time_step
+simul_frequency = 1/time_step
+
+
+# Circuit PCB voltage (VDD)
+VDD = 3.3
+VSS = 0
+
+
+# Total number of points in simulation.
+# This is to define a fixed number of points
+# If you have less, data will be interpolated
+number_of_points = int(time_frame/time_step)
+
+# base time vector
+base_time_vector = np.arange(0, number_of_points)*time_step
+
+# number of points in the simulation
+# printDebug(time_frame/time_step)
+# N_POINTS = 12
+# N_POINTS = int(time_frame/time_step)
+# full_time_vector = np.arange(0,N_POINTS)*time_step
+
+# # To be calculated through the simulation.
+# # It's equal base_time_vector if only one frame.
+# # And increments each step with base_time_vector + time_frame
+# full_time_vector = None
+
 # list of channel responses for each lamp, when bypassig Channel.
-import numpy as np
+
 # Unitary channel
-list_of_channel_response = [1*np.array([1])]
-list_of_channel_response = [1*np.array([np.random.uniform()+np.random.uniform()*1j, (np.random.uniform()+np.random.uniform()*1j)/2, (np.random.uniform()+np.random.uniform()*1j)/4])]
-list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
-from scipy import signal
-CIR = signal.windows.hann(8)
-CIR = signal.unit_impulse(30, 'mid')*3
-b, a = signal.butter(4, 0.2)
-CIR = signal.lfilter(b, a, CIR)
+# list_of_channel_response = [1*np.array([1])]
+# list_of_channel_response = [1*np.array([np.random.uniform()+np.random.uniform()*1j, (np.random.uniform()+np.random.uniform()*1j)/2, (np.random.uniform()+np.random.uniform()*1j)/4])]
+# list_of_channel_response = [1*np.array([1, 0, 0.3+0.3j])]
+# from scipy import signal
+# CIR = signal.windows.hann(8)
+
+# G*delta(t-d/c)
+# N_POINTS = 120
+# CIR = 2*signal.unit_impulse(N_POINTS, 5) + 0.5*signal.unit_impulse(N_POINTS, 8)
+
+# Channel response types
+# impulse = (gain, delay); delay --> t - d/c
+
+# light speed (m/s)
+c_speed = 3e8
+# test (distance in m)
+# gain (inverse of distance) --> resp = dist/kappa
+attenuation = 1
+# attenuation = 0.3
+group_delay = 100e-9
+group_delay = 200e-9
+# group_delay = 900e-9
+# group_delay = 0e-9
+# group_delay = 0
+dist = [1, 1.2, 1.4, 1.9, 2.3, 5, 20]
+# dist = [1, 2.3]
+# dist = [1]
+dist = list(np.array(dist))
+response = [(attenuation/(d**2), group_delay+d/c_speed) for d in dist]
+# response = [(1, 200e-9), (1, 500e-9)]
+# response = [(0.5, 200e-9), (0.5, 1900e-9), (0.5, 1000e-9)]
+# response = [(1, 50e-9)]
+# response = [(1, 20e-9)]
+# response = [(1, 10e-9)]
+# response = [(1, 5e-9)]
+# response = [(1, 200e-9)]
+# group_delay = 50e-9
+# group_delay = 200e-9
+response = [(1, 0)]
+group_delay = 0
+# variable used for synchronization
+# TODO --- if None, returns full signal after convolution, 
+# to be used for further correlation, to find group_delay
+# TODO --- otherwise, use it to shift signal in time
+# group_delay = None
+# group_delay = 0
+# group_delay = 50e-9
+print(response)
+print(dist)
+# sad
+CIR = {
+    0: {"impulse": [(1, 1e-9)]},
+    1: {"impulse": [(1, 250e-9), (1, 500e-9)]},
+    2: {"impulse": [(1, 2e-9), (0.7, 3e-9)]},
+    3: {"butter": response},
+    4: {"impulse": response},
+    9: {"others": []}
+}
+
+
+# b, a = signal.butter(1, 0.2)
+# CIR = signal.lfilter(b, a, CIR)
 
 # list_of_channel_response = [ 1*DELTA(T-T0)]
 # list_of_channel_response = [ G0*DELTA(T-T0) + g1*DELTA(T-T1)  ]
@@ -91,8 +199,12 @@ CIR = signal.lfilter(b, a, CIR)
 # plt.plot(t, y)
 # CIR = signal.unit_impulse(10)
 # CIR = GAIN*np.array([1])
-print(CIR)
-list_of_channel_response = [CIR]
+
+list_of_channel_response = [CIR[3]]
+list_of_channel_response = [CIR[4]]
+
+# list_of_channel_response = [CIR[0], CIR[1]]
+# plotDebug(CIR, symbols='r-o')
 # list_of_channel_response = [0.1*np.array([1, 0, 0.3+0.3j])]
 
 # rx_SNR (dB) is ued if not set, if not calculated. Can use <None> to ignore noise
@@ -123,6 +235,9 @@ roic_config = [{
     "circuit_simulation": [False], ## ROIC simulation OFF
     # "circuit_simulation": [True], ## ROIC simulation ON
     "circuit_type": ["BouncingPixel"],
+    # "roic_setup": [{"vmin": "500m", "vmax": "2.5", "stepTran": "1000"}],
+    # "roic_setup": [{"vmin": "500m", "vmax": "2.5", "stepTran": "10000"}],
+    # "roic_setup": [{"vmin": "700m", "vmax": "2", "stepTran": "500"}],
     "roic_setup": [{"vmin": "500m", "vmax": "2.5", "stepTran": "100"}],
     "gain": [60*1e3],
     "DR": [130],
@@ -218,8 +333,12 @@ input_info = {"type": ["str"], "data": ["Uma frase beeeem longaaaaaaaaaaa!"]}
 # input_info = {"type": ["bin"], "data": ["10"]}
 import random
 # input_info = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 32)])]}
-input_info = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 2**3)])]}
-input_info = {"type": ["bin"], "data": ["0110011001100110"]}
+input_info = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 64)])]}
+# input_info = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 2**3)])]}
+# input_info = {"type": ["bin"], "data": ["0110011001100110"]}
+# input_info = {"type": ["bin"], "data": ["0000000000000000000000000000000011111111111111111111111111111111"]}
+# input_info = {"type": ["bin"], "data": ["1111111111111111111111111111111100000000000000000000000000000000"]}
+# input_info = {"type": ["bin"], "data": ["11111111111111111111111111111111"]}
 
 # supported input_info types
 supported_input_info = ["str", "image", "audio"]
@@ -232,21 +351,24 @@ DCO_OFDM_CONFIG = {"DCO-OFDM": [5]}
 
 ACO_OFDM_CONFIG = {"ACO-OFDM": []}
 
-# slack for hermitian imaginary part
+# slack for hermitian imaginary part (check that imaginary part
+#  is [img <= slack]. instead of [img == 0])
 hermitian_slack = 1e-6
 
 # Number of FFT points
+# N_FFT = 16
 N_FFT = 32
 N_FFT = 64
 N_FFT = 128
-N_FFT = 256
-N_FFT = 512
+# N_FFT = 256
+# N_FFT = 512
 # N_FFT = 1024
 
 # percentage of pilots, depending on number of FFT carriers 
+percentage_of_pilots = 0.4
 percentage_of_pilots = 0.3
-percentage_of_pilots = 0.125
-# percentage_of_pilots = 0.5
+# percentage_of_pilots = 0.125
+# percentage_of_pilots = 0.2
 
 # pilot_value
 # pilot_value = 15+15j
@@ -262,6 +384,7 @@ modulation_config = {
                     "ofdm_type": DCO_OFDM_CONFIG,
                     "pilot_value": pilot_value,
                     "n_carriers": N_FFT, # number of IFFT stages
+                    # "ofdm_symbol_time": 3e-6, # OFDM symbol time duration (in seconds)
                     "n_pilots": int(N_FFT*percentage_of_pilots),
                     "n_cp": N_FFT//4
                     },
@@ -270,6 +393,7 @@ modulation_config = {
                     "ofdm_type": ACO_OFDM_CONFIG,
                     "pilot_value": pilot_value,
                     "n_carriers": N_FFT, # number of IFFT stages
+                    # "ofdm_symbol_time": 1e-6, # OFDM symbol time duration (in seconds)
                     "n_pilots": int(N_FFT*percentage_of_pilots),
                     "n_cp": N_FFT//4
                     },

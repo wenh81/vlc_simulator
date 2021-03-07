@@ -76,7 +76,7 @@ class Mapping(object):
             
             # List of binary representations for M-QAM
             list_of_binary = [','.join(str(np.binary_repr(number, width = int(np.log2(M))))) for number in range(0, M)]
-
+            
             # Creates the mapping table
             self.mapping_table = {eval(f"({binary})") : self.m_qam_obj.modulate(eval(binary))[0] for binary in list_of_binary}
             

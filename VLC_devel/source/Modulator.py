@@ -31,6 +31,9 @@ class Modulator(object):
         # Modulation config to be applied.
         self.modulation_config = modulation_config
         
+        # Sample frequency, depending on the modulation type
+        self.sample_frequency = None
+        
         # Mapping config to be applied.
         self.mapping_config = mapping_config
         
@@ -111,11 +114,18 @@ class Modulator(object):
                 # Returns a list of OFDM symbols to be transmitted. The input stream data is
                 # splitted into various symbols, depending on the throughput of the modulator.
                 self.tx_data_list = self.ofdm_obj.getOFDMSymbolList()
+
+                # Set the sample frequency for this modulation.
+                # self.sample_frequency = (self.ofdm_obj.getNumberOfCarriers() + self.ofdm_obj.getNumberOfPilots()) / Global.time_frame
+                self.sample_frequency = self.ofdm_obj.getSampleFrequency()
+                
                 
             elif self.modulation_type == "OOK":
                 
                 # printDebug(self.bitstream_frame)
                 # PAUSE
+                # Set the sample frequency for this modulation.
+                self.sample_frequency = None
                 pass
             
             else:
@@ -138,6 +148,7 @@ class Modulator(object):
             
             # Before de-modulation, we need to setup the rx_data_list.
             self.ofdm_obj.setOFDMRxDataList(self.rx_data_list)
+            self.ofdm_obj.setOFDMTime(self.rx_time)
             
             
             # Set the actual channel responses, for further comparissons with estimated ones
@@ -211,6 +222,18 @@ class Modulator(object):
         """Set new value for self.modulation_config"""
         
         self.modulation_config = modulation_config
+
+    @sync_track
+    def getSampleFrequency(self):
+        """Returns value of self.sample_frequency"""
+        
+        return self.sample_frequency
+
+    @sync_track
+    def setSampleFrequency(self, sample_frequency):
+        """Set new value for self.sample_frequency"""
+        
+        self.sample_frequency = sample_frequency
 
     @sync_track
     def getMappedConfig(self):
@@ -315,6 +338,18 @@ class Modulator(object):
         # self.sync_obj.appendToSimulationPath("setRxDataList @ Modulator")
         
         self.rx_data_list = rx_data_list
+    
+    @sync_track
+    def getRxTime(self):
+        """Returns value of self.rx_time"""
+        
+        return self.rx_time
+
+    @sync_track
+    def setRxTime(self, rx_time):
+        """Set new value for self.rx_time"""
+        
+        self.rx_time = rx_time
 
     @sync_track
     def getListOfChannelResponses(self):

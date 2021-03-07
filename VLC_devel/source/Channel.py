@@ -6,6 +6,10 @@ from generalLibrary import timer_dec, sync_track
 
 import generalLibrary as lib
 
+from generalLibrary import printDebug, plotDebug
+
+from scipy import signal
+
 class Channel(object):
     
     def __init__(self, tx_data_in, sync_obj):
@@ -14,6 +18,8 @@ class Channel(object):
         self.sync_obj = sync_obj
         
         self.DEBUG = self.sync_obj.getDebug("Channel") or self.sync_obj.getDebug("all")
+
+        self.PLOT = self.sync_obj.getPlot("Channel") or self.sync_obj.getPlot("all")
         
         self.sync_obj.appendToSimulationPath("Channel")
         
@@ -72,6 +78,62 @@ class Channel(object):
         
         raise ValueError(f"\n\n***Error --> Calculate channel response not implemented yet!\n")
     
+    @sync_track
+    def definesChannelResponse(self):
+        """Defines a new channel response. Get from imput definition."""
+        
+        # starts list of channel responses
+        self.channel_response = []
+        
+        # get_channel = Global.list_of_channel_response
+        for get_channel in Global.list_of_channel_response:
+            channel_type = next(iter(get_channel.keys()))
+            if channel_type == "impulse" or channel_type == "butter":
+                delay_list = []
+                gain_list = []
+                for (gain, delay) in get_channel[channel_type]:
+                    delay_list.append(delay)
+                    gain_list.append(gain)
+                # get max delay from input delays
+                max_delay = np.max(delay_list)
+                gain_sum = np.sum(gain_list)
+
+                # # max delay times 10%
+                # max_position = int((max_delay/Global.time_step)*1.5)
+                
+                CIR = 0
+                for (gain, delay) in get_channel[channel_type]:
+                    delay_position = int(np.round(delay/Global.time_step))
+                    # CIR += gain*signal.unit_impulse(int(Global.number_of_points), delay_position)
+                    # CIR_number_of_points = 
+                    # CIR += gain*signal.unit_impulse(max_position, delay_position)
+                    # CIR += gain*signal.unit_impulse(int(Global.number_of_points), int(Global.number_of_points*0.1))
+                    # asdsa
+                    # apply weight do each impulse
+                    CIR += (gain)*signal.unit_impulse(Global.number_of_points, delay_position)
+                
+                # divide CIR by number of impulses
+                # CIR /= len(get_channel[channel_type])
+
+                # divide by sum of gains, to do wigthed sum (to normalize)
+                CIR /= gain_sum
+
+                # then, multiply by max gain
+                CIR *= np.max(gain_list)
+
+            else:
+                raise ValueError(f"\n\n***Error --> <{channel_type}> not supported yet!\n")
+            
+            # if butterworth...
+            if channel_type == "butter":
+                b, a = signal.butter(1, 0.2)
+                CIR = signal.lfilter(b, a, CIR)
+            
+            if self.PLOT:
+                plotDebug(CIR, symbols='ro-')
+            
+            self.channel_response.append(CIR)
+    
     
     @sync_track
     # @timer_dec
@@ -100,15 +162,30 @@ class Channel(object):
                 # if Global.IM_DD:
                 #     CIR = np.abs(CIR)
 
-                print('CIR')
-                print(CIR)
+                printDebug(CIR.shape)
+                printDebug(tx_data.shape)
+
+                printDebug(CIR)
+                # plotDebug(tx_data, Global.base_time_vector)
+                if self.PLOT:
+                    plotDebug(CIR, Global.base_time_vector)
+                    plotDebug(tx_data, Global.base_time_vector, symbols='ro-')
+                # plotDebug(CIR)
 
                 # Apply convolution
                 convolved = np.convolve(tx_data, CIR)
                 from scipy import signal
-                convolved = signal.convolve(tx_data, CIR, mode='same')
-                print(tx_data)
-                print(convolved)
+                # convolved = signal.convolve(tx_data, CIR, mode='same')
+                # convolved = signal.convolve(tx_data, CIR, mode='valid')
+                convolved = signal.convolve(tx_data, CIR)
+                # plotDebug(convolved, Global.base_time_vector)
+                printDebug(convolved)
+                printDebug(len(convolved))
+                # plotDebug(convolved)
+                printDebug(len(CIR))
+                printDebug(len(tx_data))
+                if self.PLOT:
+                    plotDebug(convolved)
 
                 ### TODO --- NEED TO DEFINE THE OFDM TIME DELTA, AND CORRELATE IT TO THE FFT NUMBER, SAMPLING, ETC.
                 ### TODO --- HOW TO DESCRIBE THE CHANNEL MATCHEMATICALLY?
@@ -128,8 +205,13 @@ class Channel(object):
                 counter += 1
                 
             ### TODO - Sum the contribution of all convolved signals of multiple CIRs
+            ### TODO - Must go to each adequate LED 
             mean_noisy_signal = summed_noisy_signal/counter
-            
+            if self.PLOT:
+                plotDebug(mean_noisy_signal)
+                printDebug(np.max(mean_noisy_signal))
+                printDebug(np.max(convolved))
+                printDebug(np.max(tx_data))
             
             # Append to list of noisy signals
             self.rx_data_out.append(mean_noisy_signal)

@@ -12,6 +12,8 @@ import Global
 
 import generalLibrary as lib
 
+from generalLibrary import printDebug, plotDebug
+
 import pyfftw
 
 import reikna
@@ -61,8 +63,27 @@ class OFDM(object):
         # Number of pilot carriers per OFDM symbol.
         self.number_of_pilots = modulation_config["n_pilots"]
 
-        # Length of the cyclic prefix  per OFDM symbol.
+        # Length of the cyclic prefix per OFDM symbol.
         self.number_of_cyclic_prefix = modulation_config["n_cp"]
+        
+        # # Time duration of OFDM symbol (without cyclic prefix)
+        # self.ofdm_symbol_time = modulation_config["ofdm_symbol_time"]
+
+        # get actual OFDM time symbol duration (in secodns)
+        # self.ofdm_duration = self.ofdm_symbol_time*(self.number_of_cyclic_prefix/self.number_of_carriers + 1)
+        self.ofdm_duration = Global.time_frame
+
+        # Total number of subcarriers including cyclic prefix
+        self.total_subcarriers = (self.number_of_cyclic_prefix + self.number_of_carriers)
+
+        # Set what will be the sample frequency. For OFDM this is the inverse of symbol duration by total number of subcarriers
+        # b/c fundamental frequency of OFDM is 1 / (OFDM symbol duration), and largest frequency is max number of carriers * fundamental
+        self.sample_frequency = (self.total_subcarriers) / Global.time_frame
+        # self.sample_frequency = 20*(self.total_subcarriers) / Global.time_frame
+        
+        # Start the time vector list (each position for a position in data list)
+        self.time_vector_list = None
+        self.time_vector = None
 
         # Modulation config info
         self.modulation_config = modulation_config
@@ -143,7 +164,7 @@ class OFDM(object):
             self.mapping_obj.setNumberOfDataCarriers(self.number_of_data_carriers)
             
             # Apply the mapping for such information frame (bitstream_ofdm_frame)
-            self.mapping_obj.applyMapping()            
+            self.mapping_obj.applyMapping()
             
             # Get the mapped info
             self.mapped_info = self.mapping_obj.getMappedInfo()
@@ -156,6 +177,11 @@ class OFDM(object):
             
             # Do the IDFT on the OFDM symbol data
             self.applyIFFT()
+
+            # printDebug(self.ofdm_symbol_data)
+            # plotDebug(self.ofdm_symbol_data, symbols='r-o')
+            # printDebug(self.digital_ofdm.real)
+            # plotDebug(self.digital_ofdm.real, symbols='r-o')
 
             # Add the cyclic prefix in the OFDM symbol
             self.applyCp()
@@ -201,8 +227,64 @@ class OFDM(object):
             else:
                 raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
             
+            # number_of_subcarrierslen(self.ofdm_symbol_tx)
+            # H = np.fft.fft(self.ofdm_symbol_tx, (self.number_of_carriers))
+            # printDebug(H)
+            # plotDebug(H, symbols='o-b')
+            # self.ofdm_duration = self.ofdm_symbol_time*(self.number_of_cyclic_prefix/self.number_of_carriers + 1)
+
+            # printDebug(self.ofdm_duration)
+            # N_POINTS = (self.number_of_cyclic_prefix + self.number_of_carriers)
+            # printDebug(N_POINTS)
+            # self.time_vector
+
+            # # Create time vector array for each iteration
+            # if self.time_vector_list is None:
+            #     self.time_vector_list = []
+            #     self.time_vector_list.append(np.arange(0,self.total_subcarriers)*(self.ofdm_duration/self.total_subcarriers))
+            # else:
+            #     self.time_vector_list.append(self.time_vector_list[-1] + self.ofdm_duration)
             
+            # # # update time list into global variable
+            # # Global.full_time_vector = self.time_vector_list
+
+            # # self.ofdm_symbol_list.append(self.ofdm_symbol_tx)
+
+            # # Global.time_vector = Global.common_time_vector
+
+            # printDebug(self.ofdm_symbol_tx)
+            # printDebug(len(self.ofdm_symbol_tx))
+            # # printDebug(self.time_vector_list[-1])
+            # printDebug(len(self.time_vector_list[-1]))
+            # # printDebug(Global.number_of_points)
+            # # printDebug(Global.base_time_vector)
+
+            # if self.time_vector is None:
+            #     self.time_vector = np.arange(0,self.total_subcarriers)*(self.ofdm_duration/self.total_subcarriers)
+            #     self.ofdm_symbol_tx = lib.interpolateData(np.arange(0,self.total_subcarriers)*(self.ofdm_duration/self.total_subcarriers), self.ofdm_symbol_tx)
+            # else:
+            #     self.time_vector += self.ofdm_duration
+            #     self.ofdm_symbol_tx = lib.interpolateData(np.arange(0,self.total_subcarriers)*(self.ofdm_duration/self.total_subcarriers), self.ofdm_symbol_tx)
+            
+            # Do interpolation
+            self.ofdm_symbol_tx = lib.interpolateData(np.arange(0,self.total_subcarriers)*(self.ofdm_duration/self.total_subcarriers), self.ofdm_symbol_tx)
+            
+            # plotDebug(self.ofdm_symbol_tx, self.time_vector)
+            
+
+            # interpolate data to be in conformity with common time vector
+            # self.ofdm_symbol_tx = lib.interpolateData(self.time_vector_list[0], self.ofdm_symbol_tx)
+            # self.ofdm_symbol_tx = lib.interpolateData(Global.base_time_vector, self.ofdm_symbol_tx)
+            
+            # plotDebug(self.ofdm_symbol_tx, symbols='g-o')
+            # fd
+
+            # Zero clip before sending
+            self.ofdm_symbol_tx = lib.zeroClip(self.ofdm_symbol_tx)
+
+            # Add interpolated data to data list.
             self.ofdm_symbol_list.append(self.ofdm_symbol_tx)
+            
             
     
     @sync_track
@@ -561,6 +643,55 @@ class OFDM(object):
         # when de-mapping, the ouput starts as an empty list (temp_list)
         temp_list = []
         
+        printDebug(self.ofdm_time)
+        # plotDebug(self.ofdm_rx_data_list, self.ofdm_time, symbols='bo-')
+        # plotDebug(self.ofdm_rx_data_list, symbols='bo-')
+
+        # given that we know the 'group delay' of the incoming signal, 
+        # shift signal and get only the desired samples
+        # TODO -- Is there a way to calculate group delay? To be used for synchronization...
+        # TODO -- Maybe can be considered as 'zero' for short distances: dist/c -> 0
+        points_per_frame = int(Global.time_frame * self.sample_frequency)
+        # points_per_frame = len(self.ofdm_time)
+        # points_per_frame = int(Global.time_frame * self.sample_frequency)
+        if Global.group_delay is None:
+            group_delay = 0
+        else:
+            group_delay = Global.group_delay
+        delay_steps = int(np.round(group_delay*self.sample_frequency))
+        # delay_steps = int(np.round(group_delay*self.sample_frequency)+1) ### +1 IS WRONG!!!
+        printDebug(points_per_frame)
+        printDebug(delay_steps)
+        printDebug(len(self.ofdm_rx_data_list))
+        number_of_symbols = int(np.round(len(self.ofdm_rx_data_list)/points_per_frame))
+        printDebug(number_of_symbols)
+        if Global.group_delay is None:
+            self.ofdm_rx_data_list = self.ofdm_rx_data_list[delay_steps:(number_of_symbols)*points_per_frame+delay_steps]
+            self.ofdm_time = self.ofdm_time[delay_steps:(number_of_symbols)*points_per_frame+delay_steps]
+        else:
+            self.ofdm_rx_data_list = self.ofdm_rx_data_list[delay_steps:(number_of_symbols-1)*points_per_frame+delay_steps]
+            self.ofdm_time = self.ofdm_time[delay_steps:(number_of_symbols-1)*points_per_frame+delay_steps]
+        self.ofdm_time = self.ofdm_time - delay_steps/self.sample_frequency
+        # printDebug(len(self.ofdm_rx_data_list))
+        # plotDebug(self.ofdm_rx_data_list, self.ofdm_time, symbols='ro-')
+        # plotDebug(self.ofdm_rx_data_list, symbols='ro-')
+        
+        
+        # Subdivide into lists of OFDM symbols. If N symbols were sent, then N+1 arrive (since convolution has size N)
+        # ofdm_rx_data_list is actually an np.array, that will become a list of ODFM symbols again.
+        # the additional symbol due to convolution is all zeros, and is responsible for having the delays
+        # There might be ISI in that wave of all OFDM symbols (which does not affect this procedure of decomposing)
+        # The 'zeros' introduced due to convolution will be understood as zeros as well, after de-mapping. 
+        # printDebug(self.total_subcarriers)
+        self.ofdm_rx_data_list = [self.ofdm_rx_data_list[\
+            j*points_per_frame:\
+                (j+1)*points_per_frame] \
+                    for j in range(0, int(len(self.ofdm_rx_data_list)/points_per_frame))]
+        
+        # # DEBUG
+        # for idx_data, rx_ofdm_symbol in enumerate(self.ofdm_rx_data_list):
+        #     plotDebug(rx_ofdm_symbol)
+
         # for each chunk of information to become an OFDM symbol, to the Mapping
         for idx_data, rx_ofdm_symbol in enumerate(self.ofdm_rx_data_list):
             
@@ -649,6 +780,9 @@ class OFDM(object):
                         show = show
                     )
             
+            # TODO -- Apply equalization if group_delay is None?
+            # if Global.group_delay is None...
+            
             # DEBUG
             # # Applies equalization, given the channel response
             self.applyEqualization()            
@@ -726,7 +860,7 @@ class OFDM(object):
     @sync_track
     def estimateChannel(self):
         """Analyze pilots to get the channel estimation."""
-        
+
         if not Global.IM_DD:
             OFDM_type = None
             self.estimated_pilots_response = self.ofdm_symbol_rx[self.pilot_subcarriers] / self.pilot_value
@@ -833,7 +967,24 @@ class OFDM(object):
         # x = np.arange(0, 64)
         # freq = np.arange(self.number_of_carriers, 0, -3)
         # freq = np.arange(0, self.number_of_carriers, 1) - 4
-        freq = np.arange(0, self.number_of_carriers, 1)
+        
+        
+        # freq = np.arange(0, self.number_of_carriers, 1)
+        freq = np.arange(0, self.total_subcarriers, 1)
+        # get actual frequencies for each subcarrier
+        freq = (freq+1)/Global.time_frame
+        
+        # Actual frequency for the pitlos
+        # pilot_subcarriers_freq = np.arange(0, self.pilot_subcarriers, 1)
+        # pilot_subcarriers_freq = (pilot_subcarriers_freq+1)/Global.time_frame
+        pilot_subcarriers_freq = (np.array(self.pilot_subcarriers)+1)/Global.time_frame
+
+        # Actual valid carriers
+        valid_carriers_freq = (self.valid_carriers + 1)/Global.time_frame
+        printDebug(freq/1e6)
+        printDebug(pilot_subcarriers_freq/1e6)
+        printDebug(valid_carriers_freq/1e6)
+        
         
         ## TODO --- DEBUG WHY THE 'ACTUAL' CHANNEL RESPONSE IS NOT MATCHING THE PILOTS ESTIMATES??
         ## TODO --- LOOKS LIKE THE 'ABS' HELPS, SINCE THE OFDM FOR LIFI USES ONLY 'REAL' DATA.
@@ -842,7 +993,22 @@ class OFDM(object):
         # if Global.IM_DD:
         #     current_channel = abs(current_channel)
 
-        CIR = np.fft.fft(current_channel, len(freq))
+        # fourierTransform = np.fft.fft(current_channel)/len(current_channel)
+        # fourierTransform = fourierTransform[range(int(len(current_channel)/2))] # Exclude sampling frequency
+
+        CIR = np.fft.fft(current_channel)
+        # CIR = CIR[range(int(len(current_channel)/2))] # Exclude sampling frequency
+        # plotDebug(current_channel, Global.base_time_vector, symbols='bo-')
+        # samplingFrequency = Global.simul_frequency
+        # timePeriod  = tpCount/samplingFrequency
+        # timePeriod  = Global.time_frame
+        tpCount     = len(current_channel)
+        frequencies = np.arange(int(tpCount))/Global.time_frame
+
+        # plotDebug(CIR, frequencies)
+        
+
+        # CIR = np.fft.fft(current_channel)
         # CIR = np.fft.fft(current_channel, self.valid_carriers)
         # CIR = np.fft.fft(current_channel, self.number_of_carriers)
         # print('current_channel')
@@ -859,24 +1025,37 @@ class OFDM(object):
         # print(CIR)
         # print(len(CIR))
         # asd
-        
+        # printDebug(current_channel)
+        # plotDebug(current_channel)
+        # plotDebug(current_channel, symbols='o-')
+        # plotDebug(CIR, frequencies, symbols='o-')
         
         # plt.plot(np.arange(self.number_of_carriers), abs(CIR), label='Actual channel response')
         # plt.plot(self.valid_carriers, abs(CIR), 'r-', label='Actual channel response')
         # plt.plot(freq, CIR, 'ro-', label='Actual channel response')
-        plt.plot(freq, abs(CIR)/np.max(CIR), 'ro-', label='Actual channel response')
-        plt.plot(current_channel/np.max(current_channel), 'go-', label='current_channel')
-        plt.plot(self.valid_carriers, abs(self.estimated_channel_response)/np.max(self.estimated_channel_response), 'ko-', label='Interpolated estimated channel')
+        # plt.plot(freq, abs(CIR)/np.max(CIR), 'ro-', label='Actual channel response')
+        # plt.plot(frequencies, abs(CIR), 'ro-', label='Actual channel response')
+
+        printDebug(frequencies)
+        printDebug(CIR)
+        interp = interpolate.interp1d(frequencies, CIR, kind='cubic', fill_value="extrapolate")
+        printDebug(interp(freq))
+        # plotDebug(interp(freq))
+        # SOME ISSUE HERE..........
+        plt.plot(freq, abs(interp(freq))/np.max(abs(interp(freq))), 'ro-', label='Actual channel response')
+        # plt.plot(frequencies, abs(CIR)/np.max(abs(CIR)), 'go-', label='current_channel')
+        # plt.plot(self.valid_carriers, abs(self.estimated_channel_response)/np.max(self.estimated_channel_response), 'ko-', label='Interpolated estimated channel')
+        plt.plot(valid_carriers_freq, abs(self.estimated_channel_response)/np.max(self.estimated_channel_response), 'ko-', label='Interpolated estimated channel')
         # plt.plot(np.arange(0, self.number_of_carriers), abs(self.estimated_channel_response), 'bo', label='Interpolated estimated channel')
         # plt.plot(self.all_subcarriers, abs(self.estimated_channel_response), 'bo', label='Interpolated estimated channel')
-        plt.stem(np.array(self.pilot_subcarriers), abs(self.estimated_pilots_response)/np.max(self.estimated_pilots_response), label='Estimated pilots')
+        plt.stem(pilot_subcarriers_freq, abs(self.estimated_pilots_response)/np.max(self.estimated_pilots_response), label='Estimated pilots')
         plt.grid(True)
         plt.title('Channel response estimations')
         plt.xlabel('Subcarrier indexes')
         plt.ylabel('$|H(f)|$')
         plt.legend(fontsize=10)
         # plt.ylim(0, np.max([np.max(abs(self.estimated_channel_response)), np.max(abs(CIR))])*1.1)
-        plt.ylim(0, 1.1)
+        # plt.ylim(0, 1.1)
         plt.show(block=show)
         # plt.show(show)
         
@@ -1024,15 +1203,25 @@ class OFDM(object):
     def getOFDMRxDataList(self):
         """Returns value of self.ofdm_rx_data_list"""
         
-        
         return self.ofdm_rx_data_list
     
     @sync_track
     def setOFDMRxDataList(self, ofdm_rx_data_list):
         """Set new value for self.ofdm_rx_data_list"""
         
-        
         self.ofdm_rx_data_list = ofdm_rx_data_list
+    
+    @sync_track
+    def getOFDMTime(self):
+        """Returns value of self.ofdm_time"""
+        
+        return self.ofdm_time
+    
+    @sync_track
+    def setOFDMTime(self, ofdm_time):
+        """Set new value for self.ofdm_time"""
+        
+        self.ofdm_time = ofdm_time
     
     @sync_track
     def getOFDMSymbolRx(self):
@@ -1075,6 +1264,18 @@ class OFDM(object):
         
         
         self.pilot_subcarriers = pilot_subcarriers
+    
+    @sync_track
+    def getSampleFrequency(self):
+        """Returns value of self.sample_frequency"""
+        
+        return self.sample_frequency
+
+    @sync_track
+    def setSampleFrequency(self, sample_frequency):
+        """Set new value for self.sample_frequency"""
+        
+        self.sample_frequency = sample_frequency
     
     @sync_track
     def getEstimatedChannel(self):

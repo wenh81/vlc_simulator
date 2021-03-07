@@ -19,13 +19,23 @@ import Global
 from beeprint import pp
 # import beeprint as pp
 
+import numpy as np
+
 from matplotlib import pyplot as plt
 
 import generalLibrary as lib
 
 from generalLibrary import timer_dec, sync_track
 
+from generalLibrary import printDebug, plotDebug
+
 from timeit import default_timer as timer
+
+from scipy import signal
+
+# first time random is imported
+import random
+random.seed(Global.rand_seed)
 
 class VLC(object):
     
@@ -132,16 +142,30 @@ class VLC(object):
                 tx_data_list = self.tx_data_list,
                 sync_obj = self.sync_obj
             )
+
+            printDebug(len(self.tx_data_list))
+            printDebug(self.tx_data_list)
+            # plotDebug(self.tx_data_list[0])
+            # plotDebug(self.tx_data_list[1])
+            # sad
             
             ###########################################################################
             # >>>>>>>>>> APPLY DAC ON TX_DATA, CONVERTING TO ANALOG. CAN BE 
             # >>>>>>>>>> BYPASSED BY Global.bypass_dict["DAC"]
             
-            # Applies DAC
-            self.transmitter_obj.applyDAC()
-
-            ## TODO ---- ADD HERE THE ADDITION OF THE DC VALUE OF DCO-OFDM MODULATION (VOLTAGE DOMAIN)
+            # Applies Low-Pass Filter
+            self.transmitter_obj.applyFilter(
+                filter_order = 20,
+                # cuttof = 400e6,
+                # cuttof = Global.simul_frequency*(0.3),
+                cuttof = Global.simul_frequency*(0.49),
+                filter_type = 'low'
+            )
             
+            # Applies DAC
+            self.transmitter_obj.applyDAC(offset_value = 0)
+            
+            ## TODO ---- ADD HERE THE ADDITION OF THE DC VALUE OF DCO-OFDM MODULATION (VOLTAGE DOMAIN)
             
             ###########################################################################
             # >>>>>>>>>> CALCULATES OPTICAL POWER, DEPENDING ON THE LIGHTSOURCES
@@ -156,9 +180,19 @@ class VLC(object):
             # Gets the list of optical powers to be transmitted
             tx_data_list = self.transmitter_obj.getTxOpticalOutList()
             
+            # Creates global full time vector with Global.time_frame * (number of symbols in current frame)
+            Global.full_time_vector = [np.arange(0, Global.number_of_points)*Global.time_step \
+                + idx*Global.time_frame \
+                    for idx in range(len(tx_data_list))]
+
+            printDebug(Global.full_time_vector)
+            printDebug(len(Global.full_time_vector))
+
             if self.PLOT:
                 handle = plt.figure(figsize=(8,2))
-                lib.plotTxRxDataList(tx_data_list, 'TX DATA', handle, self.sync_obj, show = False)
+                # lib.plotTxRxDataList(tx_data_list, Global.full_time_vector, 'TX DATA', handle, self.sync_obj, show = False)
+                # printDebug(Global.full_time_vector)
+                ################## lib.plotTxRxDataList(tx_data_list, Global.full_time_vector, 'TX DATA', handle, self.sync_obj, show = False)
             
             
             ###########################################################################
@@ -179,7 +213,7 @@ class VLC(object):
                 
                 raise ValueError(f"\n\n***Error --> Calculation of channel response for each LightSource, when NOT bypassing 'Channel', not implemented yet!\n")
             
-                # claculates the impulse response
+                # calculates the impulse response
                 self.channel_obj.calculatesChannelResponse()
                 
             else:
@@ -196,8 +230,10 @@ class VLC(object):
                     # self.channel_obj.setChannelResponse([...])
                     
                 else:
-                    # Set single channel response (list of 1 position)
-                    self.channel_obj.setChannelResponse(Global.list_of_channel_response)
+                    # set fake channel impulse response from input
+                    self.channel_obj.definesChannelResponse()
+                    # # Set single channel response (list of 1 position) ....
+                    # self.channel_obj.setChannelResponse(Global.list_of_channel_response)
             
             ###########################################################################
             # >>>>>>>>>> APPLY EACH CIR (FOR EACH LIGHTSOURCE) TO EACH TX_DATA.
@@ -211,9 +247,24 @@ class VLC(object):
             
             # Gets the list of optical powers at the receiver, after convolution on channel response, and noise additi-YCon.
             rx_data_list = self.channel_obj.getRxDataOut()
+
+            # Re-calculates full time vector, after convolution
+            # Creates global full time vector with Global.time_frame * (number of symbols in current frame)
+            Global.full_time_vector = [np.arange(0, len(rx_data_list[idx]))*Global.time_step \
+                + idx*Global.time_frame \
+                    for idx in range(len(rx_data_list))]
             
             if self.PLOT:
+                printDebug(len(rx_data_list[0]))
+                printDebug(len(Global.full_time_vector[0]))
+                # printDebug(rx_data_list)
+                # plotDebug(tx_data_list[0], Global.full_time_vector[0], symbols='ro-')
+                # plotDebug(tx_data_list[1], Global.full_time_vector[1], symbols='ro-')
+                # plotDebug(rx_data_list[0], Global.full_time_vector[0], symbols='ro-')
+                # plotDebug(rx_data_list[1], Global.full_time_vector[1], symbols='ro-')
+                
                 lib.plotTxRxDataList(rx_data_list, 'RX DATA', handle, self.sync_obj, show = True)
+                # lib.plotTxRxDataList(rx_data_list, 'RX DATA', handle, self.sync_obj, show = True)
             
             ###########################################################################
             # >>>>>>>>>> STARTS RECEIVER, GIVEN CONFIG
@@ -225,17 +276,51 @@ class VLC(object):
                 rx_data_list = rx_data_list,
                 sync_obj = self.sync_obj
             )
+
+            # Assemble wave train. That is, get list of convoluted signals,
+            # and assemble single wave train. This is because the convolution adds 1 OFDM symbol 
+            # from the total o N symbols (total of N + 1). On the modulator, this will be solved 
+            # when group delay is considered (that is, after data sync). The rx wave train 
+            # will be converted into a list, again.
+            self.receiver_obj.assembleWaveTrain()
+
+            # lib.plotBode(rx_data_list[0], filtered, time_frame, number_samples, cuttof)
+
+            # b = signal.firwin(80, 0.5, window=('kaiser', 8))
+            # # plotDebug(tx_data_list[0])
+            # H = np.abs(np.fft.fft(rx_data_list[0]))
+            # # H = np.fft.fft(rx_data_list[0])
+            # plotDebug(H, symbols='r-')
+            # w, h = signal.freqz(rx_data_list[0])
+            # w = w[1:]
+            # h = h[1:]
+            # fig = plt.figure()
+            # plt.title('Digital filter frequency response')
+            # ax1 = fig.add_subplot(111)
+            # plt.plot(w, 20 * np.log10(abs(h)), 'b')
+            # plt.ylabel('Amplitude [dB]', color='b')
+            # plt.xlabel('Frequency [rad/sample]')
+            # ax2 = ax1.twinx()
+            # angles = np.unwrap(np.angle(h))
+            # plt.plot(w, angles, 'g')
+            # plt.ylabel('Angle (radians)', color='g')
+            # plt.grid()
+            # plt.axis('tight')
+            # plt.show()
             
             ###########################################################################
             # >>>>>>>>>> CALCULATES PHOTOCURRENTS, DEPENDING ON THE DETECTORS
             
             # Calculates the photocurrents, provided by the detectors
+            # This provides an 'analog' voltage, with time equal to 2*Global.number_of_points
+            # This is because of the channel convolution, that will expand the signal due to delays
             self.receiver_obj.calculatesPhotocurrent()
             
             ###########################################################################
             # >>>>>>>>>> CALCULATES THE OUTPUT VOLTAGE
             
-            # Calculates the output voltage
+            # Calculates the output voltage.
+            # Here is where the current signal is sampled on the input clock sample frequency
             self.receiver_obj.calculatesOutVoltage()
             
             ###########################################################################
@@ -243,8 +328,18 @@ class VLC(object):
             
             ## TODO ---- ADD HERE THE REMOVAL OF THE DC VALUE OF DCO-OFDM DEMODULATION  (VOLTAGE DOMAIN)
 
-            # Applies ADC
-            self.receiver_obj.applyADC()
+            # Applies ADC. Passes sample frequency used on Modulator (TODO -- CHECK THIS VALUE FOR EACH)
+            self.receiver_obj.applyADC(sample_freq = self.modulator_obj.getSampleFrequency())
+            # self.receiver_obj.applyADC(sample_freq = Global.N_FFT/Global.time_frame)
+
+            # # Applies Low-Pass Filter
+            # self.receiver_obj.applyFilter(
+            #     filter_order = 20,
+            #     # cuttof = 400e6,
+            #     # cuttof = Global.simul_frequency*(0.3),
+            #     cuttof = Global.simul_frequency*(0.49),
+            #     filter_type = 'low'
+            # )
             
             
             ###########################################################################
@@ -252,6 +347,9 @@ class VLC(object):
             
             self.modulator_obj.setRxDataList(
                 self.receiver_obj.getAdcRxDataList()
+            )
+            self.modulator_obj.setRxTime(
+                self.receiver_obj.getSampledWaveTime()
             )
             
             ###########################################################################

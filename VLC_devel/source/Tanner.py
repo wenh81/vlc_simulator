@@ -52,9 +52,11 @@ class Tanner(Simulator):
         print("\nThe Tanner simulation has started. Please wait....")
         process = Popen([f'{self.tspice}', f'{self.netlist}'], stdout=PIPE, stderr=PIPE)
         stdout, stderr = process.communicate()
-        
 
+        # WHAT ABOUT IF ANY SIMUL ERROR HAPPENS???
+        
         STOP
+        
         raise ValueError(f"\n\n***Error --> start not supported yet!\n")
     
 
