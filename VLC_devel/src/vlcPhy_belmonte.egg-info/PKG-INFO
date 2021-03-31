@@ -1,0 +1,19 @@
+Metadata-Version: 2.1
+Name: vlcPhy-belmonte
+Version: 0.0.1
+Summary: This package runs a VLC phyisical link simulation (under development).
+Home-page: https://github.com/PabloBelmonte/vlc_simulator/tree/master/VLC_devel
+Author: Pablo Nunes Gra Belmonte
+Author-email: pnabelmonte@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/PabloBelmonte/vlc_simulator/tree/master/VLC_devel/issues
+Description: # VLC
+        
+        This package runs a VLC phyisical link simulation (under development).
+        
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
