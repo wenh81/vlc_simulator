@@ -9,7 +9,8 @@ class DAC(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("DAC") or self.sync_obj.getDebug("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("DAC", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("DAC")
         
@@ -58,8 +59,13 @@ class DAC(object):
                 # number of points in current time interval
                 number_of_points = int(self.time_interval/Global.time_step)
 
+                # plotDebug(tx_symbol)
                 # Do interpolation (convertion to analog). Zero-hold order.
                 tx_symbol = lib.interpolateData(np.arange(0, len(tx_symbol))*self.time_interval/len(tx_symbol), tx_symbol, number_of_points)
+                # printDebug(offset_value)
+                # printDebug(max_tx)
+                # printDebug(min_tx)
+                # plotDebug(tx_symbol)
 
                 
                 # x = tx_symbol
@@ -70,14 +76,13 @@ class DAC(object):
                 #     -> vdd = a*(max - min) + vss -> a = (vdd - vss)/(max - min)
                 # y = a*x + vss - a*min = a*(x - min) + vss -> \
                 #     y = (vdd - vss)/(max - min)*(x - min) + vss
-                
                 tx_symbol = lib.adjustRange(tx_symbol, \
                     Global.VDD_tx, Global.VSS_tx,\
                         max_tx, min_tx,\
                             offset_value)
+                # plotDebug(tx_symbol)
                 
                 # TODO -- Apply Noise.
-
                 
                 # self.dac_tx_data.append(abs(tx_symbol))
                 self.dac_tx_data.append(tx_symbol)
@@ -104,7 +109,6 @@ class DAC(object):
     @sync_track
     def getDacTxData(self):
         """Returns value of self.dac_tx_data"""
-        
         
         return self.dac_tx_data
 

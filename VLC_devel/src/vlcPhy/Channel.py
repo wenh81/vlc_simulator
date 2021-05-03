@@ -7,9 +7,8 @@ class Channel(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("Channel") or self.sync_obj.getDebug("all")
-
-        self.PLOT = self.sync_obj.getPlot("Channel") or self.sync_obj.getPlot("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("Channel", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("Channel")
         
@@ -40,16 +39,13 @@ class Channel(object):
         # Convolved data, after modulation.
         self.rx_convolved = None
 
-        # Signal to noise-ratio at the receiver (in dB)
-        self.rx_SNR = None
-
         # Average power of the optical rx_data, after the channel response.
         self.rx_optical_power = None
 
-        # Standard deviation of the rx data, given the rx_SNR
+        # Standard deviation of the rx data, given the channel_SNR
         self.rx_std = None
 
-        # Noise added by the channel, given the rx_SNR.
+        # Noise added by the channel, given the channel_SNR
         self.rx_noise = None
 
         # Convolved list of data plus noise introduced by the channel.
@@ -160,7 +156,7 @@ class Channel(object):
     
     @sync_track
     # @timer_dec
-    def applyChannelResponse(self, do_convolution = True, ):
+    def applyChannelResponse(self, do_convolution = True ):
         """Convolves the tx_data with the channel, and get the rx_data."""
         
         # If raytrace is on, calculates the SNR. Overrides previous value
@@ -188,7 +184,7 @@ class Channel(object):
 
             if do_convolution:
                 # Apply convolution
-                convolved = np.convolve(self.tx_data, CIR)
+                #### convolved = np.convolve(self.tx_data, CIR)
                 from scipy import signal
                 convolved = signal.convolve(self.tx_data, CIR)
 
@@ -237,13 +233,15 @@ class Channel(object):
             
             # search for zeros introduced by convolution, and apply tx_voltage_bias again.
             # This ensure that there are no "steps" when moving into the wave burst symbols
+            ## TODO -- Subtrair bias no inicio da convolução com canal, e adicionar de novo ao final da convolução.
             if self.IM_DD:
                 all_zeros = [np.abs(convolved) < Global.zero_slack]
-                convolved[all_zeros] += Global.tx_voltage_bias
+                # convolved[all_zeros] += Global.tx_voltage_bias
+                convolved[all_zeros] += Global.tx_voltage_bias_add
 
             # Get convolved time vector
             convolved_time = np.arange(0, len(convolved))*self.time_step
-
+            
             # Apply noise to a signal
             noisy_signal = self.applyChannelNoise(convolved)
             
@@ -284,29 +282,32 @@ class Channel(object):
     def calculatesReceiverSNR(self, SNR=None):
         """Calculates the SNR at the side of the receiver. If raytrace is on, it is calculated; if not, must pass the expected value."""
         
-        raise ValueError(f"\n\n***Error --> Calculation of rx_SNR not implemented yet!\n")
+        raise ValueError(f"\n\n***Error --> Calculation of channel_SNR not implemented yet!\n")
     
     @sync_track
     def applyChannelNoise(self, signal):
-        """Apply the noise in the channel, given the rx_SNR, and outputs the final value for the rx_data_out."""
+        """Apply the noise in the channel, given the channel_SNR, and outputs the final value for the rx_data_out."""
         
         # If noise not applieable
-        if self.rx_SNR == None:
+        if self.channel_SNR == None:
             return signal
+
         
         # Average power for the convolved signal
         signal_power = np.mean(abs(signal**2))
         
-        # Calculate the std for given signal power, based on rx_SNR
-        sigma2 = signal_power * 10**( -self.rx_SNR/10)
+        # Calculate the std for given signal power, based on channel_SNR
+        sigma2 = signal_power * 10**( -self.channel_SNR/10)
         
         # Generate noise given std
         noise = np.sqrt(sigma2/2) * (np.random.randn(*signal.shape)+1j*np.random.randn(*signal.shape))
         
-        # TODO --  IS THAT CORRECT? APPLY CIR AND THEN ABS
-        if Global.IM_DD:
-            noise = np.abs(noise)
+        # # TODO --  IS THAT CORRECT? APPLY CIR AND THEN ABS
+        # # if Global.IM_DD:
+        # if self.IM_DD:
+        #     noise = np.abs(noise)
         
+        # return lib.zeroClip(noise + signal)
         return noise + signal
     
 

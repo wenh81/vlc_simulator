@@ -9,7 +9,8 @@ class Transmitter(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("Transmitter") or self.sync_obj.getDebug("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("Transmitter", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("Transmitter")
         
@@ -101,7 +102,7 @@ class Transmitter(object):
     def applyDAC(self, offset_value = 0, IM_DD = True, time_interval = None):
         """Converts tx_data into dac values."""
         
-
+        
         # if not bypassing dac
         if not Global.bypass_dict["DAC"]:
             
@@ -111,16 +112,18 @@ class Transmitter(object):
                 time_interval = time_interval,
                 sync_obj = self.sync_obj
             )
-            
+            # plotDebug(self.tx_data_list_in[0])
             # Converts the 'tx_data' list into 'dac_tx_data' list
             self.dac_obj.convertsToAnalog(offset_value = offset_value)
             
             # Get the list of dac tx_data
             self.dac_tx_data_list = self.dac_obj.getDacTxData()
             
+            # plotDebug(self.dac_tx_data_list[0])
         else:
             #### Bypass DAC
             # self.dac_tx_data_list = self.tx_data_list_in
+            # plotDebug(self.tx_data_list_in[0])
             max_tx = np.max([np.max(tx_symbol) for tx_symbol in self.tx_data_list_in])
             min_tx = np.min([np.min(tx_symbol) for tx_symbol in self.tx_data_list_in])
             
@@ -159,12 +162,18 @@ class Transmitter(object):
             # Create all configured lamps, and pass the input info to all of them.
             # Next, should sum up their impact.
             self.createAllLamps()
+
+            raise ValueError(f"\n\n***Error --> Simulation for light sources not supported yet, at bypass_dict['LightSource'] = <{Global.bypass_dict['LightSource']}>!\n")
+
+            for lamp in self.all_lamp_arrays:
+
+                self.tx_optical_out_list = lamp.convertToOpticalPower(self.dac_tx_data_list)
+                
             
             # TODO -- DO SOME CALCULATIONS BASED ON INPUT LIGHT
             ## votlage --> current -[non-linear]-> optical
             # self.tx_optical_out_list = self.dac_tx_data_list
             
-            raise ValueError(f"\n\n***Error --> Simulation for light sources not supported yet, at bypass_dict['LightSource'] = <{Global.bypass_dict['LightSource']}>!\n")
         else:
 
             ## TODO -- Apply gain here for voltage to optical?

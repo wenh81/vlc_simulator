@@ -10,6 +10,14 @@ from .common_imports import *
 # ONLY FOR LINUX
 # import skcuda.fft as cu_fft
 
+def getDebugPlot(module_name, sync_obj):
+    """Method to return debug and plot flags for current module"""
+    DEBUG = (sync_obj.getDebug(module_name) or sync_obj.getDebug("all")) and not sync_obj.getDebug("None")
+    PLOT = (sync_obj.getPlot(module_name) or sync_obj.getPlot("all")) and not sync_obj.getPlot("None")
+
+    return DEBUG, PLOT
+
+    
 def sampleSignal(signal, time, sample_frequency):
     """Apply sampling on given signal."""
 
@@ -58,23 +66,32 @@ def assembleWaveListSameInterval(signal_list, time_interval, time_step):
     
     return out_wave_train, out_wave_time
 
-def assembleWaveListDifferentIntervals(signal_list, time_interval_list, num_symbols, time_step):
+def assembleWaveListDifferentIntervals(signal_list, time_interval_list, num_symbols, time_step, offset = 0):
     """Given list of signals, list of time intervals for each symbol, and number of symbol for each, concatenate them on a single np array, given the same time step defining distance between points in each wave."""
     
     total_duration = np.sum([sym_duration*num_symbols[idx] for idx, sym_duration in enumerate(time_interval_list)])
     # total_duration = np.sum(time_interval_list)
     total_number_of_points = int(total_duration/time_step)
     all_zeros = np.zeros(total_number_of_points)
+    base_values = all_zeros.copy()*(0+0j)
+    # all_zeros = np.ones(total_number_of_points)
 
-    printDebug(total_duration)
+    # printDebug(total_duration)
 
-    out_wave = all_zeros.copy()*(0+0j)
+    # out_wave = all_zeros.copy()*(0+0j)
+    out_wave = base_values.copy()
+    # # Set the offset value as the base for the 
+    # out_wave = all_zeros.copy() + (offset + offset*1j)
+
     
     number_of_points = 0
     for idx,data in enumerate(signal_list):
 
+
         # starts vector with all zeros plus actual data
-        new_data = sumVectosDiffSizes(all_zeros.copy()*(0+0j), data)
+        # new_data = sumVectosDiffSizes(all_zeros.copy()*(0+0j), data)
+        new_data = sumVectosDiffSizes(base_values.copy(), data)
+        # new_data = sumVectosDiffSizes(all_zeros.copy() + (offset + offset*1j), data)
         
         # plotDebug(new_data, np.arange(0, len(new_data))*time_step)
         new_data = np.roll(new_data, number_of_points)
@@ -85,6 +102,9 @@ def assembleWaveListDifferentIntervals(signal_list, time_interval_list, num_symb
 
         out_wave = sumVectosDiffSizes(out_wave, new_data)
         out_wave_time = np.arange(0, len(out_wave))*time_step
+    
+    # Remove 'zeros'
+    out_wave[out_wave == 0] = offset
     
     return out_wave, out_wave_time
 
@@ -299,13 +319,19 @@ def printDebug(signal = None, details = False, plot = False, stop = False, stop_
         else:
             raise ValueError(stop_message)
 
-def adjustRange(signal, new_max, new_min, old_max, old_min, offset):
+def adjustRange(signal, new_max, new_min, old_max, old_min, offset = 0):
     """Adjust signal to some new range."""
     
     # TODO --- Remove offset from here
+    
+    new_min = new_min + offset
+    if new_min > new_max:
+        raise ValueError(f"\n\n***Error --> Can't define maximum ({new_max}) smaller than minimum ({new_min - offset}) + offset ({offset})!\nCheck the defined voltage ratings.\n")
 
     return (new_max - (new_min))/(old_max - old_min)\
-        *(signal - old_min) + (new_min) + (offset)
+        *(signal - old_min) + (new_min)
+    # return (new_max - (new_min))/(old_max - old_min)\
+    #     *(signal - old_min) + (new_min) + (offset)
     # return (new_max - (new_min + offset))/(old_max - old_min)\
     #     *(signal - old_min) + (new_min + offset)
 

@@ -8,9 +8,8 @@ class MeritFunctions(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("MeritFunctions") or self.sync_obj.getDebug("all")
-        
-        self.PLOT = self.sync_obj.getPlot()
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("MeritFunctions", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("MeritFunctions")
         

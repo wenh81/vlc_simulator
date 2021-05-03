@@ -23,6 +23,9 @@ import os
 from commpy.modulation import QAMModem, PSKModem, ofdm_tx
 from subprocess import Popen, PIPE
 
+from sklearn.metrics import mean_squared_error
+# from scipy.optimize import fmin
+
 # from scipy.signal import correlate
 # import pycuda.autoinit
 # import pycuda.gpuarray as gpuarray

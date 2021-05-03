@@ -2,13 +2,14 @@ from .common_imports import *
 
 class Receiver(object):
     
-    def __init__(self, receiver_config, roic_config, rx_data, rx_time, sample_freq, sample_phase, sync_obj):
+    def __init__(self, receiver_config, roic_config, rx_data, rx_time, sample_freq, sample_phase, adc_configuration, sync_obj):
         """Constructor of receiver. Receives a array of lights."""
         
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("Receiver") or self.sync_obj.getDebug("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("Receiver", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("Receiver")
         
@@ -20,6 +21,9 @@ class Receiver(object):
         
         # Sample phase for the receiver
         self.sample_phase = sample_phase
+
+        # Voltage references / number of bits
+        self.adc_configuration = adc_configuration
         
         # Contains list of dicts with all information needed to configure the detectors on the receiver. Each position has a dict, with the type of detector, the position for each detector, and angle. Can be used to configure more than one array of detectors.
         self.receiver_config = receiver_config
@@ -32,6 +36,9 @@ class Receiver(object):
         
         # Data time related to input data
         self.rx_time = rx_time
+        
+        # Flag that indicates if adc was already applied for this wave
+        self.applied_offset = False
         
         # # rx data list for all photocurrents
         # self.rx_photocurrent = []
@@ -121,7 +128,9 @@ class Receiver(object):
             
             raise ValueError(f"\n\n***Error --> Simulation for detectors not supported yet, at bypass_dict['Detector'] = <{Global.bypass_dict['Detector']}>!\n")
         else:
+
             # If bypassing, just pass the rx data list
+            ### TODO --- Add responsivity here for 'dummy' calc? Or inside the Detector?
             self.rx_photocurrent = self.rx_data
             
         # printDebug(len(self.rx_photocurrent[0]))
@@ -247,11 +256,18 @@ class Receiver(object):
     #     #     for rx_data in self.adc_rx_data_list]
     
     @sync_track
-    def applyADC(self, offset_value = 0):
+    def applyADC(self, offset_value : float = 0, override_freq : float = None, IM_DD : bool = False):
         """Converts rx_voltage into adc values."""
         
-        # Remove offset, before ADC / or bypass
-        self.rx_voltage -= offset_value
+        if override_freq is not None:
+            self.sample_freq = override_freq
+
+        # printDebug(offset_value)
+        # plotDebug(self.rx_voltage, symbols='bo-', hold=True)
+        if not self.applied_offset:
+            # Remove offset, before ADC / or bypass
+            self.rx_voltage -= offset_value
+            self.applied_offset = True
 
         # plotDebug(self.rx_voltage, symbols='ro-')
 
@@ -263,6 +279,7 @@ class Receiver(object):
                 rx_data = self.rx_voltage,
                 rx_time = self.rx_time,
                 sample_freq = self.sample_freq,
+                adc_configuration = self.adc_configuration,
                 sync_obj = self.sync_obj
             )
             
@@ -270,8 +287,15 @@ class Receiver(object):
             self.sampled_wave, self.sampled_wave_time = self.adc_obj.convertsToDigital()
             
         else:
+            # plotDebug(self.rx_voltage, self.rx_time)
             # Bypass ADC -- sample voltage given input frequency
             self.sampled_wave, self.sampled_wave_time = lib.sampleSignal(self.rx_voltage, self.rx_time, self.sample_freq)
+        
+        if IM_DD:
+            # remove zero
+            self.sampled_wave = lib.zeroClip(self.sampled_wave)
+            
+        # plotDebug(self.sampled_wave)
 
     @sync_track
     def getReceiverConfig(self):
@@ -297,6 +321,18 @@ class Receiver(object):
         
         self.rx_data = rx_data_in_list
     
+    @sync_track
+    def getRxVoltage(self):
+        """Returns value of self.rx_voltage"""
+        
+        return self.rx_voltage
+
+    @sync_track
+    def setRxVoltage(self, rx_voltage):
+        """Set new value for self.rx_voltage"""
+        
+        self.rx_voltage = rx_voltage
+        
     @sync_track
     def getRxPhotocurrent(self):
         """Returns value of self.rx_photocurrent"""

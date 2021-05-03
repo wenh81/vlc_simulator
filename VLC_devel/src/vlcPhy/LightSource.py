@@ -8,7 +8,8 @@ class LightSource(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("LightSource") or self.sync_obj.getDebug("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("LightSource", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("LightSource")
         

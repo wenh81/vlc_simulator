@@ -4,6 +4,8 @@ from .common_imports import *
 # global debug flag
 DEBUG = {
     "all": False,
+    "None": False,
+    "None": True,
     "VLC": True,
     "Message": False,
     "Transmitter": False,
@@ -28,12 +30,17 @@ DEBUG = {
 # global plot flag
 PLOT = {
     "all": False,
-    "VLC": False,
+    # "None": False,
+    "None": True,
+    # "VLC": False,
+    "VLC": True,
     "Message": False,
     "Transmitter": False,
     "Mapping": False,
     "Modulator": False,
+    # "Modulator": True,
     "OFDM": False,
+    # "OFDM": True,
     "DAC": False,
     "Channel": False,
     # "Channel": True,
@@ -62,7 +69,8 @@ bypass_dict = {
     "Detector": True,
     # "ROIC": False, ## Read-Out Integrated Circuit ON
     "ROIC": True, ## NO ROIC
-    "ADC": True,
+    # "ADC": True,
+    "ADC": False,
     "ADC_rounding_or_simul": True
 }
 
@@ -80,7 +88,7 @@ rand_seed = 10
 # simulation time frame [1/(operating frequency)] for each transaction
 time_frame = 50e-6
 time_frame = 5e-6
-# time_frame = 1e-6
+time_frame = 1e-6
 # time_frame = 170e-9
 # time_frame = 0.3e-6
 # time_frame = 2e-6
@@ -109,6 +117,17 @@ VDD_rx = 3.3
 VSS_rx = 0
 tx_voltage_bias_add = 1.5 ## For IM/DD, it's the bias applied on the LED on TX.
 rx_voltage_bias_subtract = 1.5 ## For IM/DD, it's the bias applied on the LED on RX.
+# tx_voltage_bias_add = 0 ## For IM/DD, it's the bias applied on the LED on TX.
+# rx_voltage_bias_subtract = 0 ## For IM/DD, it's the bias applied on the LED on RX.
+
+# Total voltage bias for DCO-OFDM
+# DCO_BIAS = 0.5
+DCO_BIAS = 1.5
+# DCO_BIAS = 0
+
+# ADC references
+adc_configuration = {"vref_plus": VDD_rx, "vref_minus": VSS_rx, "n_bits": 8}
+# adc_configuration = {"vref_plus": VDD_rx, "vref_minus": VSS_rx, "n_bits": 12}
 
 # type of interpolation
 interpolation_type = 'linear'
@@ -161,23 +180,26 @@ c_speed = 3e8
 attenuation = 1
 # attenuation = 0.3
 group_delay = 0
-# group_delay = 100e-9
-# group_delay = 200e-9
+group_delay = 10e-9
+group_delay = 40e-9
+group_delay = 113e-9
+group_delay = 200e-9
 # group_delay = 400e-9
 # group_delay = 500e-9
 # group_delay = 520e-9
 # group_delay = 0e-9
 # group_delay = 0
 dist = [1, 1.2, 1.4, 1.9, 2.3, 5, 20]
-# dist = [1, 1.2, 1.4, 1.9, 2.3]
+dist = [1, 1.2, 1.4, 1.9, 2.3]
 # dist = [1, 1.2, 1.1]
-# dist = [1, 1.1]
-dist = [1, 1.01]
+dist = [1, 1.1]
+# dist = [1, 1.01]
 # dist = [2, 2.1]
-# dist = [1]
+dist = [1]
 # group_delay = 0
 dist = list(np.array(dist))
 response = [(attenuation/(d**2), group_delay+d/c_speed) for d in dist]
+
 response = [(attenuation/(d**2), d*group_delay) for d in dist]
 # response = [(attenuation/(d**2), group_delay+d/c_speed) for d in dist]
 # response = [(1, 200e-9), (1, 500e-9)]
@@ -220,12 +242,12 @@ list_of_channel_response = [CIR[4]]
 # list_of_channel_response = [0.1*np.array([1, 0, 0.3+0.3j])]
 
 # rx_SNR (dB) is ued if not set, if not calculated. Can use <None> to ignore noise
-rx_SNR_dB = None
-# rx_SNR_dB = 50
-# rx_SNR_dB = 30
+rx_SNR_dB = 50
+rx_SNR_dB = 30
 # rx_SNR_dB = 25
 # rx_SNR_dB = 20
 # rx_SNR_dB = 10
+rx_SNR_dB = None
 
 # TODO --- add timeunits to the program
 timeunit = "ns"
@@ -347,8 +369,10 @@ import random
 # payload_data = {"type": ["bin"], "data": ["11111111111111111111111111111111"]}
 payload_data = {"type": ["bin"], "data": ["0100010100111011000110110011100111110101110100010100001000100011"]}
 payload_data = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 256)])]}
+# payload_data = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 64)])]}
+# payload_data = {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 128)])]}
 # 256-bit
-payload_data = {"type": ["bin"], "data": ["0110000011100001011100010000000110101010110000100011110110001001100001110011000001111100110000101100001011110100100011010010000110001110000010000101101100101011101110010011011011111011100101111010000010001110100111010010000010100101110011111111111011010011"]}
+# payload_data = {"type": ["bin"], "data": ["0110000011100001011100010000000110101010110000100011110110001001100001110011000001111100110000101100001011110100100011010010000110001110000010000101101100101011101110010011011011111011100101111010000010001110100111010010000010100101110011111111111011010011"]}
 # payload_data = {"type": ["bin"], "data": ["00011100001110011000001111100110000101100001011110100100011010010000110001110000010000101101100101011101110010011011011111011100101111010000010001110100111010010000010100101110011111111111011010011"]}
 
 # supported input_info types
@@ -451,52 +475,119 @@ modulation_config = {
                     "n_fft": 16, # 64-bit data, with 1 bit symbol = 4x16 data FFT (all are 'pilots')
                     "pilots": [], ## no pilots here, b/c all will be used for channel estimation
                     "IM_DD": True,
-                    "n_cp": 4
+                    "n_cp": 10
                     },
                 
                 "ACO-OFDM-TDP": {
                     "type": "OFDM",
                     "ofdm_type": {"ACO-OFDM": []},
-                    "n_fft": 16, # 15-bit data with 1 bit symbol -> 15 data FFT  + 1 pilot
-                    "pilots": [0],
+                    # "n_fft": 16, # 15-bit data with 1 bit symbol -> 15 data FFT  + 1 pilot
+                    # "pilots": [1, 5],
+                    # "n_fft": 52,
+                    # "pilots": [5, 19], 
+                    "n_fft": 64,
+                    "pilots": [5, 19], #### this values just works for ACO
                     "IM_DD": True,
                     "n_cp": 4
+                    },
+                
+                "ACO-OFDM-ZEROS": {
+                    "type": "OFDM",
+                    "ofdm_type": {"ACO-OFDM": []},
+                    # "n_fft": 52*2, # number of IFFT stages
+                    "n_fft": 64*2, # number of IFFT stages #### this values just works for ACO
+                    "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    "IM_DD": True,
+                    "n_cp": 10
                     },
                 
                 "ACO-OFDM-DATA": {
                     "type": "OFDM",
                     "ofdm_type": {"ACO-OFDM": []},
-                    "n_fft": 52, # number of IFFT stages
-                    "pilots": [5, 19], 
+                    # "n_fft": 52, # number of IFFT stages
+                    # "pilots": [5, 19], 
+                    # "pilots": [1, 9, 15, 23], 
+                    "n_fft": 52*2, # number of IFFT stages
+                    "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
                     "IM_DD": True,
-                    "n_cp": 4
+                    "n_cp": 10
+                    },
+
+                "ACO-OFDM-DATA2": {
+                    "type": "OFDM",
+                    "ofdm_type": {"ACO-OFDM": []},
+                    # "n_fft": 52, # number of IFFT stages
+                    # "pilots": [5, 19], 
+                    # "pilots": [1, 9, 15, 23], 
+                    # "n_fft": 52*2, # number of IFFT stages
+                    # "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    "n_fft": 128, # number of IFFT stages
+                    "pilots": [5, 19, 33, 47, 59], ## equivalent to [-21, -7, +7, +21]
+                    "IM_DD": True,
+                    "n_cp": 10
                     },
 
                 "DCO-OFDM-FLP": {
                     "type": "OFDM",
-                    "ofdm_type": {"DCO-OFDM": [5-tx_voltage_bias_add]},
+                    "ofdm_type": {"DCO-OFDM": [DCO_BIAS]},
                     "n_fft": 16, # 64-bit data, with 1 bit symbol = 4x16 data FFT (all are 'pilots')
                     "pilots": [], ## no pilots here, b/c all will be used for channel estimation
                     "IM_DD": True,
-                    "n_cp": 4
+                    "n_cp": 10
                     },
                 
                 "DCO-OFDM-TDP": {
                     "type": "OFDM",
-                    "ofdm_type": {"DCO-OFDM": [5-tx_voltage_bias_add]},
-                    "n_fft": 16, # 15-bit data with 1 bit symbol -> 15 data FFT  + 1 pilot
-                    "pilots": [0],
+                    "ofdm_type": {"DCO-OFDM": [DCO_BIAS]},
+                    # "n_fft": 16, # 15-bit data with 1 bit symbol -> 15 data FFT  + 1 pilot
+                    # "pilots": [1, 6],
+                    # "n_fft": 52,
+                    # "pilots": [5, 19], 
+                    "n_fft": 64,
+                    "pilots": [5, 15, 19], #### this values just works for DCO
                     "IM_DD": True,
                     "n_cp": 4
                     },
                 
-                "DCO-OFDM-DATA": {
+                "DCO-OFDM-ZEROS": {
                     "type": "OFDM",
-                    "ofdm_type": {"DCO-OFDM": [5-tx_voltage_bias_add]},
-                    "n_fft": 52, # number of IFFT stages
-                    "pilots": [5, 19], 
+                    "ofdm_type": {"DCO-OFDM": [DCO_BIAS]},
+                    # "n_fft": 52*2, # number of IFFT stages
+                    # "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    # "n_fft": 64*2, # number of IFFT stages
+                    # "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    "n_fft": 48, # number of IFFT stages
+                    "pilots": [5, 19], ## equivalent to [-21, -7, +7, +21]
                     "IM_DD": True,
                     "n_cp": 4
+                    },
+
+                "DCO-OFDM-DATA": {
+                    "type": "OFDM",
+                    "ofdm_type": {"DCO-OFDM": [DCO_BIAS]},
+                    # "n_fft": 52, # number of IFFT stages
+                    # "pilots": [5, 19], 
+                    # "pilots": [1, 9, 15, 23], 
+                    "n_fft": 52*2, # number of IFFT stages
+                    "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    "IM_DD": True,
+                    "n_cp": 10
+                    },
+
+                "DCO-OFDM-DATA2": {
+                    "type": "OFDM",
+                    "ofdm_type": {"DCO-OFDM": [DCO_BIAS]},
+                    # "n_fft": 52, # number of IFFT stages
+                    # "pilots": [5, 19], 
+                    # "pilots": [1, 9, 15, 23], 
+                    "n_fft": 52*2, # number of IFFT stages
+                    "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    # "n_fft": 128, # number of IFFT stages
+                    # "pilots": [5, 19, 33, 47, 59], ## equivalent to [-21, -7, +7, +21]
+                    # "n_fft": 64, # number of IFFT stages
+                    # "pilots": [1, 9, 15, 23], 
+                    "IM_DD": True,
+                    "n_cp": 10
                     },
 
                 "RF-OFDM-FLP": {
@@ -511,8 +602,30 @@ modulation_config = {
                 "RF-OFDM-TDP": {
                     "type": "OFDM",
                     "ofdm_type": {"RF-OFDM": ""},
-                    "n_fft": 32, # 15-bit data with 1 bit symbol -> 15 data FFT  + 1 pilot (twice)
-                    "pilots": [7, 23], ## [-8, +8]
+                    # "n_fft": 32, # 16-bit data with 1 bit symbol -> 15 data FFT  + 1 pilot (twice)
+                    "n_fft": 52, # 16-bit data with 1 bit symbol -> 15 data FFT  + 1 pilot (twice)
+                    # "pilots": [7, 23], ## [-8, +8]
+                    # "pilots": [3, 7, 13, 17, 23, 28], ## [-8, +8]
+                    "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    "IM_DD": False,
+                    "n_cp": 10
+                    },
+                "RF-OFDM-ZEROS": {
+                    "type": "OFDM",
+                    "ofdm_type": {"RF-OFDM": ""},
+                    "n_fft": 52, # number of IFFT stages
+                    "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    "IM_DD": False,
+                    "n_cp": 10
+                    },
+
+                "RF-OFDM-DATA2": {
+                    "type": "OFDM",
+                    "ofdm_type": {"RF-OFDM": "802.11a OFDM"},
+                    # "n_fft": 52, # number of IFFT stages
+                    # "pilots": [5, 19, 33, 47], ## equivalent to [-21, -7, +7, +21]
+                    "n_fft": 128, # number of IFFT stages
+                    "pilots": [5, 19, 33, 47, 128-47, 128-19, 128-33, 128-5], ## equivalent to [-21, -7, +7, +21]
                     "IM_DD": False,
                     "n_cp": 10
                     },
@@ -556,6 +669,10 @@ mapping_config = {
 log_results = "log_results.log"
 
 
+USED_OFDM_TYPE = "RF"
+USED_OFDM_TYPE = "DCO"
+# USED_OFDM_TYPE = "ACO"
+
 ###############
 ## TODO -- Convert the TX/RX info decode into a 'burst' config, as below
 # Setups the burst.
@@ -564,146 +681,85 @@ log_results = "log_results.log"
 # each will run a sumbol tx with its own characteristics.
 burst_config = {
                 'fields': ['SHR', '__PAYLOAD__'],
+                # 'fields': ['SHR'] + ['__PAYLOAD__']*4,
+                'fields': ['SHR', '_ZEROS_', '__PAYLOAD__', '_ZEROS_'],
+                # 'fields': ['SHR'],
                 'SHR': { ## Synchronization Header
                     'subfields': ['FLP'],
                     # 'subfields': ['FLP', 'TDP', 'TDP', 'TDP', 'TDP', 'TDP', 'TDP'],
                     # 'subfields': ['FLP', 'TDP'],
+                    'subfields': ['FLP', 'TDP', 'TDP'],
+                    # 'subfields': ['FLP'] + ['TDP']*2,
                     'FLP': { ## Fast-locking Pattern
                         'sync': True, ## sets this pattern as a sync pattern to get the phase delay. This WON'T be converted into actual data.
                         'duration': 1e-6,
+                        # 'sample_frequency_ratio': 10,
+                        # 'sample_frequency_ratio': 10,
+                        'sample_frequency_ratio': 2,
+                        'sample_frequency_ratio': 5,
                         'mapping_index': 'BPSK',
                         'pilots_mapping_index': 'BPSK',
                         # 'modulation_index': "ACO-OFDM-FLP",
                         # 'modulation_index': "DCO-OFDM-FLP",
-                        'modulation_index': "RF-OFDM-FLP",
+                        # 'modulation_index': "RF-OFDM-FLP",
+                        'modulation_index': f"{USED_OFDM_TYPE}-OFDM-FLP",
                         # 'data': {"type": ["bin"], "data": ["101010101010101010101010101010"]}, # Base pattern, used for sync: 32-bit
                         # 'data': {"type": ["bin"], "data": ["10101010101010101010101010101010"]}, # Base pattern, used for sync: 32-bit
                         # 'data': {"type": ["bin"], "data": ["01010101010101010101010101010101"]}, # Base pattern, used for sync: 32-bit
                         # 'data': {"type": ["bin"], "data": ["10101010101010101010101010101010"]}, # Base pattern, used for sync: 16-bit
                         'data': {"type": ["bin"], "data": [''.join(['10']*32)] }, # Base pattern, used for sync: 64-bit
+                        # 'data': {"type": ["bin"], "data": [''.join(['10']*64)] }, # Base pattern, used for sync: 64-bit
                         'method_tx': "FLPEncode@OFDM",
                         'method_rx': "FLPDecode@OFDM",
                         'args_rx': "arg0,arg1"
                     },
                     'TDP': { ## Topology Dependent Pattern
                         'duration': 1e-6,
+                        'sample_frequency_ratio': 2,
                         'mapping_index': 'BPSK',
                         'pilots_mapping_index': 'BPSK',
                         # 'modulation_index': "ACO-OFDM-TDP", # with 15-bit, use one bit as pilots, and BPSK
                         # 'modulation_index': "DCO-OFDM-TDP", # with 15-bit, use one bit as pilots, and BPSK
-                        'modulation_index': "RF-OFDM-TDP", # with 15-bit, use one bit as pilots, and BPSK
-                        'data': {"type": ["bin"], "data": ['101011101111010010100010000101'] }, # 15-bit pattern: identifiesthe network topology: only visibility, peer-to-peer, star, and broadcast
+                        # 'modulation_index': "RF-OFDM-TDP", # with 15-bit, use one bit as pilots, and BPSK
+                        'modulation_index': f"{USED_OFDM_TYPE}-OFDM-TDP",
+                        # 'data': {"type": ["bin"], "data": ['101011101111010010100010000101'] }, # 15-bit pattern: identifies the network topology: only visibility, peer-to-peer, star, and broadcast
+                        'data': {"type": ["bin"], "data": ['1010111011110100101000100001010'] }, # 16-bit pattern: identifies the network topology: only visibility, peer-to-peer, star, and broadcast
+                    }
+                },
+                '_ZEROS_': {
+                    'subfields': ['ZEROS'],
+                    'ZEROS': { ## Onle zeros
+                        'duration': 1e-6,
+                        'sample_frequency_ratio': 2,
+                        'mapping_index': 'BPSK',
+                        'pilots_mapping_index': 'BPSK',
+                        # 'modulation_index': "RF-OFDM-ZEROS",
+                        'modulation_index': f"{USED_OFDM_TYPE}-OFDM-ZEROS",
+                        'data': {"type": ["bin"], "data": [''.join(['0']*64)] },
                     }
                 },
                 '__PAYLOAD__': {
                     'subfields': ['__DATA__'],
                     '__DATA__': {
                         'duration': 1e-6,
+                        'sample_frequency_ratio': 2,
+                        # 'sample_frequency_ratio': 4,
                         'mapping_index': '4-QAM',
                         # 'mapping_index': 'BPSK',
                         'pilots_mapping_index': 'BPSK',
                         # 'pilots_mapping_index': '4-QAM',
                         # 'modulation_index': "ACO-OFDM-DATA",
                         # 'modulation_index': "DCO-OFDM-DATA",
-                        'modulation_index': "RF-OFDM-DATA",
-                        'data': payload_data
-                    },
-                }
-}
-
-
-
-
-burst_config_1 = {
-                'sequence': ['SHR', 'PHR', '__PAYLOAD__'],
-                'SHR': { ## Synchronization Header
-                    'fields': ['FLP', 'TDP'],
-                    'FLP': { ## Fast-locking Pattern
-                        'duration': 1e-6,
-                        'mapping_index': [0],
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': ["1010101010101010"],
-                        'method': "FLPDecode@OFDM"
-                    },
-                    'TDP': { ## Test-dependent Pattern
-                        'duration': 1e-6,
-                        'mapping_index': [0],
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': ["111111111111111000000000000000111111111111111000000000000000"],
-                        'method': "TDPecode@OFDM"
-                    }
-                },
-                'PHR': { ## Physical-layer Header
-                    'fields': ['Header', 'HCS'],
-                    'Header': { ## Header :{[31:31] Burstmode, [30:28] Channel number, [27:22] MCS ID, [21:6] PSDU len, [5:5] Dimmed OOK, [4:0] Reserved}
-                        'duration': 1e-6,
-                        'mapping_index': [0],
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': ["some 32 bits here"],
-                        'method': "HeaderDecode@OFDM"
-                    },
-                    'HCS': { ## Header-Check sequence -- checks CRC for Header
-                        'duration': 1e-6,
-                        'mapping_index': [0],
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': ["some 32 bits here"],
-                        'method': "HCSDecode@OFDM"
-                    }
-                },
-                '__PAYLOAD__': {
-                    'fields': ['DATA'],
-                    'DATA': {
-                        'duration': 1e-6,
-                        'mapping_index': [0],
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': ['DATA'],
-                        "method": None
-                    },
-                }
-}
-
-burst_config_2 = {
-                'sequence': ['preamble', 'signal', 'PAYLOAD'],
-                'preamble': {
-                    'fields': ['short', 'long'], ## used to estimate channel
-                    'short': {
-                        'duration': 1e-6,
-                        'mapping_index': [0],
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': 'TBD'
-                    },
-                    'long': {
-                        'duration': 2e-6,
-                        'mapping_index': [0],
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': 'TBD'
-                    },
-                },
-                'signal': {
-                    'fields': ['info'],
-                    'info': {
-                        'duration': 1e-6,
-                        'mapping_index': [4], ## BPSK
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': ['rate_info', 'length_info']
-                    },
-                },
-                'PAYLOAD': {
-                    'fields': ['DATA'],
-                    'DATA': {
-                        'duration': 1e-6,
-                        'mapping_index': [0],
-                        'pilots_mapping_index': [4], ## BPSK
-                        'modulation_index': [0],
-                        'data': ['DATA']
+                        # 'modulation_index': "RF-OFDM-DATA",
+                        'modulation_index': f"{USED_OFDM_TYPE}-OFDM-DATA",
+                        'modulation_index': f"{USED_OFDM_TYPE}-OFDM-DATA2",
+                        # 'data': {"type": ["bin"], "data": ['10101110111101001010001000010101'] }
+                        # 'data': {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 64)])]}
+                        # 'data': {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 256)])]}
+                        # 'data': {"type": ["bin"], "data": [''.join([str(random.randint(0, 1)) for j in range(0, 32)])]}
+                        
+                        'data': {"type": ["bin"], "data": ["0110000011100001011100010000000110101010110000100011110110001001100001110011000001111100110000101100001011110100100011010010000110001110000010000101101100101011101110010011011011111011100101111010000010001110100111010010000010100101110011111111111011010011"]}
+                        # 'data': payload_data
                     },
                 }
 }

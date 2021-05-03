@@ -8,7 +8,7 @@ class SimulationSync(object):
         
         self.PLOT = PLOT
         
-        if self.DEBUG["all"] or self.DEBUG["SimulationSync"]:
+        if (self.DEBUG["all"] or self.DEBUG["SimulationSync"]) and not self.DEBUG["None"]:
             print('Running SimulationSync...')
         
         # String with the followed path for the whole simulation
@@ -30,7 +30,7 @@ class SimulationSync(object):
         """Set new value for self.simulation_path"""
         
         # If simul sync is enabled
-        if self.DEBUG["all"] or self.DEBUG["SimulationSync"]:
+        if (self.DEBUG["all"] or self.DEBUG["SimulationSync"]) and not self.DEBUG["None"]:
             # Append previous info
             next_path = f"Called << {next_path} >> From << {self.previous} >>"
             
@@ -47,7 +47,7 @@ class SimulationSync(object):
         """Returns value of self.simulation_path"""
         
         # If simul sync is not enabled
-        if not self.DEBUG["all"] and not self.DEBUG["SimulationSync"]:
+        if (not self.DEBUG["all"] and not self.DEBUG["SimulationSync"]) or self.DEBUG["None"]:
             return "<< SimulationSync DEBUG is disabled! >>"
         
         tabular_data = self.simulation_path.replace('\n', '')\

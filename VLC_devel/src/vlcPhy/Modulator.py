@@ -9,9 +9,8 @@ class Modulator(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("Modulator") or self.sync_obj.getDebug("all")
-
-        self.PLOT = self.sync_obj.getPlot("Modulator") or self.sync_obj.getPlot("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("Modulator", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("Modulator")
         
@@ -189,8 +188,9 @@ class Modulator(object):
                         decoded_sequence = decoded_sequence,
                         seq_idx = seq_idx
                     )
-                    # printDebug(delay_time)
-                    # printDebug(delay_steps)
+                    if self.DEBUG:
+                        printDebug(delay_time)
+                        printDebug(delay_steps)
                     rx_data_synced = True
                 else:
                     # Check if any of the subfields in the sequence are "True" for "sync". If so, raise error, that the first subfield should be the sync one.
@@ -204,14 +204,71 @@ class Modulator(object):
             else:
             # if decoded_sequence['seq_sync'][seq_idx] is None:
 
-                # Shift rx data by delay value calculated in previous sequence steps
-                self.rx_data = np.roll(self.rx_data, -delay_steps)
+                # # Shift rx data by delay value calculated in previous sequence steps
+                # self.rx_data = np.roll(self.rx_data, -delay_steps)
 
-                # If not at 'sync' subfield, then get only the part of data related to currente sequence data.
-                min_r = int(decoded_sequence['seq_start_time'][seq_idx] * self.sample_frequency)
-                max_r = int(decoded_sequence['seq_end_time'][seq_idx] * self.sample_frequency)
+                # Get steps from the delay time itself. TODO -- Given that the samplefreq is updated here to the current sequence step.
+                # TODO -- WHAT IF THE OFDM DURATION IS DIFFERENT? Is the sum of 'delay_steps' enough?
+                delay_steps = int(delay_time*self.sample_frequency)
+                printDebug(delay_steps)
+
+
+                # # If not at 'sync' subfield, then get only the part of data related to currente sequence data.
+                # min_r = int(decoded_sequence['seq_start_time'][seq_idx] * self.sample_frequency)
+                # max_r = int(decoded_sequence['seq_end_time'][seq_idx] * self.sample_frequency)
+                # min_r = int((decoded_sequence['seq_start_time'][seq_idx] + delay_time) * self.sample_frequency )
+                # max_r = int((decoded_sequence['seq_end_time'][seq_idx] + delay_time) * self.sample_frequency )
+                min_r = int(np.round((decoded_sequence['seq_start_time'][seq_idx] + delay_time) * self.sample_frequency))
+                max_r = int(np.round((decoded_sequence['seq_end_time'][seq_idx] + delay_time) * self.sample_frequency))
+                # min_r = int(np.round(decoded_sequence['seq_start_time'][seq_idx] * self.sample_frequency))
+                # max_r = int(np.round(decoded_sequence['seq_end_time'][seq_idx] * self.sample_frequency))
+                
+                # Find min of rx_time - forwarded time, and get closest time positions
+                temp = list(np.abs(self.rx_time - (decoded_sequence['seq_start_time'][seq_idx] + delay_time)))
+                min_r = temp.index(min(temp))
+                temp = list(np.abs(self.rx_time - (decoded_sequence['seq_end_time'][seq_idx] + delay_time)))
+                max_r = temp.index(min(temp))
+                
+                # # range_symbol = (self.rx_time > decoded_sequence['seq_start_time'][seq_idx]) and (self.rx_time < decoded_sequence['seq_end_time'][seq_idx])
+                # # Check for the range where 
+                # range_symbol_0 = np.array(self.rx_time >= (decoded_sequence['seq_start_time'][seq_idx] + delay_time))
+                # range_symbol_1 = np.array(self.rx_time <= (decoded_sequence['seq_end_time'][seq_idx] + delay_time))
+                # range_symbol = range_symbol_0 & range_symbol_1
+                # ### TODO --- If I change the sample frequency, it breaks...
+                # printDebug(decoded_sequence['seq_start_time'][seq_idx])
+                # printDebug(decoded_sequence['seq_end_time'][seq_idx])
+                # printDebug(range_symbol)
+                # printDebug(self.rx_time[range_symbol])
+                # printDebug(self.sample_frequency)
+
+                # printDebug(max_r)
+                # printDebug(min_r)
+
+                # # Add the delay steps calculated before, if available
+                # min_r += delay_steps
+                # max_r += delay_steps
+
+                # # Make sure that rx and tx data the same length in number os points for cross-correlation
+                # max_r -= (max_r - min_r) - len(tx_data)
+                # rx_data = self.rx_data[min_r:max_r]
+                # printDebug(min_r)
+                # printDebug(max_r)
+
+                if self.PLOT:
+                    if self.DEBUG:
+                        printDebug(self.rx_data)
+                        printDebug(delay_time)
+                        printDebug(delay_steps)
+                        printDebug(min_r)
+                        printDebug(max_r)
+                    plotDebug(self.rx_data, self.rx_time, symbols='ro-', hold=True, title="Synced: Before synchronization of Rx data")
+                    plotDebug(self.rx_data[min_r:], self.rx_time[min_r:], symbols='bo-', hold=True)
+                    plotDebug(self.rx_data[min_r:max_r], self.rx_time[min_r:max_r], symbols='ko-', hold=False)
+                    # plotDebug(self.rx_data[range_symbol], self.rx_time[range_symbol], symbols='ko-', hold=False)
 
                 # Before de-modulation, we need to setup the rx_data, with range related to current sequence data
+                # self.ofdm_obj.setOFDMRxData(self.rx_data[range_symbol])
+                # self.ofdm_obj.setOFDMTime(self.rx_time[range_symbol])
                 self.ofdm_obj.setOFDMRxData(self.rx_data[min_r:max_r])
                 self.ofdm_obj.setOFDMTime(self.rx_time[min_r:max_r])
                 
@@ -220,7 +277,11 @@ class Modulator(object):
                     self.list_of_channel_response
                 )
                 
-
+                # Set the sample frequency
+                self.ofdm_obj.setSampleFrequency(
+                    self.sample_frequency
+                )
+                
                 # # If data is already synced
                 # modulation_config = decoded_sequence['seq_mod'][seq_idx]
 
@@ -232,7 +293,7 @@ class Modulator(object):
 
                 # Get the RX reconstructed frame data
                 self.rx_bitstream_frame = self.ofdm_obj.getBitstreamFrame()
-
+                
                 decoded_sequence['rx_data'].append(self.rx_bitstream_frame) ### TODO --- Add decoded data to decoded sequence
                 
                 
@@ -257,7 +318,6 @@ class Modulator(object):
         return rx_data_synced, delay_time, delay_steps
         
     @sync_track
-    # @timer_dec
     def syncRxData(self, decoded_sequence = None, seq_idx = None):
         """Get tx_data info to do cross-correlation, and find actual phase delay. The tx_data is supposed here to be generated at the rx end, where we know the pattern."""
 
@@ -269,37 +329,71 @@ class Modulator(object):
         tx_data, tx_time = lib.sampleSignal(tx_data, tx_time, self.sample_frequency)
         
         # Get positions for min and max time points for current sequence
-        min_r = int(decoded_sequence['seq_start_time'][seq_idx] * self.sample_frequency)
-        max_r = int(decoded_sequence['seq_end_time'][seq_idx] * self.sample_frequency)
+        min_r = int(np.round(decoded_sequence['seq_start_time'][seq_idx] * self.sample_frequency))
+        max_r = int(np.round(decoded_sequence['seq_end_time'][seq_idx] * self.sample_frequency))
 
-        # Get range for ofdm rx signal for sync.
+        # range_symbol_0 = np.array(self.rx_time > (decoded_sequence['seq_start_time'][seq_idx] + delay_time))
+        # range_symbol_1 = np.array(self.rx_time <= (decoded_sequence['seq_end_time'][seq_idx] + delay_time))
+        # range_symbol = range_symbol_0 & range_symbol_1
+
+        # Make sure that rx and tx data the same length in number os points for cross-correlation
+        max_r -= (max_r - min_r) - len(tx_data)
         rx_data = self.rx_data[min_r:max_r]
+        printDebug(min_r)
+        printDebug(max_r)
+        
+        if self.PLOT:
+            if self.DEBUG:
+                printDebug(rx_data)
+                printDebug(tx_data)
+            plotDebug(rx_data, symbols='ro-', hold=True)
+            plotDebug(tx_data - rx_data, symbols='ko-', hold=True)
+            plotDebug(tx_data, symbols='bo-', hold=False, title="Before synchronization of Rx data")
 
         # # get gradients of signals. # TODO --- Actually need gradients?
         # s0 = np.gradient(np.gradient(rx_data))
         # s1 = np.gradient(np.gradient(tx_data))
-        s0 = rx_data
-        s1 = tx_data
-        # get max argument for cross-correlatin betwwen rx_data and tx_data
+        # # get max argument for cross-correlatin between rx_data and tx_data
         # max_arg = np.argmax(signal.correlate(s1, s0)) + 1 ## +1 for most correct cross-correlation
-        max_arg = np.argmax(signal.correlate(s1, s0)) + 0
-        # max_arg = np.argmax(signal.correlate(s1, s0)) + 1
+        max_arg = np.argmax(signal.correlate(tx_data, rx_data))
 
         # Get delay in steps for given rx wave
         if len(tx_data) > max_arg:
             self.phase_delay_steps = len(tx_data) - max_arg
         else:
+            if self.DEBUG:
+                printDebug(max_arg/self.sample_frequency)
+                printDebug(len(tx_data)/self.sample_frequency)
             raise ValueError(f"\n\n***Error --> Delay is too large to be synced...\n")
-            printDebug(max_arg/self.sample_frequency)
-            printDebug(len(tx_data)/self.sample_frequency)
-            self.phase_delay_steps = -max_arg-1 + len(tx_data)
-            # self.phase_delay_steps = max_arg
         
-        self.phase_delay_time = 0
-        self.phase_delay_steps = 0
+        # Further seach for more optmized delay with minimum rms between tx and rx. Search (-5, +5) around previous max_arg
+        search_range = np.arange(-5, 6, 1)
+        # rms = [(lambda x: mean_squared_error(np.abs(np.roll(rx_data, -self.phase_delay_steps + int(x))), np.abs(tx_data), squared=False))(x) for x in search_range]
+        rms = [mean_squared_error(np.abs(np.roll(rx_data, -self.phase_delay_steps + int(x))), np.abs(tx_data), squared=False) for x in search_range]
+        
+        if self.DEBUG:
+            new_rms = mean_squared_error(np.abs(np.roll(rx_data, -self.phase_delay_steps)), np.abs(tx_data), squared=False)
+            printDebug(self.phase_delay_steps)
+            printDebug(new_rms)
+        
+        # Adjust delay step to minumum value
+        self.phase_delay_steps -= search_range[int(rms.index(min(rms)))]
+        
+        if self.DEBUG:
+            printDebug(self.phase_delay_steps)
+            new_rms = mean_squared_error(np.abs(np.roll(rx_data, -self.phase_delay_steps)), np.abs(tx_data), squared=False)
+            printDebug(new_rms)
 
+        # result = fmin(lambda x : mean_squared_error(\
+        #     np.abs(np.roll(rx_data, -self.phase_delay_steps + int(x))), np.abs(tx_data), squared=False\
+        #         ), 0, full_output=True)
+
+        
         # Get delay in time for given rx wave
         self.phase_delay_time = self.phase_delay_steps/self.sample_frequency
+
+        # self.phase_delay_time = 200e-9
+        # self.phase_delay_steps = int(self.sample_frequency*self.phase_delay_time)
         
         if self.PLOT:
             sync_data = np.roll(rx_data, -self.phase_delay_steps)
@@ -316,8 +410,7 @@ class Modulator(object):
         self.rx_data = np.roll(self.rx_data, -self.phase_delay_steps)
         
         if self.PLOT:
-            plotDebug(self.rx_data, self.rx_time, symbols='bo-', title="Original (red) and synced (blue) busrt RX signal.")
-
+            plotDebug(self.rx_data, self.rx_time, symbols='bo-', title=f"Original (red) and synced (blue) busrt RX signal: Delay of <{(self.phase_delay_time*1e9):.2f} ns>")
 
         # Returns calculated delay.
         return self.phase_delay_time, self.phase_delay_steps

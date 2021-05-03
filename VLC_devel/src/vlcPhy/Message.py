@@ -8,7 +8,8 @@ class Message(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("Message") or self.sync_obj.getDebug("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("Message", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("Message")
         
@@ -96,6 +97,8 @@ class Message(object):
 
                 # add next duration to sequence
                 self.addToSequence('seq_duration', 'duration', all_config)
+                # add next ratio for sample frequency to sequence
+                self.addToSequence('seq_sample_ratio', 'sample_frequency_ratio', all_config)
                 # add next mapping for data
                 self.addToSequence('seq_map', 'mapping_index', all_config)
                 # add next pilot mapping for data

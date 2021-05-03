@@ -3,13 +3,14 @@ from .common_imports import *
 
 class ADC(object):
     
-    def __init__(self, rx_data, rx_time, sample_freq, sync_obj):
+    def __init__(self, rx_data, rx_time, sample_freq, adc_configuration, sync_obj):
         """Constructor of ADC."""
         
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("ADC") or self.sync_obj.getDebug("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("ADC", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("ADC")
         
@@ -27,6 +28,11 @@ class ADC(object):
         
         # Flag to indicate use of circuit simulation.
         self.rounding_or_simul = Global.bypass_dict["ADC_rounding_or_simul"]
+
+        # Voltage references / number of bits
+        self.vref_plus = adc_configuration['vref_plus']
+        self.vref_minus = adc_configuration['vref_minus']
+        self.n_bits = adc_configuration['n_bits']
         
         
     @sync_track
@@ -37,11 +43,34 @@ class ADC(object):
         if self.rounding_or_simul: # if rouding
             
             # TODO -- Quantization for ADC
-            Warning (f"\n\n***Warning --> Still not done quantization for ADC!\n")
+            Warning (f"\n\n***Warning --> Quantization not ready yet for ADC!\n")
+
+            # # Remove negative values
+            # self.rx_data_in[self.rx_data_in <= 0] = 0
+
+            # Voltage range
+            vcm = (self.vref_plus - self.vref_minus)/(2**(self.n_bits-1))
+            # plotDebug(self.rx_data_in, symbols='ro-', hold = True)
+            self.rx_data_in = np.round(self.rx_data_in/vcm) * vcm + self.vref_minus
+            # self.rx_data_in = np.ceil(self.rx_data_in/vcm) * vcm + self.vref_minus
+            printDebug(self.rx_data_in)
+            # plotDebug(self.rx_data_in, symbols='bo-')
+
+            # # Differential Nonlinearity (DNL) Error
+            # DNL = ?
+            # # Integral Nonlinearity (INL) Error
+            # INL = ?
+            # ADC gain Error
+            ADC_gain_error = 1
+            # ADC offset Error
+            ADC_gain_offset = 0
+            self.rx_data_in = ADC_gain_error*self.rx_data_in + ADC_gain_offset
             
             # TODO --- for now, bypassing
             self.adc_rx_data, self.rx_time = lib.sampleSignal(self.rx_data_in, self.rx_time, self.sample_freq)
-            pass
+            
+            # # remove zero
+            # self.sampled_wave = lib.zeroClip(self.sampled_wave)
 
         else: # if circuit simulation
             raise ValueError(f"\n\n***Error --> Circuit simulation for DAC not supported yet, at bypass_dict['DAC_rounding_or_simul'] = <{Global.bypass_dict['DAC_rounding_or_simul']}>!\n")

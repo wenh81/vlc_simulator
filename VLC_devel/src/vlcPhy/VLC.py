@@ -7,9 +7,9 @@ class VLC(object):
     def __init__(self):
         """Constructor"""
         
-        self.DEBUG = Global.DEBUG["VLC"] or Global.DEBUG["all"]
+        self.DEBUG = (Global.DEBUG["VLC"] or Global.DEBUG["all"]) and not Global.DEBUG["None"]
         
-        self.PLOT = Global.PLOT["VLC"] or Global.PLOT["all"]
+        self.PLOT = (Global.PLOT["VLC"] or Global.PLOT["all"]) and not Global.PLOT["None"]
 
         # Indicates if using IM/DD or not
         self.IM_DD = None
@@ -202,6 +202,8 @@ class VLC(object):
                 time_interval = self.decoded_sequence['seq_duration'][seq_idx],
                 time_step = Global.time_step
             )
+
+            # plotDebug(tx_wave, tx_time)
             
             # Store tx wave info for latter sync attempt at receiver end
             self.decoded_sequence['tx_wave_list'].append(tx_wave)
@@ -234,10 +236,11 @@ class VLC(object):
             signal_list = self.decoded_sequence['tx_wave_list'],
             time_interval_list = self.decoded_sequence['seq_duration'],
             num_symbols = self.decoded_sequence['tx_num_symbols'],
+            offset = offset_value,
             time_step = Global.time_step
         )
 
-        # plotDebug(burst_tx_wave, burst_tx_time, symbols='b-')
+        # plotDebug(burst_tx_wave, burst_tx_time, symbols='bo-')
         # printDebug()
 
 
@@ -253,7 +256,7 @@ class VLC(object):
 
         tx_data_list = list(burst_tx_wave) ## TODO --- NEEDED?
         
-        self.PLOT = True
+        # self.PLOT = True
 
         if self.PLOT:
             handle = plt.figure(figsize=(8,2))
@@ -359,6 +362,13 @@ class VLC(object):
 
         # Get the sample frequency defined so far
         sample_frequency = self.modulator_obj.getSampleFrequency()
+        ## TODO --- Double check. Should use 2*samplefreq? (Nyquist)
+        # sample_frequency *= 1
+        # sample_frequency *= 2
+        # sample_frequency *= 3
+        # sample_frequency *= 10
+        
+        self.modulator_obj = None
         
         # Each tx [led] convolves with channel [pd x led], producing rx [pd].
         # get the rx_data wave for each receiver.
@@ -376,6 +386,13 @@ class VLC(object):
             # during this 'for' loop. As long as it progresses, we increment 'seq_idx', and reset when loops back.
             seq_idx = 0
 
+            # Get current sample frequency (times 2) for Nyquist Freq for current sequence
+            # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx] * 2
+            sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx] * self.decoded_sequence['seq_sample_ratio'][seq_idx]
+            # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx]
+
+            printDebug(sample_frequency)
+
 
             ###########################################################################
             # >>>>>>>>>> STARTS RECEIVER, GIVEN CONFIG
@@ -387,9 +404,10 @@ class VLC(object):
                 rx_time = rx_time,
                 sample_freq = sample_frequency,
                 sample_phase = 0, ## TODO -- MUST BE APPLIED
+                adc_configuration = Global.adc_configuration,
                 sync_obj = self.sync_obj
             )
-
+            
             # while(seq_idx != MAX???):
             
 
@@ -411,45 +429,16 @@ class VLC(object):
             # Here is where the current signal is sampled on the input clock sample frequency
             self.receiver_obj.calculatesOutVoltage()
             
-            ###########################################################################
-            # >>>>>>>>>> APPLY ADC ON RX_DATA, CONVERTING FROM ANALOG TO DIGITAL
             
-            ## TODO ---- ADD HERE THE REMOVAL OF THE DC VALUE OF DCO-OFDM DEMODULATION  (VOLTAGE DOMAIN)
-            
-            # Until now, the 'seq_idx' index wasn't anaylsed, since we are converting from optical to voltage domain.
-            # Now, we need info to know what kind of modulation is the first one, so we know if have to add any DC bias.
-            # If DCO-OFDM, then all other parts of the sequence should have the same OFDM type, and getting first position is 
-            # enough to know we need to add DC for whole wave.
 
-            # Get modulation config
-            modulation_config = Global.modulation_config[self.decoded_sequence['seq_mod'][seq_idx]]
-            
-            # default values before checking
-            offset_value = 0
-            
-            # check if intensity modulation / direct detection
-            if self.IM_DD is None:
-                self.IM_DD = modulation_config["IM_DD"]
-            try:
-                OFDM_type = next(iter(modulation_config["ofdm_type"].keys()))
-                if OFDM_type == "DCO-OFDM":
-                    # Get DCO-OFDM DC value
-                    offset_value = modulation_config["ofdm_type"][OFDM_type][0]
-            except:
-                pass
-
-            # Subtract bias to voltege from the ROIC, if on IM/DD mode
-            if self.IM_DD:
-                offset_value -= Global.rx_voltage_bias_subtract
-
-            # Applies ADC:
-            # Passes sample frequency used on Modulator (TODO -- CHECK THIS VALUE FOR EACH)
-            self.receiver_obj.applyADC(
-                # sample_freq = self.modulator_obj.getSampleFrequency(),
-                offset_value = offset_value
-                # IM_DD = self.IM_DD
-                # time_interval = self.decoded_sequence['seq_duration'][seq_idx],
-            )
+            ################ # Applies ADC:
+            ################ # Passes sample frequency used on Modulator (TODO -- CHECK THIS VALUE FOR EACH)
+            ################ self.receiver_obj.applyADC(
+            ################     # sample_freq = self.modulator_obj.getSampleFrequency(),
+            ################     offset_value = offset_value
+            ################     # IM_DD = self.IM_DD
+            ################     # time_interval = self.decoded_sequence['seq_duration'][seq_idx],
+            ################ )
 
             # self.receiver_obj.applyADC(sample_freq = Global.N_FFT/Global.time_frame)
 
@@ -493,13 +482,72 @@ class VLC(object):
             # 'seq_idx' starts with 0. Then increments from here, as long as we progress on the sequence.
             # for seq_idx in range(0, len(self.decoded_sequence['seq_data'])):
             while seq_idx < len(self.decoded_sequence['seq']):
+
+                # New sample frequency for that seq index
+                # Get current sample frequency (times 2) for Nyquist Freq for current sequence
+                # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx] * 2
+                sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx] * self.decoded_sequence['seq_sample_ratio'][seq_idx]
+                # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx]  
+
+                # Add sample requency at the RX side
+                self.decoded_sequence['seq_rx_sample_freq'].append(sample_frequency)
+
+                printDebug(f'DEBUG -- {seq_idx}')
+                printDebug(sample_frequency)
+
+                ###########################################################################
+                # >>>>>>>>>> APPLY ADC ON RX_DATA, CONVERTING FROM ANALOG TO DIGITAL
+                
+                ## TODO ---- ADD HERE THE REMOVAL OF THE DC VALUE OF DCO-OFDM DEMODULATION  (VOLTAGE DOMAIN)
+                
+                # Until now, the 'seq_idx' index wasn't anaylsed, since we are converting from optical to voltage domain.
+                # Now, we need info to know what kind of modulation is the first one, so we know if have to add any DC bias.
+                # If DCO-OFDM, then all other parts of the sequence should have the same OFDM type, and getting first position is 
+                # enough to know we need to add DC for whole wave.
+
+                # Get modulation config
+                modulation_config = Global.modulation_config[self.decoded_sequence['seq_mod'][seq_idx]]
+                
+                # default values before checking
+                offset_value = 0
+                
+                # check if intensity modulation / direct detection
+                if self.IM_DD is None:
+                    self.IM_DD = modulation_config["IM_DD"]
+                try:
+                    OFDM_type = next(iter(modulation_config["ofdm_type"].keys()))
+                    if OFDM_type == "DCO-OFDM":
+                        # Get DCO-OFDM DC value
+                        offset_value = modulation_config["ofdm_type"][OFDM_type][0]
+                except:
+                    pass
+
+                # Subtract bias to voltege from the ROIC, if on IM/DD mode
+                if self.IM_DD:
+                    offset_value += Global.rx_voltage_bias_subtract
+                    # Get the voltage from receiver, and sets only real value
+                    self.receiver_obj.setRxVoltage(self.receiver_obj.getRxVoltage().real)
+
+                
+                # Applies ADC:
+                # Passes sample frequency used on Modulator (TODO -- CHECK THIS VALUE FOR EACH)
+                self.receiver_obj.applyADC(
+                    # sample_freq = self.modulator_obj.getSampleFrequency(),
+                    offset_value = offset_value,
+                    override_freq = sample_frequency,
+                    IM_DD = self.IM_DD
+                    # time_interval = self.decoded_sequence['seq_duration'][seq_idx],
+                )
+
                 # Current Sequence ID
                 print(f"**********************************************************************************\n\
 Starting sequence for field < {self.decoded_sequence['seq'][seq_idx].split('.')[0]} > and subfield < {self.decoded_sequence['seq'][seq_idx].split('.')[1]} >\n\
 **********************************************************************************\n")
 
+                # printDebug(Global.modulation_config[self.decoded_sequence['seq_mod'][seq_idx]])
+
                 # Re-create Modulator object, for the DeModulation, for each sequence step.
-                self.modulator_obj = Modulator(
+                self.demodulator_obj = Modulator(
                     is_sync=self.decoded_sequence['seq_sync'][seq_idx],
                     bitstream_frame=self.decoded_sequence['seq_data'][seq_idx],
                     modulation_config=Global.modulation_config[self.decoded_sequence['seq_mod'][seq_idx]],
@@ -510,19 +558,19 @@ Starting sequence for field < {self.decoded_sequence['seq'][seq_idx].split('.')[
                 )
 
                 # Re-create the modulator.
-                self.modulator_obj.createModulator()
+                self.demodulator_obj.createModulator()
 
                 # Re-set the sample frequency, for new modulator object.
-                self.modulator_obj.setSampleFrequency(sample_frequency)
+                self.demodulator_obj.setSampleFrequency(sample_frequency)
                 
                 ###########################################################################
                 # >>>>>>>>>> GET ADC RX_DATA TO PASS FOR DE-MODULATOR
                 
                 # Set the rx_data and rx_time to modulator.
-                self.modulator_obj.setRxData(
+                self.demodulator_obj.setRxData(
                     self.receiver_obj.getSampledWave()
                 )
-                self.modulator_obj.setRxTime(
+                self.demodulator_obj.setRxTime(
                     self.receiver_obj.getSampledWaveTime()
                 )
 
@@ -537,7 +585,7 @@ Starting sequence for field < {self.decoded_sequence['seq'][seq_idx].split('.')[
                 # >>>>>>>>>> SET THE ACTUAL CHANNEL RESPONSE, FOR FURTHER COMPARISSONS
                 
                 # Sets the list of channel responses, for further comparissons with estimated ones
-                self.modulator_obj.setListOfChannelResponses(
+                self.demodulator_obj.setListOfChannelResponses(
                     self.channel_obj.getChannelResponse()
                 )
                 
@@ -548,7 +596,7 @@ Starting sequence for field < {self.decoded_sequence['seq'][seq_idx].split('.')[
                 
                 # Applies the modulation, with modulation object just created.
                 # If on the 'sync' step, apply the synchronization first.
-                self.rx_data_synced, self.delay_time, self.delay_steps = self.modulator_obj.applyDeModulation(
+                self.rx_data_synced, self.delay_time, self.delay_steps = self.demodulator_obj.applyDeModulation(
                     decoded_sequence = self.decoded_sequence, ## get whole sequence
                     seq_idx = seq_idx, ## and at which index we are now
                     rx_data_synced = self.rx_data_synced, ## get if data is sync or not
@@ -556,7 +604,8 @@ Starting sequence for field < {self.decoded_sequence['seq'][seq_idx].split('.')[
                     delay_steps = self.delay_steps ## get delay in steps
                 )
                 
-                printDebug(self.delay_time)
+                # printDebug(self.delay_time)
+
                 # Check if current sequence step is for 'sync' or for data.
                 # if self.decoded_sequence['rx_data'][seq_idx] != 'sync':
                 if 'sync' in self.decoded_sequence['rx_data'][seq_idx]:
@@ -583,7 +632,7 @@ Sync data, with found delay of:
                     # >>>>>>>>>> RETRIEVE RX DATA
                     
                     # Get the received frame message
-                    curr_rx_frame = self.modulator_obj.getRxBitstreamFrame()
+                    curr_rx_frame = self.demodulator_obj.getRxBitstreamFrame()
 
                     # printDebug(curr_rx_frame)
                     
@@ -740,7 +789,7 @@ Sync data, with found delay of:
             
         # ,
         #     self.message_obj.getRxBitstreamFrames()
-        print(self.sync_obj.showMessageDict())
+        # print(self.sync_obj.showMessageDict())
 
     @sync_track
     def getBER(self):

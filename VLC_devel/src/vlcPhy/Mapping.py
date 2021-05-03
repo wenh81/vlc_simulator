@@ -9,7 +9,8 @@ class Mapping(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("Mapping") or self.sync_obj.getDebug("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("Mapping", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("Mapping")
         

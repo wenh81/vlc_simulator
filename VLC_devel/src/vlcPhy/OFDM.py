@@ -9,9 +9,8 @@ class OFDM(object):
         # Create sync object, and set debug and simulation path
         self.sync_obj = sync_obj
         
-        self.DEBUG = self.sync_obj.getDebug("OFDM") or self.sync_obj.getDebug("all")
-        
-        self.PLOT = self.sync_obj.getPlot("OFDM") or self.sync_obj.getPlot("all")
+        # Get debug and plot flags
+        self.DEBUG, self.PLOT = lib.getDebugPlot("OFDM", self.sync_obj)
         
         self.sync_obj.appendToSimulationPath("OFDM")
         
@@ -68,7 +67,6 @@ class OFDM(object):
         # Set what will be the sample frequency. For OFDM this is the inverse of symbol duration by total number of subcarriers
         # b/c fundamental frequency of OFDM is 1 / (OFDM symbol duration), and largest frequency is max number of carriers * fundamental
         self.sample_frequency = (self.total_subcarriers) / self.ofdm_duration
-        # self.sample_frequency = 20*(self.total_subcarriers) / Global.time_frame
         
         # Start the time vector list (each position for a position in data list)
         self.time_vector_list = None
@@ -382,7 +380,8 @@ class OFDM(object):
                 self.all_subcarriers = np.arange(self.number_of_carriers//2 - 1)
                 
                 # check the pilots vector boundaries for further error detetion
-                self.checkInputPilots(max_carriers = self.number_of_carriers//2 - 1, min_carriers = 0)
+                # self.checkInputPilots(max_carriers = self.number_of_carriers//2 - 1, min_carriers = 0)
+                self.checkInputPilots(max_carriers = self.number_of_carriers//2 - 1, min_carriers = 0, ignore_even = True)
 
                 ## TODO -- Check if must substract 1 position here as well (as done for ACO)
 
@@ -647,27 +646,73 @@ class OFDM(object):
         # This could also easely be calcuated at rx, since we know at which rx sequence we are.
         # This 'n_symbols' is derived from number of "agreed" FFT symbols, cyclic prefix, and time duration of each symbol.
         # We could also use one of the initial OFDM symbols to get this data for next PAYLOAD sequence, as long as that particular sequence is agreed.
+        next_min_pos = 0
         next_max_pos = 0
         for symbol_idx in range(0, n_symbols):
             
-            # printDebug(symbol_idx)
+            # Get the ratio between the initial sample frequency and the actual used one (got from Modulator)
+            ratio = int(self.sample_frequency / (self.total_subcarriers / self.ofdm_duration))
 
-            # plotDebug(self.ofdm_rx_data, self.ofdm_time, symbols='bo-')
-            # Get next OFDM symbol positions
-            next_min_pos = (self.number_of_cyclic_prefix + self.number_of_carriers)*(symbol_idx)
-            next_max_pos = (self.number_of_cyclic_prefix + self.number_of_carriers)*(symbol_idx+1)
-            # Set the current RX OFDM symbol
-            self.setOFDMSymbolRx(self.ofdm_rx_data[next_min_pos:next_max_pos])
+            printDebug(self.sample_frequency)
+            printDebug((self.total_subcarriers / self.ofdm_duration))
+            printDebug(self.modulation_config)
 
-            # printDebug(next_min_pos)
-            # printDebug(next_max_pos)
+            # Get next OFDM symbol positions, expanding depending on the atual sample ratio, in contrast with original max frequency
+            next_min_pos = (self.number_of_cyclic_prefix + self.number_of_carriers)*(symbol_idx) * ratio
+            next_max_pos = (self.number_of_cyclic_prefix + self.number_of_carriers)*(symbol_idx+1) * ratio
+            # next_min_pos = (carriers_times_sample_ratio)*(symbol_idx)
+            # next_max_pos = (carriers_times_sample_ratio)*(symbol_idx+1)
+            # next_min_pos = (self.total_subcarriers * ratio)*(symbol_idx)
+            # next_max_pos = (self.total_subcarriers * ratio)*(symbol_idx+1)
+
+            # self.sample_frequency = (self.total_subcarriers) / self.ofdm_duration
+
+            # # Apply ratio
+            # next_min_pos = int(next_min_pos*ratio)
+            # next_max_pos = int(next_max_pos*ratio)
+
+            # Sample the expanded signal (due to larger sample frequency), and recover original equivalent to the subcarriers
+            # Set the current RX OFDM symbol for the sampled OFDM
+            
+            printDebug(ratio)
+            printDebug(self.ofdm_rx_data)
+            self.setOFDMSymbolRx(self.ofdm_rx_data[next_min_pos:next_max_pos][::ratio])
+
+            printDebug(self.number_of_cyclic_prefix)
+            printDebug(self.number_of_carriers)
+            printDebug(self.ofdm_symbol_rx)
+            
+            if self.DEBUG:
+                printDebug(self.total_subcarriers)
+                printDebug(self.sample_frequency)
+                # printDebug(self.ofdm_rx_data)
+                printDebug(self.number_of_cyclic_prefix)
+                printDebug(self.number_of_carriers)
+                printDebug(ratio)
+                printDebug(n_symbols)
+                printDebug(next_min_pos)
+                printDebug(next_max_pos)
+                printDebug(symbol_idx)
+            if self.PLOT:
+                plotDebug(self.ofdm_rx_data, symbols='bo-', hold=True)
+                # plotDebug(self.ofdm_rx_data[next_min_pos:next_max_pos], symbols='ro-', hold=False)
+                plotDebug(self.ofdm_symbol_rx, symbols='ro-', hold=False)
+                # expanded_ofdm = self.ofdm_rx_data[next_min_pos:next_max_pos]
+                # sampled_ofdm = self.ofdm_rx_data[next_min_pos:next_max_pos][::ratio]
+                # plotDebug(sampled_ofdm, symbols='bo-', hold=True)
+                # plotDebug(expanded_ofdm, symbols='ro-')
+            
 
             # Remove the cyclic prefix in the OFDM symbol
             self.removeCp()
-
             
             # Applies the FFT
             self.applyFFT()
+
+            # Only for IM/DD
+            if self.modulation_config['IM_DD']:
+                # Apply hermitian demodulation
+                self.applyHermitianDemodulation()
 
             # Get info from pre-calculated from tx (that could also be reckoned here at rx)
             self.pilot_value = decoded_sequence['seq_pilot_value'][seq_idx]
@@ -697,14 +742,14 @@ class OFDM(object):
                 plotDebug(self.ofdm_symbol_rx, symbols='k-', label="RX wave", hold=True)
                 plotDebug(self.ofdm_symbol_rx, symbols='ro', label="Data", hold=True)
                 
-                plotDebug(self.ofdm_symbol_rx[self.pilot_subcarriers], self.pilot_subcarriers, symbols='mo', label="Pilots", hold=True)
+                plotDebug(self.ofdm_symbol_rx[self.pilot_subcarriers], self.pilot_subcarriers, symbols='bo', label="Pilots", hold=True)
             
             # Applies equalization, given the channel response
             self.applyEqualization()
             
             if self.PLOT:
                 # printDebug(self.ofdm_symbol_rx)
-                plotDebug(self.ofdm_symbol_rx, symbols='bo-', label="Eq. RX wave")
+                plotDebug(self.ofdm_symbol_rx, symbols='mo-', label="Eq. RX wave")
             
             # # Get the mapped info from TX for plotting and compare ## TODO -- Needed?
             # self.mapped_info = decoded_sequence['seq_all_mapped_info'][seq_idx][symbol_idx]
@@ -1167,10 +1212,11 @@ class OFDM(object):
 
             # pilot_subcarriers_freq = (np.array(self.pilot_subcarriers)+1)/Global.time_frame
             pilot_subcarriers_freq = (np.array(self.pilot_subcarriers)+1)/self.ofdm_duration
-            # printDebug(self.pilot_subcarriers)
+            printDebug(self.pilot_subcarriers)
             # printDebug(pilot_subcarriers_freq)
 
-            # printDebug(self.pilot_value)
+            printDebug(self.pilot_value)
+            printDebug(self.ofdm_symbol_rx)
             # plotDebug(self.ofdm_symbol_rx, symbols='bo-')
             
             self.estimated_pilots_response = self.ofdm_symbol_rx[self.pilot_subcarriers] / self.pilot_value
@@ -1198,7 +1244,7 @@ class OFDM(object):
             channel_response_modulus = channel_response_modulus_model(valid_carriers_freq)
             channel_response_angle = channel_response_angle_model(valid_carriers_freq)
 
-            self.estimated_channel_response = channel_response_modulus * np.exp(1j*channel_response_angle)
+            ##########self.estimated_channel_response = channel_response_modulus * np.exp(1j*channel_response_angle)
             # self.estimated_channel_response = channel_response_modulus * np.exp(1j*channel_response_angle + 1j*2*np.pi/Global.group_delay)
             # self.estimated_channel_response = self.estimated_channel_response * np.exp(-1j*2*np.pi*Global.group_delay)
             # self.estimated_channel_response = self.estimated_channel_response * np.exp(1j*2*np.pi/Global.group_delay)
@@ -1270,10 +1316,11 @@ class OFDM(object):
             
             elif OFDM_type is not None:
                 raise ValueError(f"\n\n***Error --> Not supported OFDM type: < {OFDM_type} >\n")
+
         
         # self.valid_carriers = self.all_subcarriers
         self.valid_carriers = np.arange(0, len(self.all_subcarriers))
-        # self.estimated_channel_response = channel_response_modulus * np.exp(1j*channel_response_angle)
+        self.estimated_channel_response = channel_response_modulus * np.exp(1j*channel_response_angle)
         # print(self.estimated_channel_response)
         # print(len(self.estimated_channel_response))
         
