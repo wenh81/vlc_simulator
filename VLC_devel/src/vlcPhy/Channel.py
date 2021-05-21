@@ -181,7 +181,6 @@ class Channel(object):
             if self.PLOT:
                 plotDebug(CIR, channel_time, symbols='b-')
                 plotDebug(self.tx_data, self.tx_data_time, symbols='r-')
-
             if do_convolution:
                 # Apply convolution
                 #### convolved = np.convolve(self.tx_data, CIR)
@@ -190,6 +189,18 @@ class Channel(object):
 
                 # Get convolved time vector
                 convolved_time = np.arange(0, len(convolved))*self.time_step
+                
+                # For the case where convolver is larger than original data (typical)
+                len_diff = len(convolved) - len(self.tx_data)
+                if len_diff > 0:
+                    only_zero = convolved[abs(convolved) <= Global.zero_slack]
+                    # When a bias was applied, but the convolution resulted in zeros.
+                    # Get the minimum of the non-zero part as the baseline
+                    if len_diff == len(only_zero):
+                        convolved[abs(convolved) <= Global.zero_slack] = np.min(convolved[abs(convolved) > Global.zero_slack])
+                    else:
+                        # For this case, there are 'normal' zeros anyway. So no need for that adjustment
+                        pass
 
                 if self.PLOT:
                     plotDebug(convolved, convolved_time)
@@ -248,11 +259,11 @@ class Channel(object):
             # TODO --  IS THAT CORRECT? APPLY CIR AND THEN ABS (or clip to zero)
             if self.IM_DD and False:
                 noisy_signal = lib.zeroClip(noisy_signal)
-                printDebug("DEBUG @ Channel")
+                # printDebug("DEBUG @ Channel")
                 plotDebug(noisy_signal, convolved_time)
                 noisy_signal = np.abs(noisy_signal)
                 plotDebug(noisy_signal, convolved_time)
-                printDebug()
+                # printDebug()
                 
             
             summed_noisy_signal += noisy_signal

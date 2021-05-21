@@ -85,7 +85,7 @@ class ROIC(object):
         
         if self.circuit_simulation:
             
-            # Calls simulator to get voltage waves from currents
+            # Calls simulator to get list of voltage waves from currents
             voltage_wave = self.callSimulator(current_wave)
             
             raise ValueError(f"\n\n***Error --> ROIC simulation is not supported yet, at roic_config['circuit_simulation'] = True\n")
@@ -94,8 +94,7 @@ class ROIC(object):
             
             # # If no simulator, converts currents to voltage using modelling
             # voltage = []
-
-                
+            
             # TODO -- Remove this after changing the gain to a curve. It might need to be interpolated...
             self.transconductance_gain = self.transconductance_gain*np.ones(len(current_wave))
             
@@ -108,34 +107,45 @@ class ROIC(object):
             # current_wave = current_wave * 5e-8
             # printDebug(current_wave, plot = True)
             
-            if not Global.IM_DD:
-                print(f"\n\n***Warning --> ROIC simulation, but using RF OFMD (Global.IM_DD off).\
-                    \nApplied gain to each channel real and imaginary instead...")
+            
+            # Add noise to current_wave. Average = current_wave ; std = self.current_noise
+            current_wave_real = np.random.normal(current_wave.real, self.current_noise)
+            current_wave_imag = np.random.normal(current_wave.imag, self.current_noise)
+            
+            # Get from SNR the noise to be applied on the current wave.
+            voltage_wave = self.transconductance_gain*current_wave_real + (1j)*self.transconductance_gain*current_wave_imag
+            
+            # # if not Global.IM_DD:
+            # if True:
+            #     print(f"\n\n***Warning --> ROIC simulation, but using RF OFMD (Global.IM_DD off).\
+            #         \nApplied gain to each channel real and imaginary instead...")
                 
-                # Add noise to current_wave. Average = current_wave ; std = self.current_noise
-                current_wave_real = np.random.normal(current_wave.real, self.current_noise)
-                current_wave_imag = np.random.normal(current_wave.imag, self.current_noise)
+            #     # Add noise to current_wave. Average = current_wave ; std = self.current_noise
+            #     current_wave_real = np.random.normal(current_wave.real, self.current_noise)
+            #     current_wave_imag = np.random.normal(current_wave.imag, self.current_noise)
                 
-                # Get from SNR the noise to be applied on the current wave.
-                voltage_wave = self.transconductance_gain*current_wave_real + (1j)*self.transconductance_gain*current_wave_imag
-                # voltage_wave = 1*current_wave_real + (1j)*1*current_wave_imag
+            #     # Get from SNR the noise to be applied on the current wave.
+            #     voltage_wave = self.transconductance_gain*current_wave_real + (1j)*self.transconductance_gain*current_wave_imag
+            #     # voltage_wave = 1*current_wave_real + (1j)*1*current_wave_imag
 
-            else:
-                # Add noise to current_wave. Average = current_wave ; std = self.current_noise
-                current_wave = np.random.normal(current_wave, self.current_noise)
+            # else:
+            #     # Add noise to current_wave. Average = current_wave ; std = self.current_noise
+            #     current_wave = np.random.normal(current_wave, self.current_noise)
             
-                # clip current_wave at zero after noise application
-                current_wave = lib.zeroClip(current_wave)
+            #     # clip current_wave at zero after noise application
+            #     current_wave = lib.zeroClip(current_wave)
             
-                # Get from SNR the noise to be applied on the current wave.
-                voltage_wave = self.transconductance_gain*current_wave
-                # voltage_wave = 1*current_wave
+            #     # Get from SNR the noise to be applied on the current wave.
+            #     voltage_wave = self.transconductance_gain*current_wave
+            #     # voltage_wave = 1*current_wave
                 
             # plotDebug(voltage_wave)
             # roic_waves.append(voltage_wave)
 
             # raise ValueError(f"\n\n***Error --> ROIC voltage_wave calculations while not bypassed, and circuit_simulation off, is not supported yet.\n")
-                
+            
+            # printDebug(voltage_wave, plot = True)
+
         return voltage_wave
     
     @sync_track

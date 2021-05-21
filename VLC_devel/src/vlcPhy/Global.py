@@ -30,10 +30,10 @@ DEBUG = {
 # global plot flag
 PLOT = {
     "all": False,
-    # "None": False,
-    "None": True,
-    # "VLC": False,
-    "VLC": True,
+    "None": False,
+    # "None": True,
+    "VLC": False,
+    # "VLC": True,
     "Message": False,
     "Transmitter": False,
     "Mapping": False,
@@ -46,6 +46,7 @@ PLOT = {
     # "Channel": True,
     "LightSource": False,
     "Receiver": False,
+    # "Receiver": True,
     "Detector": False,
     "ADC": False,
     "ROIC": False,
@@ -67,8 +68,8 @@ bypass_dict = {
     "DAC_rounding_or_simul": True,
     "Channel": True,
     "Detector": True,
-    # "ROIC": False, ## Read-Out Integrated Circuit ON
-    "ROIC": True, ## NO ROIC
+    "ROIC": False, ## Read-Out Integrated Circuit ON
+    # "ROIC": True, ## NO ROIC
     # "ADC": True,
     "ADC": False,
     "ADC_rounding_or_simul": True
@@ -115,15 +116,24 @@ VDD_tx = 3.3
 VSS_tx = 0
 VDD_rx = 3.3
 VSS_rx = 0
-tx_voltage_bias_add = 1.5 ## For IM/DD, it's the bias applied on the LED on TX.
-rx_voltage_bias_subtract = 1.5 ## For IM/DD, it's the bias applied on the LED on RX.
+tx_voltage_bias_add = 0 ## For IM/DD, it's the bias applied on the LED on TX.
+# tx_voltage_bias_add = 2 ## For IM/DD, it's the bias applied on the LED on TX.
+# rx_voltage_bias_subtract = 1.5 ## For IM/DD, it's the bias applied on the LED on RX.
 # tx_voltage_bias_add = 0 ## For IM/DD, it's the bias applied on the LED on TX.
-# rx_voltage_bias_subtract = 0 ## For IM/DD, it's the bias applied on the LED on RX.
+rx_voltage_bias_subtract = 0 ## For IM/DD, it's the bias applied on the LED on RX.
+# rx_voltage_bias_subtract = 0.4 ## For IM/DD, it's the bias applied on the LED on RX.
 
-# Total voltage bias for DCO-OFDM
+# Added background radiation power (in W)
+background_power = 0
+# background_power = 3
+
+
+# Total voltage bias for DCO-OFDM (ignore tx bias)
 # DCO_BIAS = 0.5
 DCO_BIAS = 1.5
 # DCO_BIAS = 0
+# DCO_BIAS = 2
+# DCO_BIAS -= tx_voltage_bias_add
 
 # ADC references
 adc_configuration = {"vref_plus": VDD_rx, "vref_minus": VSS_rx, "n_bits": 8}
@@ -192,9 +202,10 @@ group_delay = 200e-9
 dist = [1, 1.2, 1.4, 1.9, 2.3, 5, 20]
 dist = [1, 1.2, 1.4, 1.9, 2.3]
 # dist = [1, 1.2, 1.1]
-dist = [1, 1.1]
+# dist = [1, 1.1]
 # dist = [1, 1.01]
 # dist = [2, 2.1]
+dist = [1, 2]
 dist = [1]
 # group_delay = 0
 dist = list(np.array(dist))
@@ -220,8 +231,10 @@ response = [(attenuation/(d**2), d*group_delay) for d in dist]
 # group_delay = None
 # group_delay = 0
 # group_delay = 50e-9
-print(response)
-print(dist)
+
+# print(response)
+# print(dist)
+
 # test CIRsS
 CIR = {
     0: {"impulse": [(1, 1e-9)]},
@@ -234,7 +247,7 @@ CIR = {
 
 # test list to be used
 list_of_channel_response = [CIR[4]]
-# list_of_channel_response = [CIR[3]]
+list_of_channel_response = [CIR[3]]
 
 
 # list_of_channel_response = [CIR[0], CIR[1]]
@@ -265,20 +278,22 @@ receiver_config = [{"detector_type": ["photodiode"], "position": [(0,0,0)], "ang
 # Also, set if will do circuit simulation or not.
 # Use the simularion to extract the metrics such as DR, SNR, gain, input referred current noise (current_noise), etc.
 # Then, use the metrics instead of the simulation
-roic_config = [{
+roic_config = {
     "circuit_simulation": [False], ## ROIC simulation OFF
     # "circuit_simulation": [True], ## ROIC simulation ON
     "circuit_type": ["BouncingPixel"],
     # "roic_setup": [{"vmin": "500m", "vmax": "2.5", "stepTran": "1000"}],
     # "roic_setup": [{"vmin": "500m", "vmax": "2.5", "stepTran": "10000"}],
     # "roic_setup": [{"vmin": "700m", "vmax": "2", "stepTran": "500"}],
-    "roic_setup": [{"vmin": "500m", "vmax": "2.5", "stepTran": "100"}],
+    # "roic_setup": [{"vmin": "500m", "vmax": "2.5", "stepTran": "100"}],
+    "roic_setup": [{"vmin": "400e-3", "vmax": "2.6", "stepTran": "100"}],
     "gain": [60*1e3],
+    # "gain": [1],
     "DR": [130],
     "current_noise": [1e-9],
     "SNR": [144],
     "waves_name": ["vout"]
-    }]
+    }
 
 ############### PHYSICAL VARIABLES ###############
 # List of all wavelengths to be considered during simulation, in nm.
@@ -671,7 +686,7 @@ log_results = "log_results.log"
 
 USED_OFDM_TYPE = "RF"
 USED_OFDM_TYPE = "DCO"
-# USED_OFDM_TYPE = "ACO"
+USED_OFDM_TYPE = "ACO"
 
 ###############
 ## TODO -- Convert the TX/RX info decode into a 'burst' config, as below
@@ -718,6 +733,7 @@ burst_config = {
                         'sample_frequency_ratio': 2,
                         'mapping_index': 'BPSK',
                         'pilots_mapping_index': 'BPSK',
+                        # 'pilots_mapping_index': '4-QAM',
                         # 'modulation_index': "ACO-OFDM-TDP", # with 15-bit, use one bit as pilots, and BPSK
                         # 'modulation_index': "DCO-OFDM-TDP", # with 15-bit, use one bit as pilots, and BPSK
                         # 'modulation_index': "RF-OFDM-TDP", # with 15-bit, use one bit as pilots, and BPSK

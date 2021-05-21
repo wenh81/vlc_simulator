@@ -131,17 +131,24 @@ class Modulator(object):
                 # Returns a list of OFDM symbols to be transmitted. The input stream data is
                 # splitted into various symbols, depending on the throughput of the modulator.
                 self.tx_data_list = self.ofdm_obj.getOFDMSymbolList()
+                
+                # plotDebug(self.tx_data_list[0], symbols="ro-", hold = True)
 
-                # make sure data is non-negative fo IM/DD
-                if self.modulation_config['IM_DD']:
-                    self.tx_data_list = [lib.zeroClip(tx_data) \
-                            for tx_data in self.tx_data_list]
+                ## TODO: BELOW IS WRONG!!
+                ## Only for ACO-OFDM it should be clipped (which is done inside the OFDM.py)
+                ## For DCO, can be clipped, but only after adding the DC bias.
+                # # make sure data is non-negative fo IM/DD
+                # if self.modulation_config['IM_DD']:
+                #     self.tx_data_list = [lib.zeroClip(tx_data) \
+                #             for tx_data in self.tx_data_list]
+
+                # plotDebug(self.tx_data_list[0], symbols="b*-", hold = False)
 
                 # Set the sample frequency for this modulation.
                 # self.sample_frequency = (self.ofdm_obj.getNumberOfCarriers() + self.ofdm_obj.getNumberOfPilots()) / Global.time_frame
                 self.sample_frequency = self.ofdm_obj.getSampleFrequency()
                 
-                printDebug(self.sample_frequency/1e6)
+                # printDebug(self.sample_frequency/1e6)
                 
             elif self.modulation_type == "OOK":
                 
@@ -210,7 +217,7 @@ class Modulator(object):
                 # Get steps from the delay time itself. TODO -- Given that the samplefreq is updated here to the current sequence step.
                 # TODO -- WHAT IF THE OFDM DURATION IS DIFFERENT? Is the sum of 'delay_steps' enough?
                 delay_steps = int(delay_time*self.sample_frequency)
-                printDebug(delay_steps)
+                # printDebug(delay_steps)
 
 
                 # # If not at 'sync' subfield, then get only the part of data related to currente sequence data.
@@ -339,8 +346,8 @@ class Modulator(object):
         # Make sure that rx and tx data the same length in number os points for cross-correlation
         max_r -= (max_r - min_r) - len(tx_data)
         rx_data = self.rx_data[min_r:max_r]
-        printDebug(min_r)
-        printDebug(max_r)
+        # printDebug(min_r)
+        # printDebug(max_r)
         
         if self.PLOT:
             if self.DEBUG:

@@ -163,7 +163,6 @@ class Receiver(object):
                     roic_setup = self.roic_config["roic_setup"][idx]
                 )
             )
-        
             
             
     @sync_track
@@ -203,6 +202,7 @@ class Receiver(object):
     def calculatesOutVoltage(self):
         """Calculates what is the voltage associated with each photocurrent provided for each time step, as rx_voltage."""
         
+        
         # If not bypassing the detector, calculate photocurrent based on it.
         if not Global.bypass_dict["ROIC"]:
             
@@ -211,22 +211,23 @@ class Receiver(object):
             
             # TODO -- DO SOME CALCULATIONS BASED ON ROICS
             
-            # Calculates voltage for all roics in the array
+            # Calculates voltage for all roics in the array (# TODO --- Really need the 'array'?)
             for roic in self.roic_array:
                 
-                # list of lists for all waves (voltage) -- convertsToWaves belongs to ROIC
+                # list of all waves (voltage) -- convertsToWaves belongs to ROIC
                 all_waves = roic.convertsToWaves(self.rx_photocurrent)
                 
                 if roic.getCircuitType() == "BouncingPixel":
                     
-                    # gets the list of voltage signals for the Bouncing Pixel
+                    # gets voltage signals for the Bouncing Pixel
                     self.rx_voltage = roic.calculatesReconstructedVoltage(all_waves)
+                    # plotDebug(self.rx_voltage)
 
                 elif roic.getCircuitType() == "APS":
                     
                     raise ValueError(f"\n\n***Error --> APS not supported yet!\n")
-                    # # gets the list of voltage signals for the APS
-                    # self.rx_voltage = roic.APS_FUNTION(all_waves)
+                    # # gets voltage signals for the APS
+                    # self.rx_voltage = roic.APS_FUNCTION(all_waves)
                     
                 else:
                     raise ValueError(f"\n\n***Error --> circuit_type < {roic.getCircuitType()} > is not supported!\n")
@@ -238,12 +239,14 @@ class Receiver(object):
                 # plotDebug(self.rx_photocurrent[0])
                 # TODO --- CREATE THE ARRAY FOR EACH ROIC ARRAY....
                 # roic_array_photocurrent.append(self.rx_voltage)
-            
-            # raise ValueError(f"\n\n***Error --> Simulation for ROICs not supported yet, at bypass_dict['ROIC'] = <{Global.bypass_dict['ROIC']}>!\n")
         
         else:
             # If bypassing, just pass the rx photocurrent list
             self.rx_voltage = self.rx_photocurrent
+
+        if self.PLOT:
+            printDebug(self.rx_voltage)
+            plotDebug(self.rx_voltage)
 
     # @sync_track
     # def applyFilter(self, filter_order = 20, cuttof = 400e6, filter_type = 'low'):
@@ -290,7 +293,7 @@ class Receiver(object):
             # plotDebug(self.rx_voltage, self.rx_time)
             # Bypass ADC -- sample voltage given input frequency
             self.sampled_wave, self.sampled_wave_time = lib.sampleSignal(self.rx_voltage, self.rx_time, self.sample_freq)
-        
+
         if IM_DD:
             # remove zero
             self.sampled_wave = lib.zeroClip(self.sampled_wave)

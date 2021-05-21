@@ -250,9 +250,8 @@ class Message(object):
                 except Exception as identifier:
                     raise ValueError(f"\n\n***Error --> Could not convert <{local_dict['rx_array']}> to string @ BitstreamToMessage.\n Error message:\n{identifier}\n")
             
-            printDebug(tx_data)
-            printDebug(local_dict["rx_array"])
-            # asd
+            # printDebug(tx_data)
+            # printDebug(local_dict["rx_array"])
 
             output_array = local_dict["rx_array"]
         

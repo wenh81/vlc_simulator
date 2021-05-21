@@ -53,7 +53,7 @@ class ADC(object):
             # plotDebug(self.rx_data_in, symbols='ro-', hold = True)
             self.rx_data_in = np.round(self.rx_data_in/vcm) * vcm + self.vref_minus
             # self.rx_data_in = np.ceil(self.rx_data_in/vcm) * vcm + self.vref_minus
-            printDebug(self.rx_data_in)
+            # printDebug(self.rx_data_in)
             # plotDebug(self.rx_data_in, symbols='bo-')
 
             # # Differential Nonlinearity (DNL) Error

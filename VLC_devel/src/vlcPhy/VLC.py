@@ -79,7 +79,7 @@ class VLC(object):
             # 'seq_idx' selects all correct config for current TX symbol:
             # modulation and mapping types, symbol duration
 
-            printDebug(self.decoded_sequence['seq'][seq_idx])
+            # printDebug(self.decoded_sequence['seq'][seq_idx])
             
             # Start number of packets
             self.sync_obj.appendToMessageDict("packets", 0)
@@ -129,6 +129,8 @@ class VLC(object):
             ###########################################################################
             # >>>>>>>>>> STARTS TRANSMITTER, GIVEN CONFIG
             
+            # plotDebug(self.tx_data_list[0], symbols="ro-", hold = False)
+
             # Transmitter object.
             self.transmitter_obj = Transmitter(
                 transmitter_config = Global.transmitter_config,
@@ -152,6 +154,10 @@ class VLC(object):
             elif self.IM_DD != modulation_config["IM_DD"]:
                 raise ValueError(f"\n\n***Error --> Not allowed to use modulation configs with both IM_DD < {self.IM_DD} > and < {modulation_config['IM_DD']} >. Choose one!\n")
 
+            # Apply normal TX bias to LED if on IM/DD mode
+            if self.IM_DD:
+                offset_value += Global.tx_voltage_bias_add
+            
             try:
                 OFDM_type = next(iter(modulation_config["ofdm_type"].keys()))
                 if OFDM_type == "DCO-OFDM":
@@ -160,10 +166,6 @@ class VLC(object):
             except:
                 pass
             
-            # Apply additional bias to LED if on IM/DD mode
-            if self.IM_DD:
-                offset_value += Global.tx_voltage_bias_add
-
             # Applies DAC:
             # Optional: Offset value will be applied AFTER DAC conversion, in analog domain
             # Optional: If IM_DD, make sure only non-negative values
@@ -172,19 +174,23 @@ class VLC(object):
                 IM_DD = self.IM_DD,
                 time_interval = self.decoded_sequence['seq_duration'][seq_idx]
             )
+
+            # plotDebug(self.transmitter_obj.dac_tx_data_list[0], symbols="ro-", hold = False)
             
             ## TODO ---- MUST APPLY THE RECONSTRUCTION FILTER (if using zero-holder)
             ## TODO ---- Apply filter from circuit or theoretical (h(t))
 
             # # Applies Low-Pass Filter
-            # self.transmitter_obj.applyFilter(
+            # wave_list = self.transmitter_obj.applyFilter(
             #     filter_order = 20,
             #     # cuttof = 400e6,
             #     # cuttof = Global.simul_frequency*(0.3),
             #     cuttof = Global.simul_frequency*(0.49),
-            #     filter_type = 'low'
+            #     filter_type = 'low',
+            #     wave_list = self.transmitter_obj.getDacTxDataList()
             # )
-
+            # self.transmitter_obj.setDacTxDataList(wave_list)
+            
 
             ###########################################################################
             # >>>>>>>>>> CALCULATES OPTICAL POWER, DEPENDING ON THE LIGHTSOURCES
@@ -209,7 +215,7 @@ class VLC(object):
             self.decoded_sequence['tx_wave_list'].append(tx_wave)
             self.decoded_sequence['tx_time_list'].append(tx_time)
             self.decoded_sequence['tx_num_symbols'].append(len(tx_data_list))
-
+            
             # Store end time for tx wave for latter sync attempt at receiver end
             if self.decoded_sequence['seq_end_time'] != []:
                 self.decoded_sequence['seq_end_time'].append(
@@ -239,7 +245,7 @@ class VLC(object):
             offset = offset_value,
             time_step = Global.time_step
         )
-
+        
         # plotDebug(burst_tx_wave, burst_tx_time, symbols='bo-')
         # printDebug()
 
@@ -253,10 +259,9 @@ class VLC(object):
         #     + idx*Global.time_frame \
         #         for idx in range(len(tx_data_list))]
 
-
         tx_data_list = list(burst_tx_wave) ## TODO --- NEEDED?
         
-        # self.PLOT = True
+        
 
         if self.PLOT:
             handle = plt.figure(figsize=(8,2))
@@ -320,7 +325,7 @@ class VLC(object):
         # After channel reponse set, apply it to each lamp. Do with time domain "convolution" or in "frequency domain"
         self.channel_obj.applyChannelResponse(do_convolution = True)
         # self.channel_obj.applyChannelResponse(do_convolution = False)
-
+        
         
         ###########################################################################
         # >>>>>>>>>> GET RX_DATA LIST CONVOLVED BY CHANNEL AFTER ADDING NOISE.
@@ -348,8 +353,7 @@ class VLC(object):
 
         # printDebug(rx_data_list)
         # plotDebug(rx_data_list[0], rx_time)
-
-
+        
         
         ## TODO --- NEW FOR HERE?... CHECK HOW TO DECODE DATA...TRY TO DECODE FIELD BY FIELD?
         # for seq_idx in self.decoded_sequence['seq_idx']:
@@ -374,7 +378,8 @@ class VLC(object):
         # get the rx_data wave for each receiver.
         for rx_data_pd in rx_data_list:
             
-            # # printDebug(rx_data_pd)
+            rx_data_pd = rx_data_pd + Global.background_power
+            # printDebug(rx_data_pd)
             # plotDebug(rx_data_pd, rx_time)
             # plotDebug(rx_data_pd, rx_time, symbols="bo-")
             
@@ -390,8 +395,8 @@ class VLC(object):
             # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx] * 2
             sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx] * self.decoded_sequence['seq_sample_ratio'][seq_idx]
             # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx]
-
-            printDebug(sample_frequency)
+            
+            # printDebug(sample_frequency)
 
 
             ###########################################################################
@@ -412,7 +417,7 @@ class VLC(object):
             
 
             # lib.plotBode(rx_data_list[0], filtered, time_frame, number_samples, cuttof)
-
+            
             
             ###########################################################################
             # >>>>>>>>>> CALCULATES PHOTOCURRENTS, DEPENDING ON THE DETECTORS
@@ -430,7 +435,6 @@ class VLC(object):
             self.receiver_obj.calculatesOutVoltage()
             
             
-
             ################ # Applies ADC:
             ################ # Passes sample frequency used on Modulator (TODO -- CHECK THIS VALUE FOR EACH)
             ################ self.receiver_obj.applyADC(
@@ -477,7 +481,7 @@ class VLC(object):
             self.delay_time = 0
             self.delay_steps = 0
 
-            printDebug(self.decoded_sequence)
+            # printDebug(self.decoded_sequence)
             # From here, we have the full wave, already sampled. Now, need to debug.
             # 'seq_idx' starts with 0. Then increments from here, as long as we progress on the sequence.
             # for seq_idx in range(0, len(self.decoded_sequence['seq_data'])):
@@ -487,13 +491,13 @@ class VLC(object):
                 # Get current sample frequency (times 2) for Nyquist Freq for current sequence
                 # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx] * 2
                 sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx] * self.decoded_sequence['seq_sample_ratio'][seq_idx]
-                # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx]  
+                # sample_frequency = self.decoded_sequence['seq_sample_freq'][seq_idx]
 
                 # Add sample requency at the RX side
                 self.decoded_sequence['seq_rx_sample_freq'].append(sample_frequency)
 
-                printDebug(f'DEBUG -- {seq_idx}')
-                printDebug(sample_frequency)
+                # printDebug(f'DEBUG -- {seq_idx}')
+                # printDebug(sample_frequency)
 
                 ###########################################################################
                 # >>>>>>>>>> APPLY ADC ON RX_DATA, CONVERTING FROM ANALOG TO DIGITAL
@@ -519,6 +523,8 @@ class VLC(object):
                     if OFDM_type == "DCO-OFDM":
                         # Get DCO-OFDM DC value
                         offset_value = modulation_config["ofdm_type"][OFDM_type][0]
+                        ## TODO -- Makes no sense to have offset values here for DCO-OFDM...
+                        offset_value = 0
                 except:
                     pass
 
@@ -527,7 +533,7 @@ class VLC(object):
                     offset_value += Global.rx_voltage_bias_subtract
                     # Get the voltage from receiver, and sets only real value
                     self.receiver_obj.setRxVoltage(self.receiver_obj.getRxVoltage().real)
-
+                
                 
                 # Applies ADC:
                 # Passes sample frequency used on Modulator (TODO -- CHECK THIS VALUE FOR EACH)
@@ -538,7 +544,7 @@ class VLC(object):
                     IM_DD = self.IM_DD
                     # time_interval = self.decoded_sequence['seq_duration'][seq_idx],
                 )
-
+                
                 # Current Sequence ID
                 print(f"**********************************************************************************\n\
 Starting sequence for field < {self.decoded_sequence['seq'][seq_idx].split('.')[0]} > and subfield < {self.decoded_sequence['seq'][seq_idx].split('.')[1]} >\n\
@@ -604,8 +610,6 @@ Starting sequence for field < {self.decoded_sequence['seq'][seq_idx].split('.')[
                     delay_steps = self.delay_steps ## get delay in steps
                 )
                 
-                # printDebug(self.delay_time)
-
                 # Check if current sequence step is for 'sync' or for data.
                 # if self.decoded_sequence['rx_data'][seq_idx] != 'sync':
                 if 'sync' in self.decoded_sequence['rx_data'][seq_idx]:
@@ -627,7 +631,7 @@ Sync data, with found delay of:
                         results.write(pretty_diff)
 
                 elif 'sync' not in self.decoded_sequence['rx_data'][seq_idx]:
-
+                    
                     ###########################################################################
                     # >>>>>>>>>> RETRIEVE RX DATA
                     
@@ -663,9 +667,9 @@ Sync data, with found delay of:
 
                     ###########################################################################
                     # >>>>>>>>>> GET < BER > FOR EACH FRAME
-                    print()
-                    print()
-                    print()
+                    # printDebug()
+                    # printDebug()
+                    # printDebug()
 
                     # printDebug(self.decoded_sequence['seq_data'][seq_idx])
                     # printDebug(self.message_obj.getRxBitstreamFrames())
@@ -783,9 +787,9 @@ Sync data, with found delay of:
         
         if self.DEBUG and False:
             # Prints full simulation path
-            print(self.sync_obj.showSimulationPath())
+            printDebug(self.sync_obj.showSimulationPath())
             self.total_time = timer() - self.start_timer
-            print(f"\nTotal execution time was << {self.total_time} >> seconds.\n")
+            printDebug(f"\nTotal execution time was << {self.total_time} >> seconds.\n")
             
         # ,
         #     self.message_obj.getRxBitstreamFrames()

@@ -82,7 +82,7 @@ def assembleWaveListDifferentIntervals(signal_list, time_interval_list, num_symb
     total_number_of_points = int(total_duration/time_step)
     all_zeros = np.zeros(total_number_of_points)
 
-    printDebug(total_duration)
+    # printDebug(total_duration)
 
     out_wave = all_zeros.copy()*(0+0j)
     
@@ -216,7 +216,7 @@ def plotBode(data, time, freq_ref, data2 = None, time2 = None):
         plt.legend(['data'], fontsize=10)
     # plt.margins(0, 0.1)
     plt.grid(which='both', axis='both')
-    printDebug(freq_ref)
+    # printDebug(freq_ref)
     plt.axvline(freq_ref, color='green') # cutoff frequency
     plt.show()
 
@@ -354,7 +354,7 @@ def removeOutliers(signal, sigma_threshold = 6, default_outlier = 0):
     # find outliers
     outliers = abs(signal) > sigma_threshold*signal_std
 
-    printDebug(outliers)
+    # printDebug(outliers)
 
     # remove the outliers, settinf to default value
     signal[outliers] = default_outlier
@@ -426,7 +426,7 @@ def plotTxRxDataList(data_list, label, handle, sync_obj, show = False):
 
         # concatenated_data += list(new_data)
         # # concatenated_data = concatenated_data + new_data
-        printDebug(Global.number_of_points)
+        # printDebug(Global.number_of_points)
         # printDebug(Global.number_of_points*2)
         # # printDebug(new_data)
         # # plotDebug(new_data)

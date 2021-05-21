@@ -79,25 +79,37 @@ class BouncingPixel(ROIC):
                 
                 raise ValueError(f"\n\n***Error --> Analysis for the waves to get the output voltage from Virtuoso not supported yet!\n")
                 
-                rx_voltage_list = None
-                # return rx_voltage_list = FUNTION(all_waves)
+                rx_voltage = None
+                # return rx_voltage = FUNCTION(all_waves)
             
             elif self.which_simulator == "Tanner":
                 
                 raise ValueError(f"\n\n***Error --> Analysis for the waves to get the output voltage from Tanner not supported yet!\n")
                 
-                # return rx_voltage_list = FUNTION(all_waves)
-                rx_voltage_list = None
+                # return rx_voltage = FUNCTION(all_waves)
+                rx_voltage = None
                 
             else:
                 raise ValueError(f"\n\n***Error --> Simulator < {self.which_simulator} > at Global.which_simulator is not supported!\n")
 
-            return rx_voltage_list
+            # return rx_voltage
         
         else:
+            max_rx = np.max(all_waves)
+            min_rx = np.min(all_waves)
+            vmin = float(self.roic_setup["vmin"])
+            vmax = float(self.roic_setup["vmax"])
+            # vmin = Global.VSS_rx
+            # vmax = Global.VDD_rx
+            # raise ValueError(f"\n\n***Error --> Simulation for ROICs not supported yet, at bypass_dict['ROIC'] = <{Global.bypass_dict['ROIC']}>!\n")
+            rx_voltage = lib.adjustRange(all_waves, \
+                vmax, vmin,\
+                    max_rx, min_rx,\
+                        offset = 0)
             # If circuit simulation is off, then no need for voltage reconstruction
             # since the transconductance gain was directly applied to the input current
-            return all_waves
+            
+        return rx_voltage
                 
     
     @sync_track

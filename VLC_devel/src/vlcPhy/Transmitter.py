@@ -75,18 +75,24 @@ class Transmitter(object):
     
     
     @sync_track
-    def applyFilter(self, filter_order = 20, cuttof = 400e6, filter_type = 'low'):
+    def applyFilter(self, filter_order = 20, cuttof = 400e6, filter_type = 'low', wave_list = []):
         """Apply digital filter. Cutoff in Hz."""        
         
         # sig = tx_data
         
         # lib.butterFilter(tx_data, cuttof=100e6)
         # lib.butterFilter(tx_data, cuttof=1e3, filter_type = 'hp')
+        
+        wave_list = [lib.butterFilter(tx_data, cuttof = cuttof, \
+            filter_order = filter_order, filter_type = filter_type)\
+            for tx_data in wave_list]
+        return wave_list
+        
+        # self.tx_data_list_in = [lib.butterFilter(tx_data, cuttof = cuttof, \
+        #     filter_order = filter_order, filter_type = filter_type)\
+        #     for tx_data in self.tx_data_list_in]
 
         # return [lib.butterFilter(tx_data, cuttof=10e6)\
-        self.tx_data_list_in = [lib.butterFilter(tx_data, cuttof = cuttof, \
-            filter_order = filter_order, filter_type = filter_type)\
-            for tx_data in self.tx_data_list_in]
         # return [lib.butterFilter(tx_data, cuttof = cuttof, \
         #     filter_order = filter_order, filter_type = filter_type)\
         #     for tx_data in self.tx_data_list_in]
@@ -153,8 +159,6 @@ class Transmitter(object):
     @sync_track
     def calculatesOpticalPower(self):
         """Calculates what is the optical power provided for each time step, as tx_optical (given input dac_values)."""
-        
-        
         
         # If not bypassing the light source, calculate optical power based on it.
         if not Global.bypass_dict["LightSource"]:

@@ -165,7 +165,7 @@ class Mapping(object):
         """Given 'mapped_output', returns the closest values for the demapping."""
         
 
-        printDebug(self.mapping_type)
+        # printDebug(self.mapping_type)
         if self.mapping_type != "QA":
             
             self.setupMappingTable()
